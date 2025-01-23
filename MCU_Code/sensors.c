@@ -52,7 +52,7 @@ float readVoltage(uint8_t address){
     return voltage;
 }
 
-uint32_t readCurrent(uint8_t address){
+float readCurrent(uint8_t address){
     uint16_t combinedBuffer;
     float current;
     uint8_t buffer[2];

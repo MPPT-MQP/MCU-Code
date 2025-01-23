@@ -18,7 +18,7 @@ void configI2C0();
 //Power Monitor
 float readVoltage(uint8_t address);
 void printManID(uint8_t address);
-uint32_t readCurrent(uint8_t address);
+float readCurrent(uint8_t address);
 
 //Light Sensor
 
