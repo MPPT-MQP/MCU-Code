@@ -9,15 +9,13 @@ void configI2C0(){
     // I2C Initialisation. Using it at 300Khz.
     i2c_init(I2C_PORT, 300*1000);
     
-    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    gpio_pull_up(I2C_SDA);
-    gpio_pull_up(I2C_SCL);
+    gpio_set_function(I2C0_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(I2C0_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(I2C0_SDA);
+    gpio_pull_up(I2C0_SCL);
     // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
 }
 
-
-uint8_t sample[6];
 
 void printManID(uint8_t address){
     uint8_t buffer[2];
@@ -32,7 +30,7 @@ void printManID(uint8_t address){
 
 
 //Power Monitor
-uint32_t readVoltage(uint8_t address){
+float readVoltage(uint8_t address){
     uint16_t combinedBuffer;
     float voltage;
     uint8_t buffer[2];
@@ -52,4 +50,26 @@ uint32_t readVoltage(uint8_t address){
     printf("\nVoltage: %f", voltage);
     
     return voltage;
+}
+
+uint32_t readCurrent(uint8_t address){
+    uint16_t combinedBuffer;
+    float current;
+    uint8_t buffer[2];
+    uint8_t reg = INA740_current_register;
+    i2c_write_blocking(I2C_PORT, address, &reg, 1, true);
+    i2c_read_blocking(I2C_PORT, address, buffer, 2, false);
+    
+    //combine the two bytes
+    //Combine bytes
+    combinedBuffer = ((uint16_t)buffer[0] << 8) | buffer[1];
+
+    current = (float)combinedBuffer;
+    
+    //scale factor (1.2mA / LSB)
+    current = (current * 1.2) / 1000;
+    
+    printf("\nCurrent: %f", current);
+    
+    return current;
 }
