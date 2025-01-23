@@ -35,13 +35,15 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(MCU_Code MCU_Code.c )
+add_executable(MCU_Code
+     MCU_Code.c
+     sensors.c )
 
 pico_set_program_name(MCU_Code "MCU_Code")
 pico_set_program_version(MCU_Code "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(MCU_Code 0)
+pico_enable_stdio_uart(MCU_Code 1)
 pico_enable_stdio_usb(MCU_Code 0)
 
 # Add the standard library to the build

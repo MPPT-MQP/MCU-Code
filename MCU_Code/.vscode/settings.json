@@ -39,5 +39,6 @@
     "files.associations": {
         "powermonitor.h": "c",
         "stdlib.h": "c"
-    }
+    },
+    "cortex-debug.variableUseNaturalFormat": true
 }
