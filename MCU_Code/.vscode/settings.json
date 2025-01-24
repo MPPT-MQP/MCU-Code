@@ -38,7 +38,9 @@
     "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja",
     "files.associations": {
         "powermonitor.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "ffconf.h": "c",
+        "sd_card.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }

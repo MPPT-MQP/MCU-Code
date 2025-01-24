@@ -6,6 +6,7 @@
 #include "hardware/clocks.h"
 #include "sensors.h"
 #include "sdCard.h"
+#include "sd_card.h"
 
 
 
