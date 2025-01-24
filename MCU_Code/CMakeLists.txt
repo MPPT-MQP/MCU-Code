@@ -37,7 +37,8 @@ pico_sdk_init()
 
 add_executable(MCU_Code
      MCU_Code.c
-     sensors.c )
+     sensors.c
+     hw_config.c )
 
 pico_set_program_name(MCU_Code "MCU_Code")
 pico_set_program_version(MCU_Code "0.1")
@@ -46,9 +47,14 @@ pico_set_program_version(MCU_Code "0.1")
 pico_enable_stdio_uart(MCU_Code 1)
 pico_enable_stdio_usb(MCU_Code 0)
 
+# *************************************Tell CMake where to find other source code SD CARD
+add_subdirectory(lib/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src build)
+
 # Add the standard library to the build
 target_link_libraries(MCU_Code
-        pico_stdlib)
+        pico_stdlib
+        no-OS-FatFS-SD-SDIO-SPI-RPi-Pico)
+        #^ Tell CMake to include lib
 
 # Add the standard include files to the build
 target_include_directories(MCU_Code PRIVATE
