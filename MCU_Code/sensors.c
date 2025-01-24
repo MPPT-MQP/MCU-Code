@@ -1,4 +1,4 @@
-#include <sensors.h>
+#include "sensors.h"
 #include "hardware/i2c.h"
 #include <stdio.h>
 #include "pico/stdlib.h"
