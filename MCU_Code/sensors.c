@@ -30,7 +30,7 @@ void printManID(uint8_t address){
 
 
 //Power Monitor
-float readVoltage(uint8_t address){
+float readVoltage(uint8_t addres){
     uint16_t combinedBuffer;
     float voltage;
     uint8_t buffer[2];
