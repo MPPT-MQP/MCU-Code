@@ -35,11 +35,14 @@ int main()
     sd_init_driver();
 
     while (true) {
-        printManID(0x41);
+        printManID(0x40);
         printf("\n\nTEST");
 
 
-        readVoltage(0x41);
+        readVoltage(0x40);
+        
+        printf("\n\n READ CURRENT");
+        readCurrent(0x40);
         sleep_ms(1000);
     }
 }
