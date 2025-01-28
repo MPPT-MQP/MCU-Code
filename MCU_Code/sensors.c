@@ -7,7 +7,7 @@
 //I2C Configuration
 void configI2C0(){
     // I2C Initialisation. Using it at 300Khz.
-    i2c_init(I2C_PORT, 300*1000);
+    i2c_init(I2C0_PORT, 300*1000);
     
     gpio_set_function(I2C0_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C0_SCL, GPIO_FUNC_I2C);
@@ -16,13 +16,14 @@ void configI2C0(){
     // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
 }
 
+/*Power Monitor Functions*/
 
 void printManID(uint8_t address){
     uint8_t buffer[2];
     uint8_t reg = INA740_manufacturer_id_register;
     // uint8_t reg[1] = {INA740_config_register};
-    i2c_write_blocking(I2C_PORT, address, &reg, 1, true);
-    i2c_read_blocking(I2C_PORT, address, buffer, 2, false);
+    i2c_write_blocking(I2C0_PORT, address, &reg, 1, true);
+    i2c_read_blocking(I2C0_PORT, address, buffer, 2, false);
     char text[2] = {buffer[0], buffer[1]};
     printf("\nSTATUS: %s", text);
 }
@@ -35,8 +36,8 @@ float readVoltage(uint8_t address){
     float voltage;
     uint8_t buffer[2];
     uint8_t reg = INA740_vbus_register;
-    i2c_write_blocking(I2C_PORT, address, &reg, 1, true);
-    i2c_read_blocking(I2C_PORT, address, buffer, 2, false);
+    i2c_write_blocking(I2C0_PORT, address, &reg, 1, true);
+    i2c_read_blocking(I2C0_PORT, address, buffer, 2, false);
     
     //combine the two bytes
     //Combine bytes
@@ -57,8 +58,8 @@ float readCurrent(uint8_t address){
     float current;
     uint8_t buffer[2];
     uint8_t reg = INA740_current_register;
-    i2c_write_blocking(I2C_PORT, address, &reg, 1, true);
-    i2c_read_blocking(I2C_PORT, address, buffer, 2, false);
+    i2c_write_blocking(I2C0_PORT, address, &reg, 1, true);
+    i2c_read_blocking(I2C0_PORT, address, buffer, 2, false);
     
     //combine the two bytes
     //Combine bytes
@@ -73,3 +74,5 @@ float readCurrent(uint8_t address){
     
     return current;
 }
+
+/*End Power Monitor Functions*/
