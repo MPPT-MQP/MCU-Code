@@ -29,6 +29,9 @@ int main()
     printf("USB Clock Frequency is %d Hz\n", clock_get_hz(clk_usb));
     // For more examples of clocks use see https://github.com/raspberrypi/pico-examples/tree/master/clocks
     
+
+    /*Start of non example code*/
+    
     configI2C0();
 
     //init sd card setup (hw_config sets the SPI pins)
