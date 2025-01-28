@@ -40,7 +40,11 @@
         "powermonitor.h": "c",
         "stdlib.h": "c",
         "ffconf.h": "c",
-        "sd_card.h": "c"
+        "sd_card.h": "c",
+        "ctype.h": "c",
+        "cstdint": "c",
+        "oled_screen.h": "c",
+        "binary_info.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }
