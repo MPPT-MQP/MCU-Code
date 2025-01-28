@@ -1,5 +1,6 @@
 //Function Declarations for Sensors
-#include <powerMonitor.h>
+#include "PowerMonitor.h"
+#include "LightSensor.h"
 #include <stdint.h>
 // I2C defines
 // This example will use I2C0 on GPIO8 (SDA) and GPIO9 (SCL) running at 400KHz.
@@ -25,8 +26,3 @@ float readCurrent(uint8_t address);
 
 //Temp Sensor
 //new
-
-//OLED Screen??
-
-
-//SD Card??
