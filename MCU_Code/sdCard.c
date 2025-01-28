@@ -35,7 +35,7 @@ void writeSD(){
     }
 }
 
-void 
+ 
 /**Copied from test sd card file
  * // Open a file and write to it
     FIL fil;

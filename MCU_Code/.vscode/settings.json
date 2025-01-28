@@ -44,7 +44,9 @@
         "ctype.h": "c",
         "cstdint": "c",
         "oled_screen.h": "c",
-        "binary_info.h": "c"
+        "binary_info.h": "c",
+        "adc.h": "c",
+        "sdcard.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }

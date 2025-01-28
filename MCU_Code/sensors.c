@@ -4,6 +4,13 @@
 #include "pico/stdlib.h"
 
 
+//Sensor Globals
+
+// 12-bit conversion, assume max value == ADC_VREF == 3.3 V
+const float conversion_factor = 3.3f / (1 << 12);
+
+
+
 //I2C Configuration
 void configI2C0(){
     // I2C Initialisation. Using it at 300Khz.
@@ -76,3 +83,38 @@ float readCurrent(uint8_t address){
 }
 
 /*End Power Monitor Functions*/
+
+/*Temperature ADC Reading and Conversion*/
+
+void ADC_setup(){
+    adc_init(); 
+
+    // Make sure GPIO is high-impedance, no pullups etc
+    adc_gpio_init(TEMP_PIN);
+}
+
+uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay){
+
+    // Select ADC input 0 (GPIO26)
+    adc_select_input(0);
+
+    uint32_t sum = 0; // Variable to store the sum of ADC readings
+
+    // Take multiple ADC readings and sum them
+    for (int i = 0; i < num_samples; i++) {
+        sum += adc_read();
+        sleep_ms(sampleDelay); // Small delay between samples
+    }
+
+    // Calculate the average result
+    uint16_t avg_result = sum / num_samples;
+
+    // Calculate voltage and temperature using the averaged result
+    float voltage = avg_result * conversion_factor;
+    float temperature = (voltage - tmp_offset) / tmp_scaling;
+
+    // // Print the averaged values
+    // printf("Average Raw value: 0x%03x, voltage: %f V, temperature: %f °C\n", avg_result, voltage, temperature);
+
+    return temperature;
+}

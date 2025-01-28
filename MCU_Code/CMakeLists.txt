@@ -69,6 +69,7 @@ target_link_libraries(MCU_Code
         hardware_i2c
         hardware_timer
         hardware_clocks
+        hardware_adc
         )
 
 pico_add_extra_outputs(MCU_Code)
