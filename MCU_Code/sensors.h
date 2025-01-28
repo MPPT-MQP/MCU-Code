@@ -19,6 +19,7 @@
 #define tmp_scaling 0.01
 #define TMP_NUM_SAMPLES 20 // Number of samples to average
 #define TEMP_PIN 26
+#define TEMP_SAMPLE_DELAY 0 //sleep delay between adc reads in ms
 
 
 //Sensor Config I2C
@@ -27,13 +28,13 @@ void configI2C0();
 
 
 //Power Monitor
-float readVoltage(uint8_t address);
-void printManID(uint8_t address);
-float readCurrent(uint8_t address);
+float PM_readVoltage(uint8_t address);
+void PM_printManID(uint8_t address);
+float PM_readCurrent(uint8_t address);
 
 //Light Sensor
 //TESTING A BRANCH
 
 //Temp Sensor
-void ADC_setup();
+void TMP_ADC_setup();
 uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay);

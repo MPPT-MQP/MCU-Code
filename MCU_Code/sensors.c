@@ -25,7 +25,7 @@ void configI2C0(){
 
 /*Power Monitor Functions*/
 
-void printManID(uint8_t address){
+void PM_printManID(uint8_t address){
     uint8_t buffer[2];
     uint8_t reg = INA740_manufacturer_id_register;
     // uint8_t reg[1] = {INA740_config_register};
@@ -38,7 +38,7 @@ void printManID(uint8_t address){
 
 
 //Power Monitor
-float readVoltage(uint8_t address){
+float PM_readVoltage(uint8_t address){
     uint16_t combinedBuffer;
     float voltage;
     uint8_t buffer[2];
@@ -60,7 +60,7 @@ float readVoltage(uint8_t address){
     return voltage;
 }
 
-float readCurrent(uint8_t address){
+float PM_readCurrent(uint8_t address){
     uint16_t combinedBuffer;
     float current;
     uint8_t buffer[2];
@@ -86,7 +86,7 @@ float readCurrent(uint8_t address){
 
 /*Temperature ADC Reading and Conversion*/
 
-void ADC_setup(){
+void TMP_ADC_setup(){
     adc_init(); 
 
     // Make sure GPIO is high-impedance, no pullups etc

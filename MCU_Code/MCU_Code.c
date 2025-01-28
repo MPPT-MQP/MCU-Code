@@ -31,21 +31,24 @@ int main()
     
 
     /*Start of non example code*/
-    
+    //Power Monitor I2C
     configI2C0();
 
-    //init sd card setup (hw_config sets the SPI pins)
+    //Temp Sensor ADC
+    TPM_ADC_setup();
+
+    //init sd card setup (hw_config.c sets the SPI pins)
     sd_init_driver();
 
     while (true) {
-        printManID(0x40);
+        PM_printManID(0x40);
         printf("\n\nTEST");
 
 
-        readVoltage(0x40);
+        PM_readVoltage(0x40);
         
         printf("\n\n READ CURRENT");
-        readCurrent(0x40);
+        PM_readCurrent(0x40);
         sleep_ms(1000);
     }
 }
