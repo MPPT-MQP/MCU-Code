@@ -33,21 +33,6 @@
 */
 
 
-
-#define LIGHT_I2C i2c1
-#define LIGHT_SDA 6
-#define LIGHT_SCL 7
-
-#define TSL2561_ADDRESS 0x39
-#define TSL2561_CONTROL 0x00
-#define TSL2561_TIMING 0x01
-#define TSL2561_CHAN0_LOW 0xAC
-#define TSL2561_CHAN1_LOW 0x0E
-
-#define tmp_offset 0.5
-#define tmp_scaling 0.01
-#define NUM_SAMPLES 20 // Number of samples to average
-
 struct render_area {
     uint8_t start_col;
     uint8_t end_col;
