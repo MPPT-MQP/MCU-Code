@@ -8,6 +8,7 @@
 #include "sdCard.h"
 #include "sd_card.h"
 #include "buttons.h"
+#include "oled_screen.h"
 
 
 
@@ -44,6 +45,9 @@ int main()
     //Setup Buttons
     buttonsInit();
 
+    // Initialize OLED Screen
+    oled_init();
+
     while (true) {
         PM_printManID(0x40);
         printf("\n\nTEST");
@@ -54,5 +58,10 @@ int main()
         
         printf("\nCurrent: %f", PM_readCurrent(0x40));
         sleep_ms(1000);
+
+        // OLED Test
+        // Screen 1
+        char *screen1[] = {"TEMPERATURE:", "00.00", "IRRADIANCE", "00.00"};
+        print_text(screen1, count_of(screen1), 20);
     }
 }

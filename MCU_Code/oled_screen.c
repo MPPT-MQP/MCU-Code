@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 #include "oled_screen.h"
+#include "sensors.h"
 
 
 /* Example code to talk to an SSD1306-based OLED display
@@ -59,7 +60,7 @@ void SSD1306_send_cmd(uint8_t cmd) {
     // this "data" can be a command or data to follow up a command
     // Co = 1, D/C = 0 => the driver expects a command
     uint8_t buf[2] = {0x80, cmd};
-    i2c_write_blocking(i2c_default, SSD1306_I2C_ADDR, buf, 2, false);
+    i2c_write_blocking(I2C1_PORT, SSD1306_I2C_ADDR, buf, 2, false);
 }
 
 void SSD1306_send_cmd_list(uint8_t *buf, int num) {
@@ -80,7 +81,7 @@ void SSD1306_send_buf(uint8_t buf[], int buflen) {
     temp_buf[0] = 0x40;
     memcpy(temp_buf+1, buf, buflen);
 
-    i2c_write_blocking(i2c_default, SSD1306_I2C_ADDR, temp_buf, buflen + 1, false);
+    i2c_write_blocking(I2C1_PORT, SSD1306_I2C_ADDR, temp_buf, buflen + 1, false);
 
     free(temp_buf);
 }
@@ -271,12 +272,6 @@ static void WriteString(uint8_t *buf, int16_t x, int16_t y, char *str) {
 void oled_init() {
     // I2C is "open drain", pull ups to keep signal high when no data is being
     // sent
-    i2c_init(i2c_default, SSD1306_I2C_CLK * 1000);
-    gpio_set_function(PICO_DEFAULT_I2C_SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(PICO_DEFAULT_I2C_SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(PICO_DEFAULT_I2C_SDA_PIN);
-    gpio_pull_up(PICO_DEFAULT_I2C_SCL_PIN);
-
     // run through the complete initialization process
     SSD1306_init();
 
@@ -288,10 +283,10 @@ void oled_init() {
     sleep_ms(1000);
 }
 
-void print_text(char** text, int text_length) {
+void print_text(char** text, int text_length, int x_distance) {
    int y = 0;
    for (uint i = 0; i < text_length; i++) {
-        WriteString(buf, 6, y, text[i]);
+        WriteString(buf, x_distance, y, text[i]);
         y+=8;
     }
     render(buf, &frame_area);
