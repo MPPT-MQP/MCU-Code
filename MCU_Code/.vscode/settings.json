@@ -46,7 +46,8 @@
         "oled_screen.h": "c",
         "binary_info.h": "c",
         "adc.h": "c",
-        "sdcard.h": "c"
+        "sdcard.h": "c",
+        "string.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }

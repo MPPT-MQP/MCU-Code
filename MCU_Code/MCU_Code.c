@@ -36,7 +36,7 @@ int main()
     configI2C();
 
     //Temp Sensor ADC Setup
-    TPM_ADC_setup();
+    TMP_ADC_setup();
 
     //Init SD Card Setup (hw_config.c sets the SPI pins)
     sd_init_driver();

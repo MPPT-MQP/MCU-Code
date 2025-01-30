@@ -1,7 +1,13 @@
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include "pico/stdlib.h"
+#include "hardware/i2c.h"
 #include "oled_font.h"
 
-#define i2c_default 4
+
 /*DEFINE OLED I2C HERE*/
+#define OLED_I2C i2c1
 
 // Define the size of the display we have attached. This can vary, make sure you
 // have the right size defined or the output will look rather odd!

@@ -3,6 +3,9 @@
 #include "LightSensor.h"
 #include <stdint.h>
 #include "hardware/adc.h"
+#include "hardware/i2c.h"
+#include <stdio.h>
+#include "pico/stdlib.h"
 
 // I2C0 defines (GP Numbers, not pico pins) (Power monitors only)
 #define I2C0_PORT i2c0
