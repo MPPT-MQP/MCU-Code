@@ -32,14 +32,17 @@ int main()
     
 
     /*Start of non example code*/
-    //Power Monitor I2C
-    configI2C0();
+    //Init both I2C0 and I2C1
+    configI2C();
 
-    //Temp Sensor ADC
+    //Temp Sensor ADC Setup
     TPM_ADC_setup();
 
-    //init sd card setup (hw_config.c sets the SPI pins)
+    //Init SD Card Setup (hw_config.c sets the SPI pins)
     sd_init_driver();
+
+    //Setup Buttons
+    buttonsInit();
 
     while (true) {
         PM_printManID(0x40);

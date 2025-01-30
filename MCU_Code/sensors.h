@@ -3,16 +3,16 @@
 #include "LightSensor.h"
 #include <stdint.h>
 #include "hardware/adc.h"
-// I2C defines
-// This example will use I2C0 on GPIO8 (SDA) and GPIO9 (SCL) running at 400KHz.
-// Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
-#define I2C0_PORT i2c0
-#define I2C0_SDA 4
-#define I2C0_SCL 5
 
+// I2C0 defines (GP Numbers, not pico pins) (Power monitors only)
+#define I2C0_PORT i2c0
+#define I2C0_SDA 20
+#define I2C0_SCL 21
+
+// I2C1 defines (OLED screen, light sensor, pyranometer)
 #define I2C1_PORT i2c1
-#define I2C1_SDA 
-#define I2C1_SCL 
+#define I2C1_SDA 10
+#define I2C1_SCL 11
 
 //TEMP Defines
 #define tmp_offset 0.5
@@ -22,9 +22,8 @@
 #define TEMP_SAMPLE_DELAY 0 //sleep delay between adc reads in ms
 
 
-//Sensor Config I2C
-void configI2C0();
-
+//Sensor Config I2C both channels
+void configI2C();
 
 
 //Power Monitor
@@ -33,7 +32,9 @@ void PM_printManID(uint8_t address);
 float PM_readCurrent(uint8_t address);
 
 //Light Sensor
-//TESTING A BRANCH
+
+
+//Pyranometer
 
 //Temp Sensor
 void TMP_ADC_setup();

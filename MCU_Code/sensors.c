@@ -12,8 +12,8 @@ const float conversion_factor = 3.3f / (1 << 12);
 
 
 //I2C Configuration
-void configI2C0(){
-    // I2C Initialisation. Using it at 300Khz.
+void configI2C(){
+    // I2C0 Initialisation. Using it at 300Khz.
     i2c_init(I2C0_PORT, 300*1000);
     
     gpio_set_function(I2C0_SDA, GPIO_FUNC_I2C);
@@ -21,6 +21,14 @@ void configI2C0(){
     gpio_pull_up(I2C0_SDA);
     gpio_pull_up(I2C0_SCL);
     // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
+
+    // I2C1 Initialisation. Using it at 300Khz.
+    i2c_init(I2C1_PORT, 300*1000);
+    
+    gpio_set_function(I2C1_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(I2C1_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(I2C1_SDA);
+    gpio_pull_up(I2C1_SCL);
 }
 
 /*Power Monitor Functions*/
@@ -118,3 +126,13 @@ uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay){
 
     return temperature;
 }
+
+/*End Temperature ADC Functions*/
+
+/*Pyranometer Functions*/
+
+/*End Pyranometer Functions*/
+
+/*Light Sensor Functions*/
+
+/*End Light Sensor Functions*/
