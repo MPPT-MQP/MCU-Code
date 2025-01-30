@@ -145,3 +145,22 @@ uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay){
 /*Light Sensor Functions*/
 
 /*End Light Sensor Functions*/
+
+/* PWM Init Function*/
+
+// PWM Usage Function
+// pwm_set_chan_level(slice_num, PWM_CHAN_A, duty_cycle);
+// where duty cycle is out of 3125
+
+void pico_pwm_init(){
+    gpio_set_function(PWM_PIN, GPIO_FUNC_PWM);
+
+    uint slice_num = pwm_gpio_to_slice_num(PWM_PIN);
+
+    // Set frequency to 40kHz
+    pwm_set_wrap(slice_num, 3125);
+
+    pwm_set_enabled(slice_num, true);
+}
+
+/* End PWM Init Function*/

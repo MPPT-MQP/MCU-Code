@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "hardware/adc.h"
 #include "hardware/i2c.h"
+#include "hardware/pwm.h"
 #include <stdio.h>
 #include "pico/stdlib.h"
 
@@ -42,3 +43,7 @@ float PM_readCurrent(uint8_t address);
 //Temp Sensor
 void TMP_ADC_setup();
 uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay);
+
+// PWM Generator
+#define PWM_PIN 28
+void pico_pwm_init();

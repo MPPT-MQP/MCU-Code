@@ -71,6 +71,7 @@ target_link_libraries(MCU_Code
         hardware_timer
         hardware_clocks
         hardware_adc
+        hardware_pwm
         )
 
 pico_add_extra_outputs(MCU_Code)
