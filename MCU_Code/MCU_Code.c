@@ -7,6 +7,7 @@
 #include "sensors.h"
 #include "sdCard.h"
 #include "sd_card.h"
+#include "buttons.h"
 
 
 
@@ -29,17 +30,29 @@ int main()
     printf("USB Clock Frequency is %d Hz\n", clock_get_hz(clk_usb));
     // For more examples of clocks use see https://github.com/raspberrypi/pico-examples/tree/master/clocks
     
-    configI2C0();
 
-    //init sd card setup (hw_config sets the SPI pins)
+    /*Start of non example code*/
+    //Init both I2C0 and I2C1
+    configI2C();
+
+    //Temp Sensor ADC Setup
+    TMP_ADC_setup();
+
+    //Init SD Card Setup (hw_config.c sets the SPI pins)
     sd_init_driver();
 
+    //Setup Buttons
+    buttonsInit();
+
     while (true) {
-        printManID(0x41);
+        PM_printManID(0x40);
         printf("\n\nTEST");
 
 
-        readVoltage(0x41);
+        printf("\nVoltage: %f", PM_readVoltage(0x40));
+        
+        
+        printf("\nCurrent: %f", PM_readCurrent(0x40));
         sleep_ms(1000);
     }
 }
