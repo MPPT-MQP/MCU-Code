@@ -57,3 +57,7 @@
 
 #define SSD1306_WRITE_MODE         _u(0xFE)
 #define SSD1306_READ_MODE          _u(0xFF)
+
+// Screen Functions
+void oled_init();
+void print_text(char** text, int text_length);
