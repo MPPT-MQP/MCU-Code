@@ -1,6 +1,6 @@
 #include "buttons.h"
 
-
+/// @brief Initialize buttons 1-4 using defined pins
 void buttonsInit(){
     
     //These might work, not sure
@@ -35,7 +35,9 @@ void buttonsInit(){
 
 
 
-//Button Interrupt
+/// @brief Button interrupt ISR
+/// @param gpio gpio number that caused the interrupt passed from the pico irq
+/// @param event_mask event that caused the interrupt passed from the pico irq
 void buttonISR(uint gpio, uint32_t event_mask){
     //Flag is cleared by the PicoSDK automatically
 

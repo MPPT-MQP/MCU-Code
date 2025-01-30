@@ -9,7 +9,7 @@ const float conversion_factor = 3.3f / (1 << 12);
 
 
 
-//I2C Configuration
+/// @brief Configure I2C0 and I2C1 at specified ports, pins, and speeds
 void configI2C(){
     // I2C0 Initialisation. Using it at 300Khz.
     i2c_init(I2C0_PORT, 300*1000);
@@ -31,6 +31,8 @@ void configI2C(){
 
 /*Power Monitor Functions*/
 
+/// @brief Print TI by reading the status register of the power monitor
+/// @param address I2C address of the power monitor
 void PM_printManID(uint8_t address){
     uint8_t buffer[2];
     uint8_t reg = INA740_manufacturer_id_register;
@@ -43,7 +45,9 @@ void PM_printManID(uint8_t address){
 
 
 
-//Power Monitor
+/// @brief Read the power monitor voltage
+/// @param address I2C address of the power monitor
+/// @return voltage read by monitor
 float PM_readVoltage(uint8_t address){
     uint16_t combinedBuffer;
     float voltage;
@@ -61,11 +65,14 @@ float PM_readVoltage(uint8_t address){
     //scale factor
     voltage = (voltage * 3.125) / 1000;
     
-    printf("\nVoltage: %f", voltage);
+    // printf("\nVoltage: %f", voltage);
     
     return voltage;
 }
 
+/// @brief Read power monitor current
+/// @param address I2C address of the power monitor
+/// @return current read by monitor
 float PM_readCurrent(uint8_t address){
     uint16_t combinedBuffer;
     float current;
@@ -83,7 +90,7 @@ float PM_readCurrent(uint8_t address){
     //scale factor (1.2mA / LSB)
     current = (current * 1.2) / 1000;
     
-    printf("\nCurrent: %f", current);
+    // printf("\nCurrent: %f", current);
     
     return current;
 }
@@ -99,6 +106,10 @@ void TMP_ADC_setup(){
     adc_gpio_init(TEMP_PIN);
 }
 
+/// @brief Read the temperature of the TMP36
+/// @param num_samples number of samples to read from the ADC
+/// @param sampleDelay delay in ms between samples
+/// @return average temperature value in celcius
 uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay){
 
     // Select ADC input 0 (GPIO26)

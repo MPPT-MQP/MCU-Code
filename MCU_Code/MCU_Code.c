@@ -49,10 +49,10 @@ int main()
         printf("\n\nTEST");
 
 
-        PM_readVoltage(0x40);
+        printf("\nVoltage: %f", PM_readVoltage(0x40));
         
-        printf("\n\n READ CURRENT");
-        PM_readCurrent(0x40);
+        
+        printf("\nCurrent: %f", PM_readCurrent(0x40));
         sleep_ms(1000);
     }
 }
