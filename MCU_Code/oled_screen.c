@@ -283,10 +283,10 @@ void oled_init() {
     sleep_ms(1000);
 }
 
-void print_text(char** text, int text_length, int x_distance) {
+void print_text(char** text, int text_length, int* x_distances) {
    int y = 0;
    for (uint i = 0; i < text_length; i++) {
-        WriteString(buf, x_distance, y, text[i]);
+        WriteString(buf, x_distances[i], y, text[i]);
         y+=8;
     }
     render(buf, &frame_area);

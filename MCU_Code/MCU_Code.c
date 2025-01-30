@@ -62,6 +62,7 @@ int main()
         // OLED Test
         // Screen 1
         char *screen1[] = {"TEMPERATURE:", "00.00", "IRRADIANCE", "00.00"};
-        print_text(screen1, count_of(screen1), 20);
+        int x_distances[] = {20, 40, 20, 40};
+        print_text(screen1, count_of(screen1), x_distances);
     }
 }
