@@ -3,6 +3,7 @@
 
 int screen_num = 0;
 
+/* Start Debounce Code*/
 #define DEBOUNCE_MS 50
 bool is_debounceing = false;
 
@@ -20,6 +21,7 @@ bool debounce() {
     }
     return true;
 }
+/* End Debounce Code */
 
 void buttonsInit(void) {
     // initialize buttons
@@ -46,20 +48,19 @@ void buttonsInit(void) {
 
 void buttonCallback(uint gpio, uint32_t events) {
     if(debounce()) return;
-    screen_num++;
-    // switch(gpio) {
-    //     case 6:
-            
-    //     break;
+    switch(gpio) {
+        case 6:
+            screen_num++;
+        break;
         
-    //     case 7:
-    //     break;
+        case 7:
+        break;
 
-    //     case 8:
-    //     break;
+        case 8:
+        break;
         
-    //     case 9:
-    //     break;
-    // }
+        case 9:
+        break;
+    }
     
 }

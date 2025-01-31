@@ -40,8 +40,6 @@ int main()
     // Initialize OLED Screen
     oled_init();
 
-    uint button = 0;
-
     while (true) {
         PM_printManID(0x40);
         printf("\n\nTEST");
@@ -69,6 +67,5 @@ int main()
                 print_text(screen3, count_of(screen3), x_distances3);
             break;
         }
-       //sleep_ms(1000);
     }
 }
