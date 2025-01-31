@@ -1,66 +1,65 @@
 #include "buttons.h"
+#include "oled_screen.h"
 
-/// @brief Initialize buttons 1-4 using defined pins
-void buttonsInit(){
-    
-    //These might work, not sure
-    gpio_init_mask(0xF);
-    gpio_set_dir_in_masked(0xF);
-    //0xF sets gpio numbers 6,7,8,9 mask to 1 i think?
-    
-    // gpio_init(BUTTONPIN_1);
-    // gpio_set_dir(BUTTONPIN_1, GPIO_IN);
-    gpio_pull_up(BUTTONPIN_1);
+int screen_num = 0;
 
-    // gpio_init(BUTTONPIN_2);
-    // gpio_set_dir(BUTTONPIN_2, GPIO_IN);
-    gpio_pull_up(BUTTONPIN_2);
+#define DEBOUNCE_MS 50
+bool is_debounceing = false;
 
-    // gpio_init(BUTTONPIN_3);
-    // gpio_set_dir(BUTTONPIN_3, GPIO_IN);
-    gpio_pull_up(BUTTONPIN_3);
-
-    // gpio_init(BUTTONPIN_4);
-    // gpio_set_dir(BUTTONPIN_4, GPIO_IN);
-    gpio_pull_up(BUTTONPIN_4);
-
-    #ifdef BUTTON_INTERRUPTS
-    //Set up button interrupts (all share the same ISR fcn: buttonISR)
-    gpio_set_irq_enabled_with_callback(BUTTONPIN_1, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS, buttonISR);
-    gpio_set_irq_enabled(BUTTONPIN_2, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
-    gpio_set_irq_enabled(BUTTONPIN_3, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
-    gpio_set_irq_enabled(BUTTONPIN_4, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
-    #endif
+int64_t debounce_alarm_callback(alarm_id_t id, void *user_data) {
+    is_debounceing = false;
+    return 0;
 }
 
-
-
-/// @brief Button interrupt ISR
-/// @param gpio gpio number that caused the interrupt passed from the pico irq
-/// @param event_mask event that caused the interrupt passed from the pico irq
-void buttonISR(uint gpio, uint32_t event_mask){
-    //Flag is cleared by the PicoSDK automatically
-
-    //Find which button was pressed
-    switch (gpio)
-    {
-    case BUTTONPIN_1:
-        printf("\nButton 1 pressed\n");
-        break;
-    
-    case BUTTONPIN_2:
-        printf("\nButton 2 pressed\n");
-        break;
-    
-    case BUTTONPIN_3:
-        printf("\nButton 3 pressed\n");
-        break;
-
-    case BUTTONPIN_4:
-        printf("\nButton 4 pressed\n");
-        break;
+// Method to debounce switch input
+bool debounce() {
+    if (!is_debounceing) {
+        add_alarm_in_ms(DEBOUNCE_MS, &debounce_alarm_callback, NULL, false);
+        is_debounceing = true;
+        return false;
     }
-
+    return true;
 }
 
+void buttonsInit(void) {
+    // initialize buttons
+    gpio_init(BUTTON1PIN);
+    gpio_init(BUTTON2PIN);
+    gpio_init(BUTTON3PIN);
+    gpio_init(BUTTON4PIN);
+    // configure buttons as inputs
+    gpio_set_dir(BUTTON1PIN, GPIO_IN);
+    gpio_set_dir(BUTTON2PIN, GPIO_IN);
+    gpio_set_dir(BUTTON3PIN, GPIO_IN);
+    gpio_set_dir(BUTTON4PIN, GPIO_IN);
+    // configure pull-up resistors
+    gpio_pull_up(BUTTON1PIN);
+    gpio_pull_up(BUTTON2PIN);
+    gpio_pull_up(BUTTON3PIN);
+    gpio_pull_up(BUTTON4PIN);
+    // enable interrupts with falling edge -> 0x04
+    gpio_set_irq_enabled_with_callback(BUTTON1PIN, GPIO_IRQ_EDGE_RISE, true, &buttonCallback);
+    gpio_set_irq_enabled_with_callback(BUTTON2PIN, GPIO_IRQ_EDGE_RISE, true, &buttonCallback);
+    gpio_set_irq_enabled_with_callback(BUTTON3PIN, GPIO_IRQ_EDGE_RISE, true, &buttonCallback);
+    gpio_set_irq_enabled_with_callback(BUTTON4PIN, GPIO_IRQ_EDGE_RISE, true, &buttonCallback);
+}
 
+void buttonCallback(uint gpio, uint32_t events) {
+    if(debounce()) return;
+    screen_num++;
+    // switch(gpio) {
+    //     case 6:
+            
+    //     break;
+        
+    //     case 7:
+    //     break;
+
+    //     case 8:
+    //     break;
+        
+    //     case 9:
+    //     break;
+    // }
+    
+}

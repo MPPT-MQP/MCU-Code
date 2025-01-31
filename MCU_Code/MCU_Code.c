@@ -11,17 +11,9 @@
 #include "oled_screen.h"
 
 
-
-int64_t alarm_callback(alarm_id_t id, void *user_data) {
-    // Put your timeout handler code in here
-    return 0;
-}
-
-
 int main()
 {
     stdio_init_all();
-
 
     // // Timer example code - This example fires off the callback after 2000ms
     // add_alarm_in_ms(2000, alarm_callback, NULL, false);
@@ -48,21 +40,35 @@ int main()
     // Initialize OLED Screen
     oled_init();
 
+    uint button = 0;
+
     while (true) {
         PM_printManID(0x40);
         printf("\n\nTEST");
-
-
         printf("\nVoltage: %f", PM_readVoltage(0x40));
-        
-        
         printf("\nCurrent: %f", PM_readCurrent(0x40));
-        sleep_ms(1000);
+    
+        clear_display();
 
-        // OLED Test
-        // Screen 1
-        char *screen1[] = {"TEMPERATURE:", "00.00", "IRRADIANCE", "00.00"};
-        int x_distances[] = {20, 40, 20, 40};
-        print_text(screen1, count_of(screen1), x_distances);
+        switch(screen_num % 3) {
+            case 0:
+                char *screen1[] = {"TEMPERATURE:", "00.00", "IRRADIANCE", "00.00"};
+                int x_distances1[] = {20, 40, 20, 40};
+                print_text(screen1, count_of(screen1), x_distances1);
+            break;
+
+            case 1:
+                char *screen2[] = {"POWER MONITOR 1", "00.00 V 00.00 A", "POWER MONITOR 2", "00.00 V, 00.00 A"};
+                int x_distances2[] = {1, 1, 1, 1};
+                print_text(screen2, count_of(screen2), x_distances2);
+            break;
+
+            case 2:
+                char *screen3[] = {"POWER MONITOR 3", "00.00 V 00.00 A", "BATTERY SOC", "00.00"};
+                int x_distances3[] = {1, 1, 20, 40};
+                print_text(screen3, count_of(screen3), x_distances3);
+            break;
+        }
+       //sleep_ms(1000);
     }
 }

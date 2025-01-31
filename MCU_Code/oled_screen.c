@@ -283,6 +283,10 @@ void oled_init() {
     sleep_ms(1000);
 }
 
+void clear_display(){
+    memset(buf, 0, SSD1306_BUF_LEN);
+}
+
 void print_text(char** text, int text_length, int* x_distances) {
    int y = 0;
    for (uint i = 0; i < text_length; i++) {

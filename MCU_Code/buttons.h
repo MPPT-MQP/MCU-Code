@@ -2,14 +2,18 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
-#define BUTTONPIN_1 6
-#define BUTTONPIN_2 7
-#define BUTTONPIN_3 8
-#define BUTTONPIN_4 9
+#define BUTTON1PIN 6
+#define BUTTON2PIN 7
+#define BUTTON3PIN 8
+#define BUTTON4PIN 9
+#define BUTTONDELAYTIME 10 // delay for push button in ms
+#define BUTTONFIFOSIZE 10 // can store up to 10 button presses
 
 #define BUTTON_INTERRUPTS 1
 //Comment this out to disable interrupts
 
+extern int screen_num;
 
 void buttonsInit();
-void buttonISR();
+void buttonCallback(uint gpio, uint32_t events); // ISR for button interrupts
+
