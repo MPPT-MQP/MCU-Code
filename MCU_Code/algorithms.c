@@ -1,3 +1,4 @@
+#include "algorithms.h"
 
 //Global Variables
 float duty_cycle = 0.5;
