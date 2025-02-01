@@ -47,7 +47,9 @@
         "binary_info.h": "c",
         "adc.h": "c",
         "sdcard.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "sensors.h": "c",
+        "i2c.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }

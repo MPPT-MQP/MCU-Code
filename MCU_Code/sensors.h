@@ -7,11 +7,15 @@
 #include "hardware/pwm.h"
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "ADS1115.h"
 
 // I2C0 defines (GP Numbers, not pico pins) (Power monitors only)
 #define I2C0_PORT i2c0
-#define I2C0_SDA 20
-#define I2C0_SCL 21
+// #define I2C0_SDA 20
+// #define I2C0_SCL 21
+
+#define I2C0_SDA 4
+#define I2C0_SCL 5
 
 // I2C1 defines (OLED screen, light sensor, pyranometer)
 #define I2C1_PORT i2c1
@@ -47,3 +51,7 @@ uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay);
 // PWM Generator
 #define PWM_PIN 28
 void pico_pwm_init();
+
+//External ADC
+void configExtADC(uint16_t register, uint16_t i2cPort);
+float readExtADC(uint16_t i2cPort);
