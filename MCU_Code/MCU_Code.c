@@ -35,24 +35,29 @@ int main()
     //Init both I2C0 and I2C1
     configI2C();
 
-    //Temp Sensor ADC Setup
-    TMP_ADC_setup();
+    // //Temp Sensor ADC Setup
+    // TMP_ADC_setup();
 
-    //Init SD Card Setup (hw_config.c sets the SPI pins)
-    sd_init_driver();
+    // //Init SD Card Setup (hw_config.c sets the SPI pins)
+    // sd_init_driver();
 
-    //Setup Buttons
-    buttonsInit();
+    // //Setup Buttons
+    // buttonsInit();
+
+    // //Setup External ADC (ADS1115)
+    // configExtADC(((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_AIN3) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS), I2C1_PORT);
+    
 
     while (true) {
-        PM_printManID(0x40);
-        printf("\n\nTEST");
+        // readExtADC(I2C1_PORT);
+        // PM_printManID(0x40);
+        // printf("\n\nTEST");
 
 
-        printf("\nVoltage: %f", PM_readVoltage(0x40));
+        // printf("\nVoltage: %f", PM_readVoltage(0x40));
         
         
-        printf("\nCurrent: %f", PM_readCurrent(0x40));
-        sleep_ms(1000);
+        // printf("\nCurrent: %f", PM_readCurrent(0x40));
+        // sleep_ms(1000);
     }
 }
