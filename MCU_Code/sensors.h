@@ -22,13 +22,16 @@
 #define I2C1_SDA 10
 #define I2C1_SCL 11
 
-//TEMP Defines
+//Tempature Defines
 #define tmp_offset 0.5
 #define tmp_scaling 0.01
 #define TMP_NUM_SAMPLES 20 // Number of samples to average
 #define TEMP_PIN 26
 #define TEMP_SAMPLE_DELAY 0 //sleep delay between adc reads in ms
 
+//External ADC (ADS1115) Defines
+#define EXT_ADC_ADDDRESS 0x48
+#define CONVFACTOR 125 //(uV/ LSB)
 
 //Sensor Config I2C both channels
 void configI2C();
@@ -53,5 +56,5 @@ uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay);
 void pico_pwm_init();
 
 //External ADC
-void configExtADC(uint16_t register, uint16_t i2cPort);
-float readExtADC(uint16_t i2cPort);
+void configExtADC(uint16_t register, i2c_inst_t i2cPort);
+float readExtADC(i2c_inst_t i2cPort);

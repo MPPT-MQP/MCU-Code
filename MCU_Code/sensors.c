@@ -170,21 +170,21 @@ void pico_pwm_init(){
 /// @brief Init ADS1115 and write desired config register
 /// @param registerADC config register bits (16) define using masks and bit selectors
 /// @param i2cPort I2C 0 or 1 on Pico 2
-void configExtADC(uint16_t registerADC, uint16_t i2cPort){
+void configExtADC(uint16_t registerADC, i2c_inst_t i2cPort){
     
     uint8_t registerOut[2];
     registerOut[0]= (uint8_t)(registerADC >> 8); //bit shift MSB 8 bits into 8 bit value
     registerOut[1] = (uint8_t)(registerADC & 0xff); //take LSB 8 bits into 8 bit value
     
     // Select config register, then write 16 bits to register
-    i2c_write_blocking(i2cPort, EXT_ADC_ADDDRESS, registerOut, 3, false);
+    i2c_write_blocking(&i2cPort, EXT_ADC_ADDDRESS, registerOut, 3, false);
     
 }
 
 /// @brief Read ADS1115 voltage over I2C
 /// @param i2cPort I2C 0 or 1 on Pico 2
 /// @return voltage as a float
-float readExtADC(uint16_t i2cPort){
+float readExtADC(i2c_inst_t i2cPort){
     uint16_t combinedBuffer;
     float voltage;
     uint8_t buffer[2];
@@ -192,8 +192,8 @@ float readExtADC(uint16_t i2cPort){
     uint8_t reg1 = CONVERSION_ADDRESS;
 
     //select conversion buffer and read 16 bits from it
-    i2c_write_blocking(i2cPort, EXT_ADC_ADDDRESS, &reg1, 1, false);
-    i2c_read_blocking(i2cPort, EXT_ADC_ADDDRESS, buffer, 2, false);
+    i2c_write_blocking(&i2cPort, EXT_ADC_ADDDRESS, &reg1, 1, false);
+    i2c_read_blocking(&i2cPort, EXT_ADC_ADDDRESS, buffer, 2, false);
 
     //Combine the two bytes (MSB is recieved first)
     combinedBuffer = ((uint16_t)buffer[0] << 8) | buffer[1];
