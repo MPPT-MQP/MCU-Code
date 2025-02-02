@@ -13,7 +13,9 @@
 //Comment this out to disable interrupts
 
 extern volatile bool button1_state;
-extern volatile bool button1_prev;
+extern volatile bool button2_state;
+extern volatile bool button3_state;
+extern volatile bool button4_state;
 
 void buttonsInit();
 void buttonCallback(uint gpio, uint32_t events); // ISR for button interrupts

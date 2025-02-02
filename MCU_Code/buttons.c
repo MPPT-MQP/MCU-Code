@@ -2,7 +2,9 @@
 #include "oled_screen.h"
 
 volatile bool button1_state = 0;
-volatile bool button1_prev = 0;
+volatile bool button2_state = 0;
+volatile bool button3_state = 0;
+volatile bool button4_state = 0;
 
 /* Start Debounce Code*/
 #define DEBOUNCE_MS 50
@@ -48,22 +50,22 @@ void buttonsInit(void) {
 }
 
 void buttonCallback(uint gpio, uint32_t events) {
-    //printf("test");
     if(debounce()) return;
     switch(gpio) {
         case 6:
-            //printf("button6");
             button1_state = !button1_state;
-             
         break;
-        
+            
         case 7:
+            button2_state = !button2_state;
         break;
 
         case 8:
+            button3_state = !button3_state;
         break;
         
         case 9:
+            button4_state = !button4_state;
         break;
     }
     

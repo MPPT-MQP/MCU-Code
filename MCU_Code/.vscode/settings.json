@@ -38,6 +38,10 @@
     "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja",
     "files.associations": {
         "sdcard.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "stdlib.h": "c",
+        "user_interface.h": "c",
+        "buttons.h": "c",
+        "oled_screen.h": "c"
     }
 }
