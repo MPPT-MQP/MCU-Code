@@ -9,7 +9,7 @@
 #include "sd_card.h"
 #include "buttons.h"
 
-
+#include <time.h>
 
 int64_t alarm_callback(alarm_id_t id, void *user_data) {
     // Put your timeout handler code in here
@@ -33,7 +33,7 @@ int main()
 
     /*Start of non example code*/
     //Init both I2C0 and I2C1
-    configI2C();
+    // configI2C();
 
     // //Temp Sensor ADC Setup
     // TMP_ADC_setup();
@@ -52,7 +52,6 @@ int main()
         // readExtADC(I2C1_PORT);
         // PM_printManID(0x40);
         // printf("\n\nTEST");
-
 
         // printf("\nVoltage: %f", PM_readVoltage(0x40));
         
