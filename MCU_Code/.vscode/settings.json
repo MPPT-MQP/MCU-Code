@@ -57,7 +57,8 @@
         "streambuf": "c",
         "tuple": "c",
         "type_traits": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "pwm.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": true
 }

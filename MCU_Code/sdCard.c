@@ -21,7 +21,6 @@ void writeSD(){
     char CSVName[20] = "Test_CSV.csv";
     FIL fil;
     
-    struct sensorData sensorData;
 
     // time_t t= time(NULL);
     // struct tm date = *localtime(&t);

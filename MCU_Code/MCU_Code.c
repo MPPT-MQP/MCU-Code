@@ -47,7 +47,9 @@ int main()
     // //Setup External ADC (ADS1115)
     // configExtADC(((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_AIN3) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS), I2C1_PORT);
     
-
+    //Sensor Data Buffer
+    struct sensorData sensorBuffer[800];
+    uint16_t counter = 0;
     while (true) {
         // readExtADC(I2C1_PORT);
         // PM_printManID(0x40);
@@ -58,5 +60,30 @@ int main()
         
         // printf("\nCurrent: %f", PM_readCurrent(0x40));
         // sleep_ms(1000);
+
+
+        /* Sensor Loop*/
+
+        //Power Monitors
+        sensorBuffer[counter].PM1voltage = PM_readVoltage(PM1);
+        sensorBuffer[counter].PM1current = PM_readCurrent(PM1);
+
+        sensorBuffer[counter].PM2voltage = PM_readVoltage(PM2);
+        sensorBuffer[counter].PM2current = PM_readCurrent(PM2);
+
+        sensorBuffer[counter].PM3voltage = PM_readVoltage(PM3);
+        sensorBuffer[counter].PM3current = PM_readCurrent(PM3);
+
+        //Temperature
+        readTempature(2, 5);
+        
+        //Irradiance
+        readExtADC(*I2C1_PORT);
+        //Add conversion fcn here
+
+        if(counter > 800){
+            counter = 0;
+        }
+        /*End sensor loop*/
     }
 }

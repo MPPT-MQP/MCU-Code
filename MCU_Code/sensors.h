@@ -29,6 +29,11 @@
 #define TEMP_PIN 26
 #define TEMP_SAMPLE_DELAY 0 //sleep delay between adc reads in ms
 
+//PM Defines
+#define PM1 0x40
+#define PM2 0x41
+#define PM3 0x43
+
 //External ADC (ADS1115) Defines
 #define EXT_ADC_ADDDRESS 0x48
 #define CONVFACTOR 125 //(uV/ LSB)
