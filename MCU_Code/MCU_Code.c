@@ -10,6 +10,7 @@
 #include "buttons.h"
 #include "oled_screen.h"
 
+int screen_num = 0;
 
 int main()
 {
@@ -41,14 +42,21 @@ int main()
     oled_init();
 
     while (true) {
-        PM_printManID(0x40);
-        printf("\n\nTEST");
-        printf("\nVoltage: %f", PM_readVoltage(0x40));
-        printf("\nCurrent: %f", PM_readCurrent(0x40));
-    
+        //PM_printManID(0x40);
+        //printf("\n\nTEST");
+        //printf("\nVoltage: %f", PM_readVoltage(0x40));
+        //printf("\nCurrent: %f", PM_readCurrent(0x40));
+        //printf("%d", button1_state);
+        if(button1_state) {
+            screen_num++;
+            if(screen_num > 2) {
+                screen_num = 0;
+            }
+            button1_state = !button1_state;
+        }
         clear_display();
 
-        switch(screen_num % 3) {
+        switch(screen_num) {
             case 0:
                 char *screen1[] = {"TEMPERATURE:", "00.00", "IRRADIANCE", "00.00"};
                 int x_distances1[] = {20, 40, 20, 40};

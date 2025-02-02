@@ -1,7 +1,8 @@
 #include "buttons.h"
 #include "oled_screen.h"
 
-int screen_num = 0;
+volatile bool button1_state = 0;
+volatile bool button1_prev = 0;
 
 /* Start Debounce Code*/
 #define DEBOUNCE_MS 50
@@ -47,10 +48,13 @@ void buttonsInit(void) {
 }
 
 void buttonCallback(uint gpio, uint32_t events) {
+    //printf("test");
     if(debounce()) return;
     switch(gpio) {
         case 6:
-            screen_num++;
+            //printf("button6");
+            button1_state = !button1_state;
+             
         break;
         
         case 7:

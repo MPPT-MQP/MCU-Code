@@ -12,7 +12,8 @@
 #define BUTTON_INTERRUPTS 1
 //Comment this out to disable interrupts
 
-extern int screen_num;
+extern volatile bool button1_state;
+extern volatile bool button1_prev;
 
 void buttonsInit();
 void buttonCallback(uint gpio, uint32_t events); // ISR for button interrupts
