@@ -6,9 +6,15 @@
 int screen_num = 0;
 int select_num = 0;
 int toggle_num = 0;
+char *current_mode = "BUCK";
 char *current_algorithm = "CV";
 char *current_tracking = "START TRACKING";
-char tracking_deselect[14];
+char *tracking_status[] = {"START TRACKING", "STOP TRACKING"};
+char *mode[] = {"MODE: BUCK", "MODE: CC", "MODE: BOTH"};
+char *algorithms[] = {"CV", "Beta", "PO", "PO Var", "IC", "IC Var", "RCC", "PSO", "A-of-A"};
+int current_mode_toggle = 0;
+int current_tracking_toggle = 0;
+int current_algorithm_toggle = 0;
 
 void welcome_screen(){
     char *screen1[] = {" ", "WPI MPPT MQP", "2024-2025", " "};
@@ -30,7 +36,6 @@ void run_main_screens() {
     switch(screen_num) {
         case 0:
             if(button2_state) {                
-                strncpy(tracking_deselect, current_tracking, 14);
                 select_num++;
                 if(select_num > 2) {
                    select_num = 0;
@@ -40,38 +45,51 @@ void run_main_screens() {
             switch(select_num) {
                 case 0:
                     if(button3_state) {
-                            toggle_num++;
-                        if(toggle_num > 1) {
-                             toggle_num = 0;
+                            current_tracking_toggle++;
+                        if(current_tracking_toggle > 1) {
+                              current_tracking_toggle = 0;
                         }
                          button3_state = !button3_state;
                     }
-                    char *tracking_status[] = {"START TRACKING<", "STOP TRACKING<"};
-                    current_tracking = tracking_status[toggle_num];
-                    char *screen0[] = {current_tracking, "SET ALGORITHM", current_algorithm, "Buck CC Both"};
+                    char *tracking_status_selected[] = {"START TRACKING<", "STOP TRACKING<"};
+                    current_tracking = tracking_status_selected[current_tracking_toggle];
+                    current_algorithm = algorithms[current_algorithm_toggle];
+                    current_mode = mode[current_mode_toggle];
+                    char *screen0[] = {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
                     int x_distances0[] = {1, 1, 30, 1};
                     print_text(screen0, count_of(screen0), x_distances0);
                 break;
                     
                 case 1:
                     if(button3_state) {
-                            toggle_num++;
-                        if(toggle_num > 8) {
-                             toggle_num = 0;
+                            current_algorithm_toggle++;
+                        if(current_algorithm_toggle > 8) {
+                             current_algorithm_toggle = 0;
                         }
                          button3_state = !button3_state;
-                    }
-                    char *algorithms[] = {"CV", "Beta", "PO", "PO Var", "IC", "IC Var", "RCC", "PSO", "A-of-A"};
-                    current_algorithm = algorithms[toggle_num];
-                    char *screen01[] = {tracking_deselect, "SET ALGORITHM<", current_algorithm, "Buck CC Both"};
+                    }    
+                    current_algorithm = algorithms[current_algorithm_toggle];
+                    current_tracking = tracking_status[current_tracking_toggle];
+                    current_mode = mode[current_mode_toggle];
+                    char *screen01[] = {current_tracking, "SET ALGORITHM<", current_algorithm, current_mode};
                     int x_distances01[] = {1, 1, 30, 1};
                     print_text(screen01, count_of(screen01), x_distances01);
 
                 break;
 
                 case 2:
-                    char *mode[] = {"MODE: BUCK", "MODE: CC", "MODE: BOTH"};
-                    char *screen02[] = {tracking_deselect, "SET ALGORITHM", current_algorithm, "Buck CC Both<"};
+                    if(button3_state) {
+                            current_mode_toggle++;
+                        if(current_mode_toggle > 2) {
+                             current_mode_toggle = 0;
+                        }
+                         button3_state = !button3_state;
+                    }
+                    char *mode_selected[] = {"MODE: BUCK<", "MODE: CC<", "MODE: BOTH<"};
+                    current_tracking = tracking_status[current_tracking_toggle];
+                    current_algorithm = algorithms[current_algorithm_toggle];
+                    current_mode = mode_selected[current_mode_toggle];
+                    char *screen02[] = {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
                     int x_distances02[] = {1, 1, 30, 1};
                     print_text(screen02, count_of(screen02), x_distances02);
                 break;

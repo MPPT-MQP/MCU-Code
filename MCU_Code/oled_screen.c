@@ -5,6 +5,7 @@
  */
 #include "oled_screen.h"
 #include "sensors.h"
+#include "user_interface.h"
 
 
 /* Example code to talk to an SSD1306-based OLED display
@@ -301,7 +302,7 @@ void print_text(char** text, int text_length, int* x_distances) {
    for (uint i = 0; i < text_length; i++) {
         WriteString(buf, x_distances[i], y, text[i]);
         y+=8;
-    }
+   }
     render(buf, &frame_area);
     sleep_ms(1000);
 }
