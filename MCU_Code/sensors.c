@@ -1,7 +1,5 @@
 #include "sensors.h"
 
-
-
 //Sensor Globals
 
 // 12-bit conversion, assume max value == ADC_VREF == 3.3 V
@@ -110,7 +108,7 @@ void TMP_ADC_setup(){
 /// @param num_samples number of samples to read from the ADC
 /// @param sampleDelay delay in ms between samples
 /// @return average temperature value in celcius
-uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay){
+float readTempature(uint16_t num_samples, uint16_t sampleDelay){
 
     // Select ADC input 0 (GPIO26)
     adc_select_input(0);
@@ -206,5 +204,14 @@ float readExtADC(i2c_inst_t i2cPort){
     printf("\nVoltage: %f", voltage);
     printf("   |   Buffer: %X, %u", combinedBuffer);
 
-    return voltage;
+    return readPyranometer(voltage);
 }
+
+/*End external ADC (ADS1115)*/
+
+/*Pyranometer Functions*/
+const float voltage_multiplier = 427.8;
+float readPyranometer(float voltage){
+    return (voltage * voltage_multiplier);
+}
+/*End Pyranometer Functions*/

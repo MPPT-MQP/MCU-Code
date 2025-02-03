@@ -15,7 +15,7 @@ void mountSD(){
     }
 }
 
-void writeSD(){
+void writeSD(struct tm date, struct sensorData sensorData){
     // TODO: Setup fcn to read from buffer data and have unique filename argument
     //Open a file and write to it
     char CSVName[20] = "Test_CSV.csv";
@@ -36,14 +36,14 @@ void writeSD(){
         printf("f_printf failed\n");
     }
 
-    // //Write row data
-    // if (f_printf(&fil, "\n%02d-%02d_%02d:%02d:%02d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
-    // sensorData.date.tm_year + 1900, sensorData.date.tm_mon+1, sensorData.date.tm_mday, sensorData.date.tm_hour, sensorData.date.tm_min, sensorData.date.tm_sec,
-    //  sensorData.PM1voltage, sensorData.PM1current, sensorData.PM1power, 
-    // sensorData.PM2voltage, sensorData.PM2current, sensorData.PM2power, sensorData.PM3voltage, 
-    // sensorData.PM3current, sensorData.PM3power, sensorData.temperature, sensorData.irradiance) < 0) {
-    //     printf("f_printf failed\n");
-    // }
+    //Write row data
+    if (f_printf(&fil, "\n%02d-%02d_%02d:%02d:%02d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
+    date.tm_year + 1900, date.tm_mon+1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec,
+     sensorData.PM1voltage, sensorData.PM1current, sensorData.PM1power, 
+    sensorData.PM2voltage, sensorData.PM2current, sensorData.PM2power, sensorData.PM3voltage, 
+    sensorData.PM3current, sensorData.PM3power, sensorData.temperature, sensorData.irradiance) < 0) {
+        printf("f_printf failed\n");
+    }
 
     // Close the file
     fr = f_close(&fil);

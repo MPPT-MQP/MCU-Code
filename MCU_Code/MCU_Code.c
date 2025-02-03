@@ -8,6 +8,7 @@
 #include "sdCard.h"
 #include "sd_card.h"
 #include "buttons.h"
+#include "pico/aon_timer.h"
 
 #include <time.h>
 
@@ -16,6 +17,10 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
     return 0;
 }
 
+//Sensor Data Buffer
+static struct sensorData sensorBuffer[1500];
+static struct tm date[1500];
+uint16_t BufferCounter = 0;
 
 int main()
 {
@@ -47,9 +52,8 @@ int main()
     // //Setup External ADC (ADS1115)
     // configExtADC(((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_AIN3) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS), I2C1_PORT);
     
-    //Sensor Data Buffer
-    struct sensorData sensorBuffer[800];
-    uint16_t counter = 0;
+    
+    
     while (true) {
         // readExtADC(I2C1_PORT);
         // PM_printManID(0x40);
@@ -65,25 +69,32 @@ int main()
         /* Sensor Loop*/
 
         //Power Monitors
-        sensorBuffer[counter].PM1voltage = PM_readVoltage(PM1);
-        sensorBuffer[counter].PM1current = PM_readCurrent(PM1);
+        sensorBuffer[BufferCounter].PM1voltage = PM_readVoltage(PM1);
+        sensorBuffer[BufferCounter].PM1current = PM_readCurrent(PM1);
 
-        sensorBuffer[counter].PM2voltage = PM_readVoltage(PM2);
-        sensorBuffer[counter].PM2current = PM_readCurrent(PM2);
+        sensorBuffer[BufferCounter].PM2voltage = PM_readVoltage(PM2);
+        sensorBuffer[BufferCounter].PM2current = PM_readCurrent(PM2);
 
-        sensorBuffer[counter].PM3voltage = PM_readVoltage(PM3);
-        sensorBuffer[counter].PM3current = PM_readCurrent(PM3);
+        sensorBuffer[BufferCounter].PM3voltage = PM_readVoltage(PM3);
+        sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
 
         //Temperature
-        readTempature(2, 5);
+        sensorBuffer[BufferCounter].temperature = readTempature(2, 5);
         
         //Irradiance
-        readExtADC(*I2C1_PORT);
+        float voltage = readExtADC(*I2C1_PORT);
         //Add conversion fcn here
 
-        if(counter > 800){
-            counter = 0;
+        if(BufferCounter++ > 800){
+            BufferCounter = 0;
+        }else{
+            BufferCounter++;
         }
         /*End sensor loop*/
+
+        //Notes
+        /*Core 1 read current count value and display that value on the oled screen
+        SD card: need to decide how often to write to sd card, maybe reading 400 behind??
+        Then make a copy into a new array so that everything is formatted correctly, then save to SD card*/
     }
 }

@@ -5,10 +5,12 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
+
 void mountSD();
 
+
+
 struct sensorData {
-    struct tm date;
     float PM1voltage;
     float PM1current;
     float PM1power;

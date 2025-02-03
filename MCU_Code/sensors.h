@@ -38,6 +38,7 @@
 #define EXT_ADC_ADDDRESS 0x48
 #define CONVFACTOR 125 //(uV/ LSB)
 
+
 //Sensor Config I2C both channels
 void configI2C();
 
@@ -51,10 +52,11 @@ float PM_readCurrent(uint8_t address);
 
 
 //Pyranometer
+float readPyranometer(float voltage);
 
 //Temp Sensor
 void TMP_ADC_setup();
-uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay);
+float readTempature(uint16_t num_samples, uint16_t sampleDelay);
 
 // PWM Generator
 #define PWM_PIN 28

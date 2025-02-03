@@ -66,12 +66,14 @@ target_include_directories(MCU_Code PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(MCU_Code 
+        pico_time
         hardware_spi
         hardware_i2c
         hardware_timer
         hardware_clocks
         hardware_adc
         hardware_pwm
+        pico_aon_timer
         )
 
 pico_add_extra_outputs(MCU_Code)
