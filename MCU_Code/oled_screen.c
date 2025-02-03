@@ -237,6 +237,15 @@ static inline int GetFontIndex(uint8_t ch) {
     else if (ch == '*') {
         return ch - '*' + 40;
     }
+    else if (ch == ':') {
+        return ch - ':' + 41;
+    }
+    else if (ch == '-') {
+        return ch - '-' + 42;
+    }
+    else if (ch == '<') {
+        return ch - '<' + 43;
+    }
     else return  0; // Not got that char so space.
 }
 
