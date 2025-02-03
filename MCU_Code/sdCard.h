@@ -8,8 +8,6 @@
 
 void mountSD();
 
-
-
 struct sensorData {
     float PM1voltage;
     float PM1current;

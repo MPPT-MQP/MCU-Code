@@ -1,11 +1,5 @@
 #include "sensors.h"
 
-//Sensor Globals
-
-// 12-bit conversion, assume max value == ADC_VREF == 3.3 V
-const float conversion_factor = 3.3f / (1 << 12);
-
-
 
 /// @brief Configure I2C0 and I2C1 at specified ports, pins, and speeds
 void configI2C(){
@@ -104,6 +98,8 @@ void TMP_ADC_setup(){
     adc_gpio_init(TEMP_PIN);
 }
 
+// 12-bit conversion, assume max value == ADC_VREF == 3.3 V
+const float conversion_factor = 3.3f / (1 << 12);
 /// @brief Read the temperature of the TMP36
 /// @param num_samples number of samples to read from the ADC
 /// @param sampleDelay delay in ms between samples
@@ -135,14 +131,6 @@ float readTempature(uint16_t num_samples, uint16_t sampleDelay){
 }
 
 /*End Temperature ADC Functions*/
-
-/*Pyranometer Functions*/
-
-/*End Pyranometer Functions*/
-
-/*Light Sensor Functions*/
-
-/*End Light Sensor Functions*/
 
 /* PWM Init Function*/
 
