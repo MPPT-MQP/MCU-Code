@@ -60,5 +60,5 @@ float readTempature(uint16_t num_samples, uint16_t sampleDelay);
 void pico_pwm_init();
 
 //External ADC
-void configExtADC(uint16_t register, i2c_inst_t i2cPort);
-float readExtADC(i2c_inst_t i2cPort);
+void configExtADC(uint16_t register);
+float readExtADC();

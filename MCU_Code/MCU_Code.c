@@ -17,12 +17,13 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
 }
 
 //Sensor Data Buffer
-static struct sensorData sensorBuffer[1500];
-static struct tm date[1500];
+static struct sensorData sensorBuffer[800];
+static struct tm date[800];
 uint16_t BufferCounter = 0;
 
 int main()
 {
+
     stdio_init_all();
 
 
@@ -37,24 +38,23 @@ int main()
 
     /*Start of non example code*/
     //Init both I2C0 and I2C1
-    // configI2C();
+    configI2C();
 
-    // //Temp Sensor ADC Setup
-    // TMP_ADC_setup();
+    //Temp Sensor ADC Setup
+    TMP_ADC_setup();
 
-    // //Init SD Card Setup (hw_config.c sets the SPI pins)
+    //Init SD Card Setup (hw_config.c sets the SPI pins)
     // sd_init_driver();
 
-    // //Setup Buttons
-    // buttonsInit();
+    //Setup Buttons
+    buttonsInit();
 
     // //Setup External ADC (ADS1115)
-    // configExtADC(((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_AIN3) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS), I2C1_PORT);
+    configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
     
     
     
     while (true) {
-        // readExtADC(I2C1_PORT);
         // PM_printManID(0x40);
         // printf("\n\nTEST");
 
@@ -81,13 +81,21 @@ int main()
         sensorBuffer[BufferCounter].temperature = readTempature(2, 5);
         
         //Irradiance
-        float voltage = readExtADC(*I2C1_PORT);
-        //Add conversion fcn here
+        sensorBuffer[BufferCounter].irradiance = readExtADC();
+        // Returns irradance converted voltage value
+
+
+        // //Write inital header data below
+        printf("\nTimestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2)");
+        
+        //Write row data
+        printf("\nTIME, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
+        sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
+        sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
+        sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
 
         if(BufferCounter++ > 800){
             BufferCounter = 0;
-        }else{
-            BufferCounter++;
         }
         /*End sensor loop*/
 

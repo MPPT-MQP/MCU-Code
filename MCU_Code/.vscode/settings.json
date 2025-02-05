@@ -61,5 +61,5 @@
         "pwm.h": "c",
         "timer.h": "c"
     },
-    "cortex-debug.variableUseNaturalFormat": true
+    "cortex-debug.variableUseNaturalFormat": false
 }
