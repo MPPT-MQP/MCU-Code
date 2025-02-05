@@ -42,7 +42,8 @@ add_executable(MCU_Code
      oled_screen.c
      algorithms.c
      sdCard.c
-     buttons.c)
+     buttons.c
+     user_interface.c)
 
 # comment test
 pico_set_program_name(MCU_Code "MCU_Code")

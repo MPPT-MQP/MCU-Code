@@ -2,14 +2,21 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
-#define BUTTONPIN_1 6
-#define BUTTONPIN_2 7
-#define BUTTONPIN_3 8
-#define BUTTONPIN_4 9
+#define BUTTON1PIN 6
+#define BUTTON2PIN 7
+#define BUTTON3PIN 8
+#define BUTTON4PIN 9
 
-#define BUTTON_INTERRUPTS 1
+#define BUTTON_INTERRUPTS 4
 //Comment this out to disable interrupts
 
+// Make button state variables accessible in main 
+extern volatile bool button1_state;
+extern volatile bool button2_state;
+extern volatile bool button3_state;
+extern volatile bool button4_state;
 
+//Function Prototypes
 void buttonsInit();
-void buttonISR();
+void buttonISR(uint gpio, uint32_t events); // ISR for button interrupts
+

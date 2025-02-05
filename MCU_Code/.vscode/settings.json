@@ -37,16 +37,11 @@
     "raspberry-pi-pico.cmakePath": "${HOME}/.pico-sdk/cmake/v3.29.9/bin/cmake",
     "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja",
     "files.associations": {
-        "powermonitor.h": "c",
-        "stdlib.h": "c",
-        "ffconf.h": "c",
-        "sd_card.h": "c",
-        "ctype.h": "c",
-        "cstdint": "c",
-        "oled_screen.h": "c",
-        "binary_info.h": "c",
-        "adc.h": "c",
         "sdcard.h": "c",
+        "stdlib.h": "c",
+        "user_interface.h": "c",
+        "buttons.h": "c",
+        "oled_screen.h": "c"
         "string.h": "c",
         "sensors.h": "c",
         "i2c.h": "c",
@@ -63,4 +58,5 @@
         "queue.h": "c"
     },
     "cortex-debug.variableUseNaturalFormat": false
+
 }
