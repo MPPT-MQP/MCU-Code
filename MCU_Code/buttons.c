@@ -1,6 +1,7 @@
 #include "buttons.h"
 #include "oled_screen.h"
 
+
 volatile bool button1_state = 0;
 volatile bool button2_state = 0;
 volatile bool button3_state = 0;
@@ -26,6 +27,7 @@ bool debounce() {
 }
 /* End Debounce Code */
 
+/// @brief Initialize buttons 1-4 using defined pins
 void buttonsInit(void) {
     // initialize buttons
     gpio_init(BUTTON1PIN);
@@ -46,9 +48,9 @@ void buttonsInit(void) {
     #ifdef BUTTON_INTERRUPTS
     // enable interrupts with rising edge -> 0x08
     gpio_set_irq_enabled_with_callback(BUTTON1PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
-    gpio_set_irq_enabled_with_callback(BUTTON2PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
-    gpio_set_irq_enabled_with_callback(BUTTON3PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
-    gpio_set_irq_enabled_with_callback(BUTTON4PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
+    gpio_set_irq_enabled(BUTTONPIN_2, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
+    gpio_set_irq_enabled(BUTTONPIN_3, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
+    gpio_set_irq_enabled(BUTTONPIN_4, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
     #endif
 
 }
@@ -57,22 +59,22 @@ void buttonsInit(void) {
 void buttonISR(uint gpio, uint32_t events) {
     if(debounce()) return; // Debounce button
     switch(gpio) {
-        case 6:
+        case BUTTONPIN_1:
             printf("\nButton 1 pressed\n");
             button1_state = !button1_state;
         break;
             
-        case 7:
+        case BUTTONPIN_2:
             printf("\nButton 2 pressed\n");
             button2_state = !button2_state;
         break;
 
-        case 8:
+        case BUTTONPIN_3:
             printf("\nButton 3 pressed\n");
             button3_state = !button3_state;
         break;
         
-        case 9:
+        case BUTTONPIN_4:
             printf("\nButton 4 pressed\n");
             button4_state = !button4_state;
         break;

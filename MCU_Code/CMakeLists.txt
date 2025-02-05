@@ -40,9 +40,11 @@ add_executable(MCU_Code
      sensors.c
      hw_config.c
      oled_screen.c
+     algorithms.c
      sdCard.c
      buttons.c
      user_interface.c)
+
 # comment test
 pico_set_program_name(MCU_Code "MCU_Code")
 pico_set_program_version(MCU_Code "0.1")
@@ -72,6 +74,8 @@ target_link_libraries(MCU_Code
         hardware_timer
         hardware_clocks
         hardware_adc
+        hardware_pwm
+        pico_aon_timer
         )
 
 pico_add_extra_outputs(MCU_Code)

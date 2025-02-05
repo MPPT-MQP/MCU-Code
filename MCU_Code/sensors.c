@@ -1,14 +1,6 @@
 #include "sensors.h"
 
 
-
-//Sensor Globals
-
-// 12-bit conversion, assume max value == ADC_VREF == 3.3 V
-const float conversion_factor = 3.3f / (1 << 12);
-
-
-
 /// @brief Configure I2C0 and I2C1 at specified ports, pins, and speeds
 void configI2C(){
     // I2C0 Initialisation. Using it at 300Khz.
@@ -106,11 +98,13 @@ void TMP_ADC_setup(){
     adc_gpio_init(TEMP_PIN);
 }
 
+// 12-bit conversion, assume max value == ADC_VREF == 3.3 V
+const float conversion_factor = 3.3f / (1 << 12);
 /// @brief Read the temperature of the TMP36
 /// @param num_samples number of samples to read from the ADC
 /// @param sampleDelay delay in ms between samples
 /// @return average temperature value in celcius
-uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay){
+float readTempature(uint16_t num_samples, uint16_t sampleDelay){
 
     // Select ADC input 0 (GPIO26)
     adc_select_input(0);
@@ -138,10 +132,75 @@ uint32_t readTempature(uint16_t num_samples, uint16_t sampleDelay){
 
 /*End Temperature ADC Functions*/
 
+/* PWM Init Function*/
+
+// PWM Usage Function
+// pwm_set_chan_level(slice_num, PWM_CHAN_A, duty_cycle);
+// where duty cycle is out of 3125
+
+void pico_pwm_init(){
+    gpio_set_function(PWM_PIN, GPIO_FUNC_PWM);
+
+    uint slice_num = pwm_gpio_to_slice_num(PWM_PIN);
+
+    // Set frequency to 40kHz
+    pwm_set_wrap(slice_num, 3125);
+
+    pwm_set_enabled(slice_num, true);
+}
+
+/* End PWM Init Function*/
+
+/*External ADC*/
+
+/// @brief Init ADS1115 and write desired config register
+/// @param registerADC config register bits (16) define using masks and bit selectors
+/// @param i2cPort I2C 0 or 1 on Pico 2
+void configExtADC(uint16_t registerADC){
+    
+    uint8_t registerOut[3];
+    registerOut[0] = CONFIG_ADDRESS;
+    registerOut[1]= (uint8_t)(registerADC >> 8); //bit shift MSB 8 bits into 8 bit value
+    registerOut[2] = (uint8_t)(registerADC & 0xff); //take LSB 8 bits into 8 bit value
+    
+    // Select config register, then write 16 bits to register
+    i2c_write_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, registerOut, 3, false);
+    
+}
+
+/// @brief Read ADS1115 voltage over I2C
+/// @param i2cPort I2C 0 or 1 on Pico 2
+/// @return voltage as a float
+float readExtADC(){
+    uint16_t combinedBuffer;
+    float voltage;
+    uint8_t buffer[2];
+
+    uint8_t reg1 = CONVERSION_ADDRESS;
+
+    //select conversion buffer and read 16 bits from it
+    i2c_write_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, &reg1, 1, false);
+    i2c_read_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, buffer, 2, false);
+
+    //Combine the two bytes (MSB is recieved first)
+    combinedBuffer = ((uint16_t)buffer[0] << 8) | buffer[1];
+
+    voltage = (float)combinedBuffer;
+    
+    //scale factor (125uV / LSB) **At specific FSR of 4.096V only**
+    voltage = (voltage * CONVFACTOR) / 1000000;
+
+    printf("\nVoltage: %f", voltage);
+    printf("   |   Buffer: %X, %u", combinedBuffer);
+
+    return readPyranometer(voltage);
+}
+
+/*End external ADC (ADS1115)*/
+
 /*Pyranometer Functions*/
-
+const float voltage_multiplier = 427.8;
+float readPyranometer(float voltage){
+    return (voltage * voltage_multiplier);
+}
 /*End Pyranometer Functions*/
-
-/*Light Sensor Functions*/
-
-/*End Light Sensor Functions*/
