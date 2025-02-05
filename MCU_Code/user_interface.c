@@ -23,6 +23,7 @@ char *current_mode = "BUCK";
 char *mode[] = {"MODE: BUCK", "MODE: CC", "MODE: BOTH"};
 char *current_sd_card = "SD CARD: ON";
 char *sd_card[] = {"SD CARD: OFF", "SD CARD: ON"};
+char *current_time_select;
 
 /*Toggle Variables to Keep Track of Settings*/
 // 0 = Tracking Off, 1 = Tracking On 
@@ -33,10 +34,8 @@ int algorithm_toggle = 0;
 int mode_toggle = 0;
 // 0 = OFF, 1 = ON
 int sd_card_toggle = 0;
-// 0 = Month, 1 = Day, 2 = Year, 3 = Hours, 4 = Minutes
-int date_time_toggle = 0;
-char *current_time_select;
 
+// Run boot-up screen
 void welcome_screen(){
     char *screen1[] = {" ", "WPI MPPT MQP", "2024-2025", " "};
     int x_distances1[] = {1, 15, 30, 1};
@@ -46,11 +45,14 @@ void welcome_screen(){
     time_info = localtime(&current_time);
 }
 
+// Main user interface loop
 void run_main_screens() {
 
+    // Print current time to buffer to be displayed on screen
     strftime(date_buffer, 80,"%x", time_info);
     strftime(time_buffer, 80, "%I:%M%p", time_info);
 
+    // Check button 1 (toggles entire screen)
     if(button1_state) {
         screen_num++;
         if(screen_num > 4) {
@@ -58,10 +60,15 @@ void run_main_screens() {
         }
         button1_state = !button1_state;
     }
+    
+    // Refresh display for new info
     clear_display();
 
+    // Toggle between 5 possible screen
     switch(screen_num) {
         case 0:
+
+            // Check button 2 (toggles selected field on a screen)
             if(button2_state) {                
                 select_num++;
                 if(select_num > 2) {
@@ -71,6 +78,7 @@ void run_main_screens() {
             }
             switch(select_num) {
                 case 0:
+                    // Check button 3 (toggles settings that's currently selected)
                     if(button3_state) {
                             tracking_toggle++;
                         if(tracking_toggle > 1) {
@@ -169,6 +177,7 @@ void run_main_screens() {
                 break;
 
                 default:
+                    // Check button 3 (increments currently selected date value)
                     if(button3_state) {
                         switch(select_num-1){
                             case 0:
@@ -190,6 +199,7 @@ void run_main_screens() {
                         current_time = mktime(time_info);
                         button3_state = !button3_state;
                     }
+                    // Check button 4 (decrements currently selected date value)
                     if(button4_state) {
                         switch(select_num-1){
                             case 0:
@@ -218,6 +228,7 @@ void run_main_screens() {
                     char *screen41[] = {current_sd_card, current_time_select, date_buffer, time_buffer};
                     int x_distances41[] = {1, 1, 1, 1};
                     print_text(screen41, count_of(screen41), x_distances41);
+                    
                 break;
             }
         break;  

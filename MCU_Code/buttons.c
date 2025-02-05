@@ -42,29 +42,38 @@ void buttonsInit(void) {
     gpio_pull_up(BUTTON2PIN);
     gpio_pull_up(BUTTON3PIN);
     gpio_pull_up(BUTTON4PIN);
-    // enable interrupts with falling edge -> 0x04
-    gpio_set_irq_enabled_with_callback(BUTTON1PIN, GPIO_IRQ_EDGE_RISE, true, &buttonCallback);
-    gpio_set_irq_enabled_with_callback(BUTTON2PIN, GPIO_IRQ_EDGE_RISE, true, &buttonCallback);
-    gpio_set_irq_enabled_with_callback(BUTTON3PIN, GPIO_IRQ_EDGE_RISE, true, &buttonCallback);
-    gpio_set_irq_enabled_with_callback(BUTTON4PIN, GPIO_IRQ_EDGE_RISE, true, &buttonCallback);
+
+    #ifdef BUTTON_INTERRUPTS
+    // enable interrupts with rising edge -> 0x08
+    gpio_set_irq_enabled_with_callback(BUTTON1PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
+    gpio_set_irq_enabled_with_callback(BUTTON2PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
+    gpio_set_irq_enabled_with_callback(BUTTON3PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
+    gpio_set_irq_enabled_with_callback(BUTTON4PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
+    #endif
+
 }
 
-void buttonCallback(uint gpio, uint32_t events) {
-    if(debounce()) return;
+// Button Interrupt Service Routine
+void buttonISR(uint gpio, uint32_t events) {
+    if(debounce()) return; // Debounce button
     switch(gpio) {
         case 6:
+            printf("\nButton 1 pressed\n");
             button1_state = !button1_state;
         break;
             
         case 7:
+            printf("\nButton 2 pressed\n");
             button2_state = !button2_state;
         break;
 
         case 8:
+            printf("\nButton 3 pressed\n");
             button3_state = !button3_state;
         break;
         
         case 9:
+            printf("\nButton 4 pressed\n");
             button4_state = !button4_state;
         break;
     }
