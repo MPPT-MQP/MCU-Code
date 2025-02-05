@@ -48,9 +48,9 @@ void buttonsInit(void) {
     #ifdef BUTTON_INTERRUPTS
     // enable interrupts with rising edge -> 0x08
     gpio_set_irq_enabled_with_callback(BUTTON1PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
-    gpio_set_irq_enabled(BUTTONPIN_2, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
-    gpio_set_irq_enabled(BUTTONPIN_3, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
-    gpio_set_irq_enabled(BUTTONPIN_4, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
+    gpio_set_irq_enabled(BUTTON2PIN, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
+    gpio_set_irq_enabled(BUTTON3PIN, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
+    gpio_set_irq_enabled(BUTTON4PIN, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
     #endif
 
 }
@@ -59,22 +59,22 @@ void buttonsInit(void) {
 void buttonISR(uint gpio, uint32_t events) {
     if(debounce()) return; // Debounce button
     switch(gpio) {
-        case BUTTONPIN_1:
+        case BUTTON1PIN:
             printf("\nButton 1 pressed\n");
             button1_state = !button1_state;
         break;
             
-        case BUTTONPIN_2:
+        case BUTTON2PIN:
             printf("\nButton 2 pressed\n");
             button2_state = !button2_state;
         break;
 
-        case BUTTONPIN_3:
+        case BUTTON3PIN:
             printf("\nButton 3 pressed\n");
             button3_state = !button3_state;
         break;
         
-        case BUTTONPIN_4:
+        case BUTTON4PIN:
             printf("\nButton 4 pressed\n");
             button4_state = !button4_state;
         break;
