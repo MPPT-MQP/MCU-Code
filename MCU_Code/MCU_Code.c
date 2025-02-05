@@ -8,6 +8,8 @@
 #include "sdCard.h"
 #include "sd_card.h"
 #include "buttons.h"
+#include "oled_screen.h"
+#include "user_interface.h"
 #include "pico/util/queue.h"
 
 #include <time.h>
@@ -22,11 +24,11 @@ static struct sensorData sensorBuffer[800];
 static struct tm date[800];
 uint16_t BufferCounter = 0;
 
+
 int main()
 {
 
     stdio_init_all();
-
 
     // // Timer example code - This example fires off the callback after 2000ms
     // add_alarm_in_ms(2000, alarm_callback, NULL, false);
@@ -36,11 +38,15 @@ int main()
     printf("USB Clock Frequency is %d Hz\n", clock_get_hz(clk_usb));
     // For more examples of clocks use see https://github.com/raspberrypi/pico-examples/tree/master/clocks
     
-
     /*Start of non example code*/
     //Init both I2C0 and I2C1
     configI2C();
 
+    // Initialize OLED Screen and Display Welcome
+    oled_init();
+    welcome_screen();
+    sleep_ms(2000);
+    
     //Temp Sensor ADC Setup
     TMP_ADC_setup();
 
@@ -60,6 +66,8 @@ int main()
     // struct tm time;
     
     while (true) {
+        run_main_screens();
+        
         // PM_printManID(PM1);
         // PM_printManID(PM2);
         // PM_printManID(PM3);
@@ -113,5 +121,6 @@ int main()
         /*Core 1 read current count value and display that value on the oled screen
         SD card: need to decide how often to write to sd card, maybe reading 400 behind??
         Then make a copy into a new array so that everything is formatted correctly, then save to SD card*/
+
     }
 }

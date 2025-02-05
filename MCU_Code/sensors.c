@@ -13,7 +13,7 @@ void configI2C(){
     // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
 
     // I2C1 Initialisation. Using it at 300Khz.
-    i2c_init(I2C1_PORT, 300*1000);
+    i2c_init(I2C1_PORT, 100*1000); //might have to run at 100kHz for screen
     
     gpio_set_function(I2C1_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C1_SCL, GPIO_FUNC_I2C);

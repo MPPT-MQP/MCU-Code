@@ -5,10 +5,6 @@
 #include "hardware/i2c.h"
 #include "oled_font.h"
 
-
-/*DEFINE OLED I2C HERE*/
-#define OLED_I2C i2c1
-
 // Define the size of the display we have attached. This can vary, make sure you
 // have the right size defined or the output will look rather odd!
 // Code has been tested on 128x32 and 128x64 OLED displays
@@ -57,3 +53,8 @@
 
 #define SSD1306_WRITE_MODE         _u(0xFE)
 #define SSD1306_READ_MODE          _u(0xFF)
+
+// Screen Functions
+void oled_init();
+void print_text(char** text, int text_length, int* x_distances);
+void clear_display();
