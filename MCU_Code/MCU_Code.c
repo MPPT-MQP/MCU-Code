@@ -11,6 +11,7 @@
 #include "oled_screen.h"
 #include "user_interface.h"
 #include "pico/util/queue.h"
+#include "algorithms.h"
 
 #include <time.h>
 
@@ -19,10 +20,7 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
     return 0;
 }
 
-//Sensor Data Buffer
-static struct sensorData sensorBuffer[800];
-static struct tm date[800];
-uint16_t BufferCounter = 0;
+struct tm date[800];
 
 
 int main()
@@ -47,12 +45,15 @@ int main()
     welcome_screen();
     sleep_ms(2000);
     
-    //Temp Sensor ADC Setup
-    TMP_ADC_setup();
+    // //Temp Sensor ADC Setup
+    // TMP_ADC_setup();
 
-    //Init SD Card Setup (hw_config.c sets the SPI pins)
-    // sd_init_driver();
+    // //Init SD Card Setup (hw_config.c sets the SPI pins)
+    // // sd_init_driver();
 
+    //Init PWM
+    pico_pwm_init();
+    
     //Setup Buttons
     buttonsInit();
 
@@ -64,31 +65,36 @@ int main()
     // queue_init(&shareQueue, 32, 10);
     // aon_timer_start_with_timeofday();
     // struct tm time;
+
+    //set enable pin high
+    gpio_init(27);
+    gpio_set_dir(27, GPIO_OUT);
+    gpio_put(27, true);
     
     while (true) {
         run_main_screens();
         
-        // PM_printManID(PM1);
-        // PM_printManID(PM2);
+        PM_printManID(PM1);
+        PM_printManID(PM2);
         // PM_printManID(PM3);
 
         /* Sensor Loop*/
 
-        //Power Monitors
+        // //Power Monitors
         sensorBuffer[BufferCounter].PM1voltage = PM_readVoltage(PM1);
         sensorBuffer[BufferCounter].PM1current = PM_readCurrent(PM1);
 
         sensorBuffer[BufferCounter].PM2voltage = PM_readVoltage(PM2);
         sensorBuffer[BufferCounter].PM2current = PM_readCurrent(PM2);
 
-        sensorBuffer[BufferCounter].PM3voltage = PM_readVoltage(PM3);
-        sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
+        // sensorBuffer[BufferCounter].PM3voltage = PM_readVoltage(PM3);
+        // sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
 
-        //Temperature
-        sensorBuffer[BufferCounter].temperature = readTempature(2, 5);
+        // //Temperature
+        // sensorBuffer[BufferCounter].temperature = readTempature(2, 5);
         
         //Irradiance
-        sensorBuffer[BufferCounter].irradiance = readExtADC();
+        // sensorBuffer[BufferCounter].irradiance = readExtADC();
         // Returns irradance converted voltage value
 
 
@@ -116,6 +122,11 @@ int main()
             BufferCounter = 0;
         }
         /*End sensor loop*/
+
+        /*Run Algorithm*/
+        
+        // pwm_set_chan_level(slice_num, PWM_CHAN_A, perturb_and_observe());
+        pwm_set_chan_level(slice_num, PWM_CHAN_A, 2187);
 
         //Notes
         /*Core 1 read current count value and display that value on the oled screen

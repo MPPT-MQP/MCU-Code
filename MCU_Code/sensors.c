@@ -13,7 +13,7 @@ void configI2C(){
     // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
 
     // I2C1 Initialisation. Using it at 300Khz.
-    i2c_init(I2C1_PORT, 100*1000); //might have to run at 100kHz for screen
+    i2c_init(I2C1_PORT, 400*1000); //might have to run at 100kHz for screen
     
     gpio_set_function(I2C1_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C1_SCL, GPIO_FUNC_I2C);
@@ -137,11 +137,12 @@ float readTempature(uint16_t num_samples, uint16_t sampleDelay){
 // PWM Usage Function
 // pwm_set_chan_level(slice_num, PWM_CHAN_A, duty_cycle);
 // where duty cycle is out of 3125
+uint slice_num;
 
 void pico_pwm_init(){
     gpio_set_function(PWM_PIN, GPIO_FUNC_PWM);
 
-    uint slice_num = pwm_gpio_to_slice_num(PWM_PIN);
+    slice_num = pwm_gpio_to_slice_num(PWM_PIN);
 
     // Set frequency to 40kHz
     pwm_set_wrap(slice_num, 3125);

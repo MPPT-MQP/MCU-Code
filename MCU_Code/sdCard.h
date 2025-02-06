@@ -6,6 +6,8 @@
 #include "pico/time.h"
 
 
+
+
 void mountSD();
 
 struct sensorData {
@@ -21,3 +23,8 @@ struct sensorData {
     float temperature;
     float irradiance;
 };
+
+
+//Sensor Data Buffer
+extern struct sensorData sensorBuffer[800];
+extern uint16_t BufferCounter;

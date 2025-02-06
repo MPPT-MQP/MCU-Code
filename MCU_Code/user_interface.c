@@ -3,6 +3,7 @@
 #include "oled_screen.h"
 #include <string.h>
 #include <time.h>
+#include "sdCard.h"
 
 // Time Stuff
  time_t current_time;
@@ -47,7 +48,10 @@ void welcome_screen(){
 
 // Main user interface loop
 void run_main_screens() {
-
+    //Array for displaying sensor data
+    char displayString1[16];
+    char displayString2[16];     
+    
     // Print current time to buffer to be displayed on screen
     strftime(date_buffer, 80,"%x", time_info);
     strftime(time_buffer, 80, "%I:%M%p", time_info);
@@ -134,19 +138,24 @@ void run_main_screens() {
         break;
 
         case 1:
-            char *screen1[] = {"TEMPERATURE:", "00.00*C", "IRRADIANCE:", "00.00 W/m^2"};
+            sprintf(displayString1, "%0.2f*C", sensorBuffer[BufferCounter].temperature);
+            sprintf(displayString2, "%0.2fW/m^2", sensorBuffer[BufferCounter].irradiance);
+            char *screen1[] = {"TEMPERATURE:", displayString1, "IRRADIANCE:", displayString2};
             int x_distances1[] = {20, 40, 20, 20};
             print_text(screen1, count_of(screen1), x_distances1);
         break;
 
         case 2:
-            char *screen2[] = {"PM1 PV-Buck:", "00.00 V 00.00 A", "PM2 Buck-CC:", "00.00 V 00.00 A"};
+            sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current);
+            sprintf(displayString2, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current);
+            char *screen2[] = {"PM1 PV-Buck:", displayString1, "PM2 Buck-CC:", displayString2};
             int x_distances2[] = {20, 1, 20, 1};
             print_text(screen2, count_of(screen2), x_distances2);
         break;
 
         case 3:
-            char *screen3[] = {"PM3 CC-Battery:", "00.00 V 00.00 A", "BATTERY SOC:", "00.00%"};
+            sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter].PM3voltage, sensorBuffer[BufferCounter].PM3current);
+            char *screen3[] = {"PM3 CC-Battery:", displayString1, "BATTERY SOC:", "00.00%"};
             int x_distances3[] = {10, 1, 20, 40};
             print_text(screen3, count_of(screen3), x_distances3);
             

@@ -259,6 +259,9 @@ static inline int GetFontIndex(uint8_t ch) {
      else if (ch == '&') {
         return ch - '&' + 47;
     }
+     else if (ch == ',') {
+        return ch - ',' + 48;
+    }
 
     else return  0; // Not got that char so space.
 }

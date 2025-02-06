@@ -2,6 +2,10 @@
 #include <time.h>
 #include "pico/aon_timer.h"
 
+//Sensor Data Buffer
+struct sensorData sensorBuffer[800];
+uint16_t BufferCounter = 0;
+
 
 FRESULT fr;
 

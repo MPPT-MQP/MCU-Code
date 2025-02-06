@@ -41,6 +41,8 @@
 //PWM PIN
 #define PWM_PIN 28
 
+extern uint slice_num;
+
 //Sensor Config I2C both channels
 void configI2C();
 
