@@ -46,7 +46,7 @@ int main()
     sleep_ms(2000);
     
     // //Temp Sensor ADC Setup
-    // TMP_ADC_setup();
+    TMP_ADC_setup();
 
     // //Init SD Card Setup (hw_config.c sets the SPI pins)
     // // sd_init_driver();
@@ -91,10 +91,10 @@ int main()
         // sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
 
         // //Temperature
-        // sensorBuffer[BufferCounter].temperature = readTempature(2, 5);
+        sensorBuffer[BufferCounter].temperature = readTempature(2, 5);
         
         //Irradiance
-        // sensorBuffer[BufferCounter].irradiance = readExtADC();
+        sensorBuffer[BufferCounter].irradiance = readExtADC();
         // Returns irradance converted voltage value
 
 

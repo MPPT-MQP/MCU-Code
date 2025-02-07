@@ -41,6 +41,9 @@
 //PWM PIN
 #define PWM_PIN 28
 
+// PCF8523 RTC Address Define
+#define PCF8523_ADDRESS 0x68
+
 extern uint slice_num;
 
 //Sensor Config I2C both channels
@@ -64,3 +67,27 @@ void pico_pwm_init();
 //External ADC
 void configExtADC(uint16_t register);
 float readExtADC();
+
+// Time Struct for PCF8523 RTC
+struct pcf8523_time_t {
+  int8_t second;
+  int8_t minute;
+  int8_t hour;
+  int8_t day;
+  int8_t month;
+  // last two digits of the year eg 23 for 2023
+  // this will fall over in 2100
+  int8_t year;
+  //0..6, 0 is Sunday
+  int8_t dotw;
+};
+
+// PCF8523
+void pcf8523_reset();
+void pcf8523_write(struct pcf8523_time_t *time);
+void pcf8523_read_raw(uint8_t *buffer);
+void pcf8523_read(struct pcf8523_time_t *time);
+void pcf8523_raw_to_time(uint8_t *raw_time, struct pcf8523_time_t *time);
+void pcf8523_time_to_raw(struct pcf8523_time_t *time, uint8_t *raw);
+
+

@@ -205,3 +205,80 @@ float readPyranometer(float voltage){
     return (voltage * voltage_multiplier);
 }
 /*End Pyranometer Functions*/
+
+/* PCF8523 RTC Functions*/
+// From https://github.com/a-mueller/pico-lib-pcf8523/tree/main
+
+void pcf8523_reset() {
+  uint8_t buf[] = {0x00, 0x58};
+  i2c_write_blocking(I2C1_PORT, PCF8523_ADDRESS, buf, 2, false);
+}
+
+void pcf8523_write(struct pcf8523_time_t *time) {
+    // buf[0] is the register to write to
+    // buf[1] is the value that will be written to the register
+    uint8_t buf[2];
+
+    //Write values for the current time in the array
+    //index 0 -> second: bits 4-6 are responsible for the ten's digit and bits 0-3 for the unit's digit
+    //index 1 -> minute: bits 4-6 are responsible for the ten's digit and bits 0-3 for the unit's digit
+    //index 2 -> hour: bits 4-5 are responsible for the ten's digit and bits 0-3 for the unit's digit
+    //index 3 -> day of the month: bits 4-5 are responsible for the ten's digit and bits 0-3 for the unit's digit
+    //index 4 -> day of the week: where Sunday = 0x00, Monday = 0x01, Tuesday... ...Saturday = 0x06
+    //index 5 -> month: bit 4 is responsible for the ten's digit and bits 0-3 for the unit's digit
+    //index 6 -> year: bits 4-7 are responsible for the ten's digit and bits 0-3 for the unit's digit
+
+    //NOTE: if the value in the year register is a multiple for 4, it will be considered a leap year and hence will include the 29th of February
+
+    uint8_t current_val[7];
+    pcf8523_time_to_raw(time, current_val);
+
+    for (int i = 3; i < 10; ++i) {
+        buf[0] = i;
+        buf[1] = current_val[i - 3];
+        i2c_write_blocking(I2C1_PORT, PCF8523_ADDRESS, buf, 2, false);
+    }
+}
+
+void pcf8523_read_raw(uint8_t *buffer) {
+    // For this particular device, we send the device the register we want to read
+  // first, then subsequently read from the device. The register is auto incrementing
+  // so we don't need to keep sending the register we want, just the first.
+
+  // Start reading acceleration registers from register 0x3B for 6 bytes
+  uint8_t val = 0x03;
+  i2c_write_blocking(I2C1_PORT, PCF8523_ADDRESS, &val, 1, true); // true to keep master control of bus
+  //int result = i2c_read_blocking(I2C1_PORT, PCF8523_ADDRESS, buffer, 7, false);
+  //return (result == 7);
+
+}
+
+/* Reads the current time from the RTC */
+void pcf8523_read(struct pcf8523_time_t *time) {
+  uint8_t raw_time[7];
+  pcf8523_read_raw(raw_time);
+  pcf8523_raw_to_time(raw_time, time);
+}
+
+/* Convert the raw bytes from the RTC into numbers we can understand */
+void pcf8523_raw_to_time(uint8_t *raw_time, struct pcf8523_time_t *time) {
+    time -> second = (10 * (int8_t) ((raw_time[0] & 0x70) >> 4)) + ((int8_t) (raw_time[0] & 0x0F));
+    time -> minute = (10 * (int8_t) ((raw_time[1] & 0x70) >> 4)) + ((int8_t) (raw_time[1] & 0x0F));
+    time -> hour = (10 * (int8_t) ((raw_time[2] & 0x30) >> 4)) + ((int8_t) (raw_time[2] & 0x0F));
+    time -> day = (10 * (int8_t) ((raw_time[3] & 0x30) >> 4)) + ((int8_t) (raw_time[3] & 0x0F));
+    time -> dotw = (int8_t) (raw_time[4] & 0x07);
+    time -> month = (10 * (int8_t) ((raw_time[5] & 0x10) >> 4)) + ((int8_t) (raw_time[5] & 0x0F));
+    time -> year = (10 * (int8_t) ((raw_time[6] & 0xF0) >> 4)) + ((int8_t) (raw_time[6] & 0x0F));
+}
+
+/* Convert the time from somewhere into raw bytes the RTC can understand */
+void pcf8523_time_to_raw(struct pcf8523_time_t *time, uint8_t *raw) {
+    raw[0] = ((time -> second / 10) << 4) | ((time -> second % 10) & 0x0F);
+    raw[1] = ((time -> minute / 10) << 4) | ((time -> minute % 10) & 0x0F);
+    raw[2] = ((time -> hour / 10) << 4) | ((time -> hour %10) & 0x0F);
+    raw[3] = ((time -> day / 10) << 4) | ((time -> day % 10) & 0x0F);
+    raw[4] = time -> dotw & 0x07;
+    raw[5] = ((time -> month / 10) << 4) | ((time -> month % 10) & 0x0F);
+    raw[6] = ((time -> year / 10) << 4) | ((time -> year % 10) & 0x0F);
+}
+/*End PCF8523 Functions*/
