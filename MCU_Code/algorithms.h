@@ -1,4 +1,8 @@
 
+#include "math.h"
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 extern float duty;
 extern float voltage;
@@ -11,3 +15,4 @@ void perturb_and_observe(int variable);
 void incremental_conductance(int variable);
 void temperature_parametric();
 void beta_method();
+void particle_swarm_optimization();

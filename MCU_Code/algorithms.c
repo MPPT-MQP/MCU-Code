@@ -1,5 +1,4 @@
 #include "algorithms.h"
-#include "math.h"
 
 //Global Variables
 float duty_min = 0.1;
@@ -20,6 +19,19 @@ float prevDuty = 0.5;
 float prevVoltage = 0;
 float prevCurrent = 0;
 float prevPower = 0;
+
+// Structure to hold particle information for PSO
+struct Particle {
+    double x[10];
+    double v[10];
+    double y[10];
+    double bx[10];
+    double by[10];
+    double bg;
+    double bgx;
+    unsigned int k;
+    unsigned int iteration;
+};
 
 // Function below for each algorithm
 
@@ -175,5 +187,93 @@ void temperature_parametric() {
     float Vmpp = B0 + B1*irradiance +B2*temperature;
     float error = voltage - Vmpp;
     duty = error;
+
+}
+
+void particle_swarm_optimization() {
+    
+    // PSO Specification
+    double w =  0.5;  // Inertia weight
+    double c1 = 1.5; // Cognitive parameter
+    double c2 = 1.5; // Social parameter
+    int N = 10;   // Number of particles
+
+    float pmin = 0.01 * irradiance + 5.25;
+    float pmax = 20;
+
+    float out;
+
+    // Partical Variables
+    struct Particle p;
+    float prevIrradiance;
+    int initialized = 0;
+
+    // Ensure prev_G is initialized
+    if (!initialized) {
+        prevIrradiance = irradiance;
+    }
+
+    // Ensure p is initialized
+    if (!initialized || (irradiance != prevIrradiance)) {
+        // Reset particles
+        // p.x = linspace(pmin, pmax, N);
+        for (int i = 0; i < N; i++) {
+            p.x[i] = pmin + i * ((pmax - pmin) / (N - 1));
+        }
+        for (int i = 0; i < N; i++) {
+            p.v[i] = 0.0;
+            p.y[i] = 0.0;
+            p.bx[i] = 0.0;
+            p.by[i] = 0.0;
+        }
+        p.bg = pmin;
+        p.bgx = pmin;
+        p.k = 0; // Corresponds to Matlab's 1 (using 0-indexing in C)
+        p.iteration = 1;
+
+        // Update previous G
+        prevIrradiance = irradiance;
+        initialized = 1;
+
+        // Output first particle position
+        out = p.x[p.k];
+        return;
+    }
+
+    // Input Update
+    p.y[p.k] = power;
+
+    // Best Particle Update
+    if (p.y[p.k] > p.by[p.k]) {
+        p.bx[p.k] = p.x[p.k];
+        p.by[p.k] = p.y[p.k];
+
+        // Update global best if necessary
+        if (p.y[p.k] > p.bg) {
+            p.bg = p.y[p.k];
+            p.bgx = p.x[p.k];
+        }
+    }
+
+    // PSO Algorithm
+    double r1 = (double)rand() / (double)RAND_MAX; // Random number from 0 to 1
+    double r2 = (double)rand() / (double)RAND_MAX; // Random number from 0 to 1
+
+    p.v[p.k] = w * p.v[p.k] + c1 * r1 * (p.bx[p.k] - p.x[p.k]) + c2 * r2 * (p.bgx - p.x[p.k]);
+    p.x[p.k] = p.x[p.k] + p.v[p.k];
+
+    // Limit Position
+    p.x[p.k] = fmax(pmin, fmin(pmax, p.x[p.k]));
+
+    // Update Particle Turn, k
+    p.k = p.k + 1;
+    if (p.k >= N) {
+        p.k = 0;
+        p.iteration = 1;
+    }
+
+    // Output Best Solution
+    double best = p.bgx;
+    duty = best / 21.96;
 
 }
