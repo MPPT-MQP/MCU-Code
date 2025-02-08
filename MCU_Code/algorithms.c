@@ -88,8 +88,8 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 void constant_voltage() {
     pid_init(&cv_pid, 1, 1, 0); // Initialize with example gains 
     float Vref = 17.2;
-    float dt = 0.000001;
-    duty = pid_compute(&cv_pid, Vref, voltage, dt);
+    float dt = 0.000001; // not sure what to set this too
+    duty = pid_compute(&cv_pid, Vref, voltage, dt); 
 
 }
 
@@ -367,11 +367,11 @@ void ripple_correlation_control() {
     float dt = 0.000001;
     float PID1_input = error1 * error2;
     pid_init(&rcc_pid1, 200, 5, 0);  
-    float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt);
+    float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt); // not sure about setpoint here
 
     float PID2_input = PID1_output - error2;
     pid_init(&rcc_pid2, 0.000000002, -0.001, 0); 
-    float duty_raw = pid_compute(&rcc_pid2, 0.69, voltage, dt);
+    float duty_raw = pid_compute(&rcc_pid2, 0.69, voltage, dt); // not sure about setpoint here 
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
