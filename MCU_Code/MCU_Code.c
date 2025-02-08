@@ -25,7 +25,6 @@ struct tm date[800];
 
 int main()
 {
-
     stdio_init_all();
 
     // // Timer example code - This example fires off the callback after 2000ms
@@ -74,8 +73,8 @@ int main()
     while (true) {
         run_main_screens();
         
-        PM_printManID(PM1);
-        PM_printManID(PM2);
+       // PM_printManID(PM1);
+       // PM_printManID(PM2);
         // PM_printManID(PM3);
 
         /* Sensor Loop*/
@@ -124,9 +123,17 @@ int main()
         /*End sensor loop*/
 
         /*Run Algorithm*/
-        
-        // pwm_set_chan_level(slice_num, PWM_CHAN_A, perturb_and_observe());
-        pwm_set_chan_level(slice_num, PWM_CHAN_A, 2187);
+        if (tracking_toggle == 1) {
+            voltage = sensorBuffer[BufferCounter].PM1voltage;
+            current = sensorBuffer[BufferCounter].PM1current;
+            power = sensorBuffer[BufferCounter].PM1power;
+            temperature = sensorBuffer[BufferCounter].temperature;
+            irradiance = sensorBuffer[BufferCounter].irradiance;
+            printf("Algorithm Values: %0.2f, %0.2f, %0.2f, %0.2f", voltage, current, power, duty);
+            perturb_and_observe(0);
+            pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
+        }
+        // pwm_set_chan_level(slice_num, PWM_CHAN_A, 2187);
 
         //Notes
         /*Core 1 read current count value and display that value on the oled screen
