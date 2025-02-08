@@ -20,6 +20,22 @@ float prevVoltage = 0;
 float prevCurrent = 0;
 float prevPower = 0;
 
+// RCC Variables
+float prevVoltage_gain = 0;
+float prevCurrent_gain = 0;
+float prevPower_gain = 0;
+
+// Structure for PID controller 
+typedef struct {
+    float kp, ki, kd; // Gains for P, I, and D terms
+    float integral;   // Integral term accumulator
+    float prev_error; // Previous error for derivative calculation
+} PIDController;
+
+PIDController cv_pid;
+PIDController rcc_pid1;
+PIDController rcc_pid2;
+
 // Structure to hold particle information for PSO
 struct Particle {
     double x[10];
@@ -33,7 +49,48 @@ struct Particle {
     unsigned int iteration;
 };
 
-// Function below for each algorithm
+/* PID functions */
+void pid_init(PIDController *pid, float kp, float ki, float kd) {
+    pid->kp = kp;
+    pid->ki = ki;
+    pid->kd = kd;
+    pid->integral = 0;
+    pid->prev_error = 0;
+}
+
+float pid_compute(PIDController *pid, float setpoint, float actual_value, float dt) {
+    float error = setpoint - actual_value;
+
+    // Proportional term
+    float proportional = pid->kp * error;
+
+    // Integral term
+    pid->integral += error * dt;
+    float integral = pid->ki * pid->integral;
+
+    // Derivative term
+    float derivative = pid->kd * (error - pid->prev_error) / dt;
+
+    // Calculate total output
+    float output = proportional + integral + derivative;
+
+    // Update previous error
+    pid->prev_error = error;
+
+    return output;
+}
+/* End PID Functions*/
+
+
+/* ALGORITHM FUNCTIONS */
+
+void constant_voltage() {
+    pid_init(&cv_pid, 1, 1, 0); // Initialize with example gains 
+    float Vref = 17.2;
+    float dt = 0.000001;
+    duty = pid_compute(&cv_pid, Vref, voltage, dt);
+
+}
 
 void perturb_and_observe(int variable){
 
@@ -185,9 +242,15 @@ void temperature_parametric() {
     float B1 = -0.0003;
     float B2 = -0.088;
     float Vmpp = B0 + B1*irradiance +B2*temperature;
-    float error = voltage - Vmpp;
-    duty = error;
+    float duty_raw = voltage - Vmpp;
 
+    if (duty_raw >= duty_max || duty_raw <= duty_min) {
+        duty = prevDuty;
+    }
+    else {
+        duty = duty_raw;
+        prevDuty = duty;
+    }
 }
 
 void particle_swarm_optimization() {
@@ -274,6 +337,49 @@ void particle_swarm_optimization() {
 
     // Output Best Solution
     double best = p.bgx;
-    duty = best / 21.96;
+    float duty_raw = best / 21.96;
+
+    if (duty_raw >= duty_max || duty_raw <= duty_min) {
+        duty = prevDuty;
+    }
+    else {
+        duty = duty_raw;
+        prevDuty = duty;
+    }
 
 }
+
+void ripple_correlation_control(){
+    
+    float voltage_gain = voltage * 0.9;
+    float current_gain = current * 100;
+    float power_gain = voltage_gain * current_gain;
+
+    float LPF_Beta = 0.0015;
+
+    float LPF1_output = LPF_Beta * power_gain + (1 - LPF_Beta) * prevPower_gain;
+    float LPF2_output = LPF_Beta * voltage_gain + (1 - LPF_Beta) * prevVoltage_gain;
+    
+    float error1 = power_gain - LPF1_output;
+    float error2 = voltage_gain - LPF2_output;
+
+    float dt = 0.000001;
+    float PID1_input = error1 * error2;
+    pid_init(&rcc_pid1, 200, 5, 0);  
+    float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt);
+
+    float PID2_input = PID1_output - error2;
+    pid_init(&rcc_pid2, 0.000000002, -0.001, 0); 
+    float duty_raw = pid_compute(&rcc_pid2, 0.69, voltage, dt);
+
+    if (duty_raw >= duty_max || duty_raw <= duty_min) {
+        duty = prevDuty;
+    }
+    else {
+        duty = duty_raw;
+        prevDuty = duty;
+    }
+
+}
+
+/* END ALGORITHM FUNCTIONS */

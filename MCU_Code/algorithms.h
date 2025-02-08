@@ -16,3 +16,5 @@ void incremental_conductance(int variable);
 void temperature_parametric();
 void beta_method();
 void particle_swarm_optimization();
+void constant_voltage();
+void ripple_correlation_control();
