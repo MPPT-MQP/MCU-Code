@@ -32,6 +32,7 @@ typedef struct {
     float prev_error; // Previous error for derivative calculation
 } PIDController;
 
+// PID Controller Instances for Each Algorithm 
 PIDController cv_pid;
 PIDController rcc_pid1;
 PIDController rcc_pid2;
@@ -349,7 +350,7 @@ void particle_swarm_optimization() {
 
 }
 
-void ripple_correlation_control(){
+void ripple_correlation_control() {
     
     float voltage_gain = voltage * 0.9;
     float current_gain = current * 100;
