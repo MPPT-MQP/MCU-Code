@@ -166,7 +166,7 @@ void run_main_screens() {
         case 4:
             if(button2_state) {                
                 select_num++;
-                if(select_num > 6) {
+                if(select_num > 5) {
                    select_num = 0;
                 }
                 button2_state = !button2_state;
