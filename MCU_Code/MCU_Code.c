@@ -68,7 +68,7 @@ int main()
     //set enable pin high
     gpio_init(27);
     gpio_set_dir(27, GPIO_OUT);
-    gpio_put(27, true);
+   
     
     while (true) {
         run_main_screens();
@@ -124,15 +124,21 @@ int main()
 
         /*Run Algorithm*/
         if (tracking_toggle == 1) {
-            voltage = sensorBuffer[BufferCounter].PM1voltage;
-            current = sensorBuffer[BufferCounter].PM1current;
-            power = sensorBuffer[BufferCounter].PM1power;
-            temperature = sensorBuffer[BufferCounter].temperature;
-            irradiance = sensorBuffer[BufferCounter].irradiance;
-            printf("Algorithm Values: %0.2f, %0.2f, %0.2f, %0.2f", voltage, current, power, duty);
+            gpio_put(27, true);
+            voltage = sensorBuffer[BufferCounter-1].PM1voltage;
+            current = sensorBuffer[BufferCounter-1].PM1current;
+            //power = sensorBuffer[BufferCounter-1].PM1power;
+            power = voltage * current;
+            temperature = sensorBuffer[BufferCounter-1].temperature;
+            irradiance = sensorBuffer[BufferCounter-1].irradiance;
+            printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
             perturb_and_observe(0);
             pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
         }
+        else {
+            gpio_put(27, false);
+        }
+
         // pwm_set_chan_level(slice_num, PWM_CHAN_A, 2187);
 
         //Notes
