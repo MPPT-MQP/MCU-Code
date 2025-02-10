@@ -68,8 +68,8 @@ int main()
     //set enable pin high
     gpio_init(27);
     gpio_set_dir(27, GPIO_OUT);
+    gpio_put(27, false);
    
-    
     while (true) {
         run_main_screens();
         
