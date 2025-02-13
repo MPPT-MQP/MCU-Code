@@ -135,15 +135,19 @@ int main()
         // sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
 
         //Sprintf to format the data
-        char formatString[32];
+        char formatString[90];
         aon_timer_get_time_calendar(&time);
-        sprintf(formatString, "\n%02d:%02d:%02d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
+        sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
         time.tm_hour, time.tm_min, time.tm_sec,
         sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
         sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
         sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
 
-        queue_try_add(&shareQueue, &formatString);
+        //Returns false if the queue is full
+        bool resultsAdd = queue_try_add(&shareQueue, &formatString);
+        if(resultsAdd == false){
+            printf("\nCORE 0: Queue Full Add Error \n");
+        }
 
         if(BufferCounter++ > 20){
             BufferCounter = 0;
