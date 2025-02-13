@@ -12,8 +12,8 @@
 #include "user_interface.h"
 #include "pico/util/queue.h"
 #include "algorithms.h"
-
 #include <time.h>
+#include "pico/multicore.h"
 
 int64_t alarm_callback(alarm_id_t id, void *user_data) {
     // Put your timeout handler code in here
@@ -21,10 +21,35 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
 }
 
 struct tm date[800];
+queue_t shareQueue;
+bool saveFlag = false;
+
+/// @brief Core 1 Main Function
+void core1_main(){
+    // Initialize OLED Screen and Display Welcome
+    oled_init();
+    welcome_screen();
+
+    //Setup Buttons
+    buttonsInit();
+
+
+    while(1){
+        run_main_screens();
+        copySDBuffer();
+
+        if(saveFlag == true){
+            writeSD(64800);
+        }
+    }
+}
 
 int main()
 {
     stdio_init_all();
+    saveFlag = false;
+    //Launch core 1 (OLED, SD Card)
+    multicore_launch_core1(core1_main);
 
     // // Timer example code - This example fires off the callback after 2000ms
     // add_alarm_in_ms(2000, alarm_callback, NULL, false);
@@ -42,31 +67,31 @@ int main()
     // pcf8523_set_from_PC();
     // pcf8523_set_manually(2025, 2, 13, 9, 34, 23);
 
-    // Initialize OLED Screen and Display Welcome
-    oled_init();
-    welcome_screen();
-    sleep_ms(2000);
+    // // Initialize OLED Screen and Display Welcome
+    // oled_init();
+    // welcome_screen();
     
     // //Temp Sensor ADC Setup
     TMP_ADC_setup();
 
-    // //Init SD Card Setup (hw_config.c sets the SPI pins)
-    // // sd_init_driver();
+    //Init SD Card Setup (hw_config.c sets the SPI pins)
+    sd_init_driver();
+    mountSD();
+    initSDFile();
 
     //Init PWM
     pico_pwm_init();
     
-    //Setup Buttons
-    buttonsInit();
+    // //Setup Buttons
+    // buttonsInit();
 
-    // //Setup External ADC (ADS1115)
+    //Setup External ADC (ADS1115)
     configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
     
-    // //Init Queue (NEED TO TEST)
-    // queue_t shareQueue;
-    // queue_init(&shareQueue, 32, 10);
-    // aon_timer_start_with_timeofday();
-    // struct tm time;
+    //Init Queue
+    queue_init(&shareQueue, 90, 20);
+    aon_timer_start_with_timeofday();
+    struct tm time;
 
     //set enable pin high
     gpio_init(27);
@@ -74,10 +99,10 @@ int main()
     gpio_put(27, false);
    
     while (true) {
-        run_main_screens();
         
-       // PM_printManID(PM1);
-       // PM_printManID(PM2);
+        
+        // PM_printManID(PM1);
+        // PM_printManID(PM2);
         // PM_printManID(PM3);
 
         /* Sensor Loop*/
@@ -92,8 +117,8 @@ int main()
         // sensorBuffer[BufferCounter].PM3voltage = PM_readVoltage(PM3);
         // sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
 
-        // //Temperature
-        sensorBuffer[BufferCounter].temperature = readTempature(2, 5);
+        //Temperature
+        sensorBuffer[BufferCounter].temperature = readTempature(2, 1);
         
         //Irradiance
         sensorBuffer[BufferCounter].irradiance = readExtADC();
@@ -101,26 +126,26 @@ int main()
 
 
         // //Write inital header data below
-        printf("\nTimestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2)");
+        // printf("\nTimestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2)");
         
-        //Write row data
-        printf("\nTIME, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
-        sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
-        sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
-        sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
-
-        // //Sprintf to format the data
-        // char formatString[32];
-        // aon_timer_get_time(&time);
-        // sprintf(&formatString, "%02d:%02d:%02d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
-        // time.tm_hour, time.tm_min, time.tm_sec,
+        // //Write row data
+        // printf("\nTIME, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
         // sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
         // sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
         // sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
 
-        // queue_try_add(&shareQueue, &formatString);
+        //Sprintf to format the data
+        char formatString[32];
+        aon_timer_get_time_calendar(&time);
+        sprintf(formatString, "\n%02d:%02d:%02d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
+        time.tm_hour, time.tm_min, time.tm_sec,
+        sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
+        sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
+        sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
 
-        if(BufferCounter++ > 800){
+        queue_try_add(&shareQueue, &formatString);
+
+        if(BufferCounter++ > 20){
             BufferCounter = 0;
         }
         /*End sensor loop*/
@@ -141,13 +166,6 @@ int main()
         else {
             gpio_put(27, false);
         }
-
-        // pwm_set_chan_level(slice_num, PWM_CHAN_A, 2187);
-
-        //Notes
-        /*Core 1 read current count value and display that value on the oled screen
-        SD card: need to decide how often to write to sd card, maybe reading 400 behind??
-        Then make a copy into a new array so that everything is formatted correctly, then save to SD card*/
 
     }
 }

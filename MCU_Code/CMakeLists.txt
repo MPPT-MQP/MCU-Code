@@ -76,6 +76,7 @@ target_link_libraries(MCU_Code
         hardware_adc
         hardware_pwm
         pico_aon_timer
+        pico_multicore
         )
 
 pico_add_extra_outputs(MCU_Code)

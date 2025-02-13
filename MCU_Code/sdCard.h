@@ -2,13 +2,19 @@
 #include "ff.h"
 #include "ffconf.h"
 #include <stdio.h>
+#include <string.h>
 #include "pico/stdlib.h"
 #include "pico/time.h"
+#include "pico/util/queue.h"
+#include "pico/aon_timer.h"
 
 
-
+extern bool saveFlag;
 
 void mountSD();
+void initSDFile();
+void copySDBuffer();
+void writeSD(uint16_t bytes);
 
 struct sensorData {
     float PM1voltage;
@@ -26,5 +32,7 @@ struct sensorData {
 
 
 //Sensor Data Buffer
-extern struct sensorData sensorBuffer[800];
+extern struct sensorData sensorBuffer[20];
 extern uint16_t BufferCounter;
+
+extern queue_t shareQueue;

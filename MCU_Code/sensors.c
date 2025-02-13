@@ -193,8 +193,8 @@ float readExtADC(){
     //scale factor (125uV / LSB) **At specific FSR of 4.096V only**
     voltage = (voltage * CONVFACTOR) / 1000000;
 
-    printf("\nVoltage: %f", voltage);
-    printf("   |   Buffer: %X, %u", combinedBuffer);
+    // printf("\nVoltage: %f", voltage);
+    // printf("   |   Buffer: %X, %u", combinedBuffer);
 
     return readPyranometer(voltage);
 }
