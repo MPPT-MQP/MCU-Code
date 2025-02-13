@@ -4,12 +4,15 @@
 #include <string.h>
 #include <time.h>
 #include "sdCard.h"
+#include "sensors.h"
+
 
 // Time Stuff
- time_t current_time;
- struct tm *time_info;
- char date_buffer[80];
- char time_buffer[80];
+//  time_t current_time;
+//  struct tm *time_info;
+ char date_string[80];
+ char time_string[80];
+ int year, month, day, hour, minute, second;
 
 /* Variables to keep track of which screen and setting is selected*/
 int screen_num = 0;
@@ -42,8 +45,8 @@ void welcome_screen(){
     int x_distances1[] = {1, 15, 30, 1};
     print_text(screen1, count_of(screen1), x_distances1);
     
-    time(&current_time);
-    time_info = localtime(&current_time);
+    // time(&current_time);
+    // time_info = localtime(&current_time);
 }
 
 // Main user interface loop
@@ -53,8 +56,16 @@ void run_main_screens() {
     char displayString2[16];     
     
     // Print current time to buffer to be displayed on screen
-    strftime(date_buffer, 80,"%x", time_info);
-    strftime(time_buffer, 80, "%I:%M%p", time_info);
+    pcf8523_read(&pcf_datetime);
+    year = pcf_datetime.year;
+    month = pcf_datetime.month;
+    day = pcf_datetime.day;
+    hour = pcf_datetime.hour;
+    minute = pcf_datetime.minute;
+    second = pcf_datetime.second;
+    //printf("%d-%d-%d %d:%d:%d", year, month, day, hour, minute, second);
+    sprintf(date_string, "%d-%d-%d", year, month, day);
+    sprintf(time_string, "%d:%d:%d", hour, minute, second);
 
     // Check button 1 (toggles entire screen)
     if(button1_state) {
@@ -182,7 +193,7 @@ void run_main_screens() {
                     }
                     char *sd_card_selected[] = {"SD CARD: OFF<", "SD CARD: ON<"};
                     current_sd_card = sd_card_selected[sd_card_toggle];
-                    char *screen4[] = {current_sd_card, "DATE & TIME", date_buffer, time_buffer};
+                    char *screen4[] = {current_sd_card, "DATE & TIME", date_string, time_string};
                     int x_distances4[] = {1, 1, 1, 1};
                     print_text(screen4, count_of(screen4), x_distances4);
                 break;
@@ -192,51 +203,55 @@ void run_main_screens() {
                     if(button3_state) {
                         switch(select_num-1){
                             case 0:
-                                (time_info->tm_mon)++;
+                                (pcf_datetime.month)++;
                             break;
                             case 1:
-                                (time_info->tm_mday)++;
+                                (pcf_datetime.day)++;
                             break;
                             case 2:
-                                (time_info->tm_year)++;
+                                (pcf_datetime.year)++;
                             break;
                             case 3:
-                                (time_info->tm_hour)++;
+                                (pcf_datetime.hour)++;
                             break;
                             case 4:
-                                (time_info->tm_min)++;
+                                (pcf_datetime.minute)++;
+                            case 5: 
+                                (pcf_datetime.second)++;
                             break;
                         }
-                        current_time = mktime(time_info);
+                        pcf8523_write(&pcf_datetime);
                         button3_state = !button3_state;
                     }
                     // Check button 4 (decrements currently selected date value)
                     if(button4_state) {
                         switch(select_num-1){
                             case 0:
-                                (time_info->tm_mon)--;
+                                (pcf_datetime.month)--;
                             break;
                             case 1:
-                                (time_info->tm_mday)--;
+                                (pcf_datetime.day)--;
                             break;
                             case 2:
-                                (time_info->tm_year)--;
+                                (pcf_datetime.year)--;
                             break;
                             case 3:
-                                (time_info->tm_hour)--;
+                                (pcf_datetime.hour)--;
                             break;
                             case 4:
-                                (time_info->tm_min)--;
+                                (pcf_datetime.minute)--;
+                            case 5: 
+                                (pcf_datetime.second)--;
                             break;
                         }
-                        current_time = mktime(time_info);
+                        pcf8523_write(&pcf_datetime);
                         button4_state = !button4_state;
                     }
 
-                    char *date_time_selected[] = {"DATE & TIME MO", "DATE & TIME D", "DATE & TIME Y", "DATE & TIME H", "DATE & TIME MI"};
+                    char *date_time_selected[] = {"DATE & TIME MO", "DATE & TIME D", "DATE & TIME Y", "DATE & TIME H", "DATE & TIME MI", "DATE & TIME S"};
                     current_time_select = date_time_selected[select_num-1];
                     current_sd_card = sd_card[sd_card_toggle];
-                    char *screen41[] = {current_sd_card, current_time_select, date_buffer, time_buffer};
+                    char *screen41[] = {current_sd_card, current_time_select, date_string, time_string};
                     int x_distances41[] = {1, 1, 1, 1};
                     print_text(screen41, count_of(screen41), x_distances41);
                     

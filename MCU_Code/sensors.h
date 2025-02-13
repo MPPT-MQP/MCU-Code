@@ -82,6 +82,8 @@ struct pcf8523_time_t {
   int8_t dotw;
 };
 
+extern struct pcf8523_time_t pcf_datetime;
+
 // PCF8523
 void pcf8523_reset();
 void pcf8523_write(struct pcf8523_time_t *time);
@@ -89,5 +91,7 @@ void pcf8523_read_raw(uint8_t *buffer);
 void pcf8523_read(struct pcf8523_time_t *time);
 void pcf8523_raw_to_time(uint8_t *raw_time, struct pcf8523_time_t *time);
 void pcf8523_time_to_raw(struct pcf8523_time_t *time, uint8_t *raw);
+void pcf8523_set_from_PC();
+void pcf8523_set_manually(int year, int month, int day, int hour, int minute, int second);
 
 

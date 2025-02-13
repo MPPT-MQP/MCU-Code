@@ -1,5 +1,7 @@
 #include "sensors.h"
+#include <string.h>
 
+struct pcf8523_time_t pcf_datetime;
 
 /// @brief Configure I2C0 and I2C1 at specified ports, pins, and speeds
 void configI2C(){
@@ -212,6 +214,11 @@ float readPyranometer(float voltage){
 void pcf8523_reset() {
   uint8_t buf[] = {0x00, 0x58};
   i2c_write_blocking(I2C1_PORT, PCF8523_ADDRESS, buf, 2, false);
+
+    //write to control 3
+    uint8_t buf2[] = {0x02, 0x80}; //0x80 is default control3 and setting 100 to turn on battery switch-over function is enabled in standard mode;
+    //battery low detection function is disabled
+    i2c_write_blocking(I2C1_PORT, PCF8523_ADDRESS, buf2, 2, false);
 }
 
 void pcf8523_write(struct pcf8523_time_t *time) {
@@ -248,7 +255,7 @@ void pcf8523_read_raw(uint8_t *buffer) {
   // Start reading acceleration registers from register 0x3B for 6 bytes
   uint8_t val = 0x03;
   i2c_write_blocking(I2C1_PORT, PCF8523_ADDRESS, &val, 1, true); // true to keep master control of bus
-  //int result = i2c_read_blocking(I2C1_PORT, PCF8523_ADDRESS, buffer, 7, false);
+  int result = i2c_read_blocking(I2C1_PORT, PCF8523_ADDRESS, buffer, 7, false);
   //return (result == 7);
 
 }
@@ -280,5 +287,44 @@ void pcf8523_time_to_raw(struct pcf8523_time_t *time, uint8_t *raw) {
     raw[4] = time -> dotw & 0x07;
     raw[5] = ((time -> month / 10) << 4) | ((time -> month % 10) & 0x0F);
     raw[6] = ((time -> year / 10) << 4) | ((time -> year % 10) & 0x0F);
+}
+
+/* Read current PC time from serial communication and set RTC accordingly */
+// Need accompanying python script running on host PC 
+void pcf8523_set_from_PC(){
+    
+    pcf8523_reset();
+    char time_buffer[20];
+    int year, month, day, hour, minute, second;
+
+    fgets(time_buffer, sizeof(time_buffer), stdin);
+    time_buffer[strcspn(time_buffer, "\n")] = 0; // Remove trailing newlin
+    
+    sscanf(time_buffer, "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+  
+    pcf_datetime.second = second+1;
+    pcf_datetime.minute = minute;
+    pcf_datetime.hour = hour;
+    pcf_datetime.day = day;
+    pcf_datetime.month = month;
+    pcf_datetime.year = year-2000;
+    //datetime.dotw = 2;
+  
+     pcf8523_write(&pcf_datetime);
+}
+
+/* Set RTC time manually upon upload*/
+void pcf8523_set_manually(int year, int month, int day, int hour, int minute, int second) {
+
+    pcf8523_reset();
+    pcf_datetime.second = second;
+    pcf_datetime.minute = minute;
+    pcf_datetime.hour = hour;
+    pcf_datetime.day = day;
+    pcf_datetime.month = month;
+    pcf_datetime.year = year-2000;
+
+    pcf8523_write(&pcf_datetime);
+
 }
 /*End PCF8523 Functions*/

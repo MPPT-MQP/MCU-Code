@@ -22,7 +22,6 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
 
 struct tm date[800];
 
-
 int main()
 {
     stdio_init_all();
@@ -38,6 +37,10 @@ int main()
     /*Start of non example code*/
     //Init both I2C0 and I2C1
     configI2C();
+
+    /* RTC Initialization Options - Uncomment to set RTC */
+    // pcf8523_set_from_PC();
+    // pcf8523_set_manually(2025, 2, 13, 9, 34, 23);
 
     // Initialize OLED Screen and Display Welcome
     oled_init();
