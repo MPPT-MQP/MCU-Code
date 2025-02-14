@@ -57,7 +57,7 @@ void copySDBuffer(){
     strcpy(sensorLocalBuffer[counter], test);
     if(removeQueue == false){
         //Queue empty
-        printf("\nCORE 1: QUEUE EMPTY\n");
+        //printf("\nCORE 1: QUEUE EMPTY\n");
     }else{
         if(counter++ > 720){
             counter = 0;

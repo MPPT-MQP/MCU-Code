@@ -3,7 +3,7 @@
 //Global Variables
 float duty_min = 0.1;
 float duty_max = 0.95;
-static float P_0_step_val = 0.03;
+static float P_0_step_val = 0.035;
 float P_O_step;
 static float I_C_step_val = 0.0001;
 float I_C_step;

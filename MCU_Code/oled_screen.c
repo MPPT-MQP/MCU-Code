@@ -306,7 +306,7 @@ void oled_init() {
     // zero the entire display
     memset(buf, 0, SSD1306_BUF_LEN);
     render(buf, &frame_area);
-    sleep_ms(1000);
+   // sleep_ms(1000);
 }
 
 void clear_display(){
@@ -320,7 +320,7 @@ void print_text(char** text, int text_length, int* x_distances) {
         y+=8;
    }
     render(buf, &frame_area);
-    sleep_ms(1000);
+    //sleep_ms(1000);
 }
 
 
