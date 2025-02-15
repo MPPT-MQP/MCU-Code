@@ -20,7 +20,7 @@ int64_t alarm_callback(alarm_id_t id, void *user_data) {
     return 0;
 }
 
-struct tm date[800];
+
 queue_t shareQueue;
 bool saveFlag = false;
 
@@ -53,8 +53,18 @@ int main()
 
     //Init Queue
     queue_init(&shareQueue, 90, 20);
-    aon_timer_start_with_timeofday();
-    struct tm time;
+
+    //Set Pico Clock
+     struct pcf8523_time_t RTCtime;
+     struct tm PicoTime;
+     PicoTime.tm_hour = RTCtime.hour;
+     PicoTime.tm_min = RTCtime.minute;
+     PicoTime.tm_sec = RTCtime.second;
+     PicoTime.tm_year = RTCtime.year;
+     PicoTime.tm_mon = RTCtime.month;
+     PicoTime.tm_mday = RTCtime.day;
+    pcf8523_read(&RTCtime);
+    aon_timer_start(&PicoTime);
 
     multicore_launch_core1(core1_main);
 
@@ -162,9 +172,9 @@ int main()
             perturb_and_observe(0);
             pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
             char formatString[90];
-            aon_timer_get_time_calendar(&time);
+            aon_timer_get_time_calendar(&PicoTime);
             sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
-            time.tm_hour, time.tm_min, time.tm_sec,
+            PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
             sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
             sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
             sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, duty);
