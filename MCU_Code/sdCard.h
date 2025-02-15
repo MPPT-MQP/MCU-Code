@@ -36,3 +36,8 @@ extern struct sensorData sensorBuffer[20];
 extern uint16_t BufferCounter;
 
 extern queue_t shareQueue;
+
+//Extern PicoTime Struct
+extern struct tm PicoTime;
+
+

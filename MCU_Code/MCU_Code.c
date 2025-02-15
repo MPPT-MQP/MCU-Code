@@ -15,11 +15,13 @@
 #include <time.h>
 #include "pico/multicore.h"
 
+struct pcf8523_time_t RTCtime;
+struct tm PicoTime;
+
 int64_t alarm_callback(alarm_id_t id, void *user_data) {
     // Put your timeout handler code in here
     return 0;
 }
-
 
 queue_t shareQueue;
 bool saveFlag = false;
@@ -55,16 +57,14 @@ int main()
     queue_init(&shareQueue, 90, 20);
 
     //Set Pico Clock
-     struct pcf8523_time_t RTCtime;
-     struct tm PicoTime;
-     PicoTime.tm_hour = RTCtime.hour;
-     PicoTime.tm_min = RTCtime.minute;
-     PicoTime.tm_sec = RTCtime.second;
-     PicoTime.tm_year = RTCtime.year;
-     PicoTime.tm_mon = RTCtime.month;
-     PicoTime.tm_mday = RTCtime.day;
     pcf8523_read(&RTCtime);
-    aon_timer_start(&PicoTime);
+    PicoTime.tm_hour = RTCtime.hour;
+    PicoTime.tm_min = RTCtime.minute;
+    PicoTime.tm_sec = RTCtime.second;
+    PicoTime.tm_year = RTCtime.year;
+    PicoTime.tm_mon = RTCtime.month;
+    PicoTime.tm_mday = RTCtime.day;
+    aon_timer_start_calendar(&PicoTime);
 
     multicore_launch_core1(core1_main);
 

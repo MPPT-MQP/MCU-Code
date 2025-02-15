@@ -6,13 +6,9 @@
 #include "sdCard.h"
 #include "sensors.h"
 
-
 // Time Stuff
-//  time_t current_time;
-//  struct tm *time_info;
  char date_string[80];
  char time_string[80];
- int year, month, day, hour, minute, second;
 
 /* Variables to keep track of which screen and setting is selected*/
 int screen_num = 0;
@@ -44,9 +40,6 @@ void welcome_screen(){
     char *screen1[] = {" ", "WPI MPPT MQP", "2024-2025", " "};
     int x_distances1[] = {1, 15, 30, 1};
     print_text(screen1, count_of(screen1), x_distances1);
-    
-    // time(&current_time);
-    // time_info = localtime(&current_time);
 }
 
 // Main user interface loop
@@ -56,16 +49,8 @@ void run_main_screens() {
     char displayString2[16];     
     
     // Print current time to buffer to be displayed on screen
-    pcf8523_read(&pcf_datetime);
-    year = pcf_datetime.year;
-    month = pcf_datetime.month;
-    day = pcf_datetime.day;
-    hour = pcf_datetime.hour;
-    minute = pcf_datetime.minute;
-    second = pcf_datetime.second;
-    //printf("%d-%d-%d %d:%d:%d", year, month, day, hour, minute, second);
-    sprintf(date_string, "%d-%d-%d", year, month, day);
-    sprintf(time_string, "%d:%d:%d", hour, minute, second);
+    sprintf(date_string, "%d-%d-%d", PicoTime.tm_year, PicoTime.tm_mon, PicoTime.tm_mday);
+    sprintf(time_string, "%d:%d:%d", PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec);
 
     // Check button 1 (toggles entire screen)
     if(button1_state) {
@@ -203,48 +188,46 @@ void run_main_screens() {
                     if(button3_state) {
                         switch(select_num-1){
                             case 0:
-                                (pcf_datetime.month)++;
+                                (PicoTime.tm_mon)++;
                             break;
                             case 1:
-                                (pcf_datetime.day)++;
+                                (PicoTime.tm_mday)++;
                             break;
                             case 2:
-                                (pcf_datetime.year)++;
+                                (PicoTime.tm_year)++;
                             break;
                             case 3:
-                                (pcf_datetime.hour)++;
+                                (PicoTime.tm_hour)++;
                             break;
                             case 4:
-                                (pcf_datetime.minute)++;
+                                (PicoTime.tm_min)++;
                             case 5: 
-                                (pcf_datetime.second)++;
+                                (PicoTime.tm_sec)++;
                             break;
                         }
-                        pcf8523_write(&pcf_datetime);
                         button3_state = !button3_state;
                     }
                     // Check button 4 (decrements currently selected date value)
                     if(button4_state) {
                         switch(select_num-1){
                             case 0:
-                                (pcf_datetime.month)--;
+                                (PicoTime.tm_mon)--;
                             break;
                             case 1:
-                                (pcf_datetime.day)--;
+                                (PicoTime.tm_mday)--;
                             break;
                             case 2:
-                                (pcf_datetime.year)--;
+                                (PicoTime.tm_year)--;
                             break;
                             case 3:
-                                (pcf_datetime.hour)--;
+                                (PicoTime.tm_hour)--;
                             break;
                             case 4:
-                                (pcf_datetime.minute)--;
+                                (PicoTime.tm_min)--;
                             case 5: 
-                                (pcf_datetime.second)--;
+                                (PicoTime.tm_sec)--;
                             break;
                         }
-                        pcf8523_write(&pcf_datetime);
                         button4_state = !button4_state;
                     }
 
