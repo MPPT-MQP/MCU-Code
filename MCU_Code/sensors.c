@@ -174,7 +174,7 @@ void configExtADC(uint16_t registerADC){
     registerOut[2] = (uint8_t)(registerADC & 0xff); //take LSB 8 bits into 8 bit value
     
     // Select config register, then write 16 bits to register
-    i2c_write_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, registerOut, 3, false);
+    i2c_write_blocking(I2C0_PORT, EXT_ADC_ADDDRESS, registerOut, 3, false);
     
 }
 

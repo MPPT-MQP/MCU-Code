@@ -18,7 +18,7 @@
 
 //Amount of time until alarm isr runs (flag is toggling between true and false)
 //Set the time in ms to half of the desired update rate??
-#define ALARM_TIME_MS 2000
+#define ALARM_TIME_MS 1000
 
 struct pcf8523_time_t RTCtime;
 struct tm PicoTime;
