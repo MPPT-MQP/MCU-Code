@@ -29,16 +29,17 @@ bool saveFlag = false;
 /// @brief Core 1 Main Function
 void core1_main(){
     // Initialize OLED Screen and Display Welcome
-    //sleep_ms(50);
-    // oled_init();
-    // welcome_screen();
+    sleep_ms(50);
+    oled_init();
+    welcome_screen();
 
     //Setup Buttons
-    
+    buttonsInit();
+
     printf("test core 1");
 
     while(1){
-        //run_main_screens();
+        run_main_screens();
         copySDBuffer();
 
         if(saveFlag == true){
@@ -50,11 +51,13 @@ void core1_main(){
 int main()
 {
     stdio_init_all();
-    saveFlag = false;
-    //Launch core 1 (OLED, SD Card)
 
     //Init Queue
     queue_init(&shareQueue, 90, 20);
+
+    /*Start of non example code*/
+    //Init both I2C0 and I2C1
+    configI2C();
 
     //Set Pico Clock
     pcf8523_read(&RTCtime);
@@ -66,6 +69,8 @@ int main()
     PicoTime.tm_mday = RTCtime.day;
     aon_timer_start_calendar(&PicoTime);
 
+    saveFlag = false;
+    //Launch core 1 (OLED, SD Card)
     multicore_launch_core1(core1_main);
 
     // // Timer example code - This example fires off the callback after 2000ms
@@ -75,20 +80,16 @@ int main()
     printf("System Clock Frequency is %d Hz\n", clock_get_hz(clk_sys));
     printf("USB Clock Frequency is %d Hz\n", clock_get_hz(clk_usb));
     // For more examples of clocks use see https://github.com/raspberrypi/pico-examples/tree/master/clocks
-    
-    /*Start of non example code*/
-    //Init both I2C0 and I2C1
-    configI2C();
 
     /* RTC Initialization Options - Uncomment to set RTC */
     // pcf8523_set_from_PC();
     // pcf8523_set_manually(2025, 2, 13, 9, 34, 23);
 
-    // // Initialize OLED Screen and Display Welcome
-    oled_init();
-    welcome_screen();
+    // //Initialize OLED Screen and Display Welcome
+    // oled_init();
+    // welcome_screen();
     
-    // //Temp Sensor ADC Setup
+    //Temp Sensor ADC Setup
     TMP_ADC_setup();
 
     //Init SD Card Setup (hw_config.c sets the SPI pins)
@@ -98,8 +99,6 @@ int main()
 
     //Init PWM
     pico_pwm_init();
-
-    buttonsInit();
     
     // //Setup Buttons
     // buttonsInit();
@@ -109,14 +108,13 @@ int main()
     
     
 
-    //set enable pin high
+    //set enable pin high????????????????????????????????????????????????????????????????
     gpio_init(27);
     gpio_set_dir(27, GPIO_OUT);
     gpio_put(27, false);
    
     while (true) {
-        run_main_screens();
-        
+        //Power Monitor Status Printouts (Should print "TI")
         // PM_printManID(PM1);
         // PM_printManID(PM2);
         // PM_printManID(PM3);
@@ -149,11 +147,7 @@ int main()
         // sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
         // sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
         // sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
-
-        //Sprintf to format the data
         
-
-
         if(BufferCounter++ > 20){
             BufferCounter = 0;
         }
@@ -161,6 +155,7 @@ int main()
 
         /*Run Algorithm*/
         if (button3_state == 1) {
+            //IS THIS GPIO ENABLE??
             gpio_put(27, true);
             voltage = sensorBuffer[BufferCounter-1].PM1voltage;
             current = sensorBuffer[BufferCounter-1].PM1current;
@@ -171,22 +166,25 @@ int main()
             
             perturb_and_observe(0);
             pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
+            
+            //Sprintf to format sensor data
             char formatString[90];
             aon_timer_get_time_calendar(&PicoTime);
-            sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
+            sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
             PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
             sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
             sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
-            sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, duty);
+            sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty);
             printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
         
             //Returns false if the queue is full
             bool resultsAdd = queue_try_add(&shareQueue, &formatString);
             if(resultsAdd == false){
-                //printf("\nCORE 0: Queue Full Add Error \n");
+                printf("\nCORE 0: Queue Full Add Error \n");
             }
         }
         else {
+            //WHAT IS THIS??
             gpio_put(27, false);
         }
 
