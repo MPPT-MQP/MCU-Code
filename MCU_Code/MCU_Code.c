@@ -28,7 +28,7 @@ bool saveFlag = false;
 bool screenUpdateFlag = false;
 
 
-/// @brief ISR handler for the repeating timer on core 1
+/// @brief ISR handler for the repeating timer on core 1.
 // Return true from ISR to keep the repeating timer running
 bool alarmISR(__unused repeating_timer_t *t){
     printf("\nAlarm repeat timer ISR");
