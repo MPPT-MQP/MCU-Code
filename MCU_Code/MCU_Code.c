@@ -14,17 +14,23 @@
 #include "algorithms.h"
 #include <time.h>
 #include "pico/multicore.h"
+#include "pico/time.h"
+
+#define ALARM_TIME_MS 1000
 
 struct pcf8523_time_t RTCtime;
 struct tm PicoTime;
 
-int64_t alarm_callback(alarm_id_t id, void *user_data) {
-    // Put your timeout handler code in here
-    return 0;
-}
-
 queue_t shareQueue;
 bool saveFlag = false;
+bool screenUpdateFlag = false;
+
+
+/// @brief ISR handler for the repeating timer on core 1
+alarmISR(__unused repeating_timer_t *t){
+    printf("\nAlarm repeat timer ISR");
+    screenUpdateFlag = !screenUpdateFlag;
+}
 
 /// @brief Core 1 Main Function
 void core1_main(){
@@ -32,6 +38,11 @@ void core1_main(){
     sleep_ms(50);
     oled_init();
     welcome_screen();
+
+    //Initialize Alarm Pool and repeating timer (IRQ will call on core 1)
+    struct repeating_timer alarmTimer;
+    alarm_pool_t *core1Pool = alarm_pool_create_with_unused_hardware_alarm(2);
+    alarm_pool_add_repeating_timer_ms(core1Pool, ALARM_TIME_MS, alarmISR, NULL, &alarmTimer);
 
     //Setup Buttons
     buttonsInit();
@@ -72,10 +83,6 @@ int main()
     saveFlag = false;
     //Launch core 1 (OLED, SD Card)
     multicore_launch_core1(core1_main);
-
-    // // Timer example code - This example fires off the callback after 2000ms
-    // add_alarm_in_ms(2000, alarm_callback, NULL, false);
-    // // For more examples of timer use see https://github.com/raspberrypi/pico-examples/tree/master/timer
 
     printf("System Clock Frequency is %d Hz\n", clock_get_hz(clk_sys));
     printf("USB Clock Frequency is %d Hz\n", clock_get_hz(clk_usb));
