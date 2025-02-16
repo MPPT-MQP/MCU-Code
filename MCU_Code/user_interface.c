@@ -137,6 +137,7 @@ void run_main_screens() {
             if(screenUpdateFlag){
                 sprintf(displayString1, "%0.2f*C", sensorBuffer[BufferCounter-1].temperature);
                 sprintf(displayString2, "%0.2f W/m^2", sensorBuffer[BufferCounter-1].irradiance);
+                screenUpdateFlag = !screenUpdateFlag;
             }
             char *screen1[] = {"TEMPERATURE:", displayString1, "IRRADIANCE:", displayString2};
             int x_distances1[] = {20, 40, 20, 20};
@@ -147,6 +148,7 @@ void run_main_screens() {
             if(screenUpdateFlag){
                 sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM1voltage, sensorBuffer[BufferCounter-1].PM1current);
                 sprintf(displayString2, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM2voltage, sensorBuffer[BufferCounter-1].PM2current);
+                screenUpdateFlag = !screenUpdateFlag;
             }
             char *screen2[] = {"PM1 PV-Buck:", displayString1, "PM2 Buck-CC:", displayString2};
             int x_distances2[] = {20, 1, 20, 1};
@@ -158,6 +160,7 @@ void run_main_screens() {
                 float batterySOC = 44.328 * (sensorBuffer[BufferCounter-1].PM3voltage) - 475.61;
                 sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM3voltage, sensorBuffer[BufferCounter-1].PM3current);
                 sprintf(displayString2, "%0.2f%", batterySOC);
+                screenUpdateFlag = !screenUpdateFlag;
             }
             char *screen3[] = {"PM3 CC-Battery:", displayString1, "BATTERY SOC:", displayString2};
             int x_distances3[] = {10, 1, 20, 40};

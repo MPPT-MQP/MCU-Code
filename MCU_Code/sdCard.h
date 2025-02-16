@@ -37,7 +37,8 @@ extern uint16_t BufferCounter;
 
 extern queue_t shareQueue;
 
-//Extern PicoTime Struct
+//Extern Time Structs
+extern struct pcf8523_time_t RTCtime;
 extern struct tm PicoTime;
 
 

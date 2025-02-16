@@ -38,8 +38,9 @@
 #define EXT_ADC_ADDDRESS 0x48
 #define CONVFACTOR 125 //(uV/ LSB)
 
-//PWM PIN
+// DC-DC Converter Pins
 #define PWM_PIN 28
+#define EN_PIN 27
 
 // PCF8523 RTC Address Define
 #define PCF8523_ADDRESS 0x68

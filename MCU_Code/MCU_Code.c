@@ -18,7 +18,7 @@
 
 //Amount of time until alarm isr runs (flag is toggling between true and false)
 //Set the time in ms to half of the desired update rate??
-#define ALARM_TIME_MS 1000
+#define ALARM_TIME_MS 2000
 
 struct pcf8523_time_t RTCtime;
 struct tm PicoTime;
@@ -75,6 +75,8 @@ int main()
     configI2C();
 
     //Set Pico Clock
+    //pcf8523_set_manually(2025, 2, 16, 12, 45, 11);
+    //pcf8523_set_from_PC();
     pcf8523_read(&RTCtime);
     PicoTime.tm_hour = RTCtime.hour;
     PicoTime.tm_min = RTCtime.minute;
@@ -119,10 +121,10 @@ int main()
     
     
 
-    //set enable pin high????????????????????????????????????????????????????????????????
-    gpio_init(27);
-    gpio_set_dir(27, GPIO_OUT);
-    gpio_put(27, false);
+    // Gate Enable Pin
+    gpio_init(EN_PIN);
+    gpio_set_dir(EN_PIN, GPIO_OUT);
+    gpio_put(EN_PIN, false);
    
     while (true) {
         //Power Monitor Status Printouts (Should print "TI")
@@ -165,9 +167,9 @@ int main()
         /*End sensor loop*/
 
         /*Run Algorithm*/
-        if (button3_state == 1) {
-            //IS THIS GPIO ENABLE??
-            gpio_put(27, true);
+        if (tracking_toggle == 1) {
+            //Turn on DC-DC Converter
+            gpio_put(EN_PIN, true);
             voltage = sensorBuffer[BufferCounter-1].PM1voltage;
             current = sensorBuffer[BufferCounter-1].PM1current;
             //power = sensorBuffer[BufferCounter-1].PM1power;
@@ -195,8 +197,8 @@ int main()
             }
         }
         else {
-            //WHAT IS THIS??
-            gpio_put(27, false);
+            // Turn off DC-DC Converter 
+            gpio_put(EN_PIN, false);
         }
 
     }

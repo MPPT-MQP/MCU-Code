@@ -1,4 +1,5 @@
 #include "sensors.h"
+#include "sdCard.h"
 #include <string.h>
 
 struct pcf8523_time_t pcf_datetime;
@@ -308,29 +309,29 @@ void pcf8523_set_from_PC(){
     
     sscanf(time_buffer, "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
   
-    pcf_datetime.second = second+1;
-    pcf_datetime.minute = minute;
-    pcf_datetime.hour = hour;
-    pcf_datetime.day = day;
-    pcf_datetime.month = month;
-    pcf_datetime.year = year-2000;
+    RTCtime.second = second+1;
+    RTCtime.minute = minute;
+    RTCtime.hour = hour;
+    RTCtime.day = day;
+    RTCtime.month = month;
+    RTCtime.year = year-2000;
     //datetime.dotw = 2;
   
-     pcf8523_write(&pcf_datetime);
+     pcf8523_write(&RTCtime);
 }
 
 /* Set RTC time manually upon upload*/
 void pcf8523_set_manually(int year, int month, int day, int hour, int minute, int second) {
 
     pcf8523_reset();
-    pcf_datetime.second = second;
-    pcf_datetime.minute = minute;
-    pcf_datetime.hour = hour;
-    pcf_datetime.day = day;
-    pcf_datetime.month = month;
-    pcf_datetime.year = year-2000;
+    RTCtime.second = second+1;
+    RTCtime.minute = minute;
+    RTCtime.hour = hour;
+    RTCtime.day = day;
+    RTCtime.month = month;
+    RTCtime.year = year-2000;
 
-    pcf8523_write(&pcf_datetime);
+    pcf8523_write(&RTCtime);
 
 }
 /*End PCF8523 Functions*/
