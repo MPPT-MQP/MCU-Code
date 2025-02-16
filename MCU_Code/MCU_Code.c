@@ -121,7 +121,7 @@ int main()
     
     
 
-    // Gate Enable Pin
+    // Gate Driver Enable Pin Setup
     gpio_init(EN_PIN);
     gpio_set_dir(EN_PIN, GPIO_OUT);
     gpio_put(EN_PIN, false);

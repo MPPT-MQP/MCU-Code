@@ -47,10 +47,6 @@ void run_main_screens() {
     //Array for displaying sensor data
     char displayString1[16];
     char displayString2[16];     
-    
-    // Print current time to buffer to be displayed on screen
-    sprintf(date_string, "%d-%d-%d", PicoTime.tm_year, PicoTime.tm_mon, PicoTime.tm_mday);
-    sprintf(time_string, "%d:%d:%d", PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec);
 
     // Check button 1 (toggles entire screen)
     if(button1_state) {
@@ -169,6 +165,11 @@ void run_main_screens() {
         break;
 
         case 4:
+            // Print current time to buffer to be displayed on screen
+            aon_timer_get_time_calendar(&PicoTime);
+            sprintf(date_string, "%d-%d-%d", PicoTime.tm_year, PicoTime.tm_mon, PicoTime.tm_mday);
+            sprintf(time_string, "%d:%d:%d", PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec);
+           
             if(button2_state) {                
                 select_num++;
                 if(select_num > 5) {
