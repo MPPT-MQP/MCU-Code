@@ -79,8 +79,14 @@ float PM_readCurrent(uint8_t address){
     //Combine bytes
     combinedBuffer = ((uint16_t)buffer[0] << 8) | buffer[1];
 
-    current = (float)combinedBuffer;
-    
+    // Convert for 2's compliment and signed value
+    if(combinedBuffer > 0x7FFF){
+        current = (float)combinedBuffer - 0x10000;
+    } 
+    else {
+        current = (float)combinedBuffer;
+    }
+
     //scale factor (1.2mA / LSB)
     current = (current * 1.2) / 1000;
     
