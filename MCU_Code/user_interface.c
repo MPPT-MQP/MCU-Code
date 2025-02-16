@@ -134,25 +134,31 @@ void run_main_screens() {
         break;
 
         case 1:
-            sprintf(displayString1, "%0.2f*C", sensorBuffer[BufferCounter-1].temperature);
-            sprintf(displayString2, "%0.2f W/m^2", sensorBuffer[BufferCounter-1].irradiance);
+            if(screenUpdateFlag){
+                sprintf(displayString1, "%0.2f*C", sensorBuffer[BufferCounter-1].temperature);
+                sprintf(displayString2, "%0.2f W/m^2", sensorBuffer[BufferCounter-1].irradiance);
+            }
             char *screen1[] = {"TEMPERATURE:", displayString1, "IRRADIANCE:", displayString2};
             int x_distances1[] = {20, 40, 20, 20};
             print_text(screen1, count_of(screen1), x_distances1);
         break;
 
         case 2:
-            sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM1voltage, sensorBuffer[BufferCounter-1].PM1current);
-            sprintf(displayString2, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM2voltage, sensorBuffer[BufferCounter-1].PM2current);
+            if(screenUpdateFlag){
+                sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM1voltage, sensorBuffer[BufferCounter-1].PM1current);
+                sprintf(displayString2, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM2voltage, sensorBuffer[BufferCounter-1].PM2current);
+            }
             char *screen2[] = {"PM1 PV-Buck:", displayString1, "PM2 Buck-CC:", displayString2};
             int x_distances2[] = {20, 1, 20, 1};
             print_text(screen2, count_of(screen2), x_distances2);
         break;
 
         case 3:
-            float batterySOC = 44.328 * (sensorBuffer[BufferCounter-1].PM3voltage) - 475.61;
-            sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM3voltage, sensorBuffer[BufferCounter-1].PM3current);
-            sprintf(displayString2, "%0.2f%", batterySOC);
+            if(screenUpdateFlag){
+                float batterySOC = 44.328 * (sensorBuffer[BufferCounter-1].PM3voltage) - 475.61;
+                sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter-1].PM3voltage, sensorBuffer[BufferCounter-1].PM3current);
+                sprintf(displayString2, "%0.2f%", batterySOC);
+            }
             char *screen3[] = {"PM3 CC-Battery:", displayString1, "BATTERY SOC:", displayString2};
             int x_distances3[] = {10, 1, 20, 40};
             print_text(screen3, count_of(screen3), x_distances3);
