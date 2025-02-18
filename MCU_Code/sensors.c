@@ -174,7 +174,7 @@ void configExtADC(uint16_t registerADC){
     registerOut[2] = (uint8_t)(registerADC & 0xff); //take LSB 8 bits into 8 bit value
     
     // Select config register, then write 16 bits to register
-    i2c_write_blocking(I2C0_PORT, EXT_ADC_ADDDRESS, registerOut, 3, false);
+    i2c_write_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, registerOut, 3, false);
     
 }
 
@@ -189,8 +189,8 @@ float readExtADC(){
     uint8_t reg1 = CONVERSION_ADDRESS;
 
     //select conversion buffer and read 16 bits from it
-    i2c_write_blocking(I2C0_PORT, EXT_ADC_ADDDRESS, &reg1, 1, false);
-    i2c_read_blocking(I2C0_PORT, EXT_ADC_ADDDRESS, buffer, 2, false);
+    i2c_write_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, &reg1, 1, false);
+    i2c_read_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, buffer, 2, false);
 
     //Combine the two bytes (MSB is recieved first)
     combinedBuffer = ((uint16_t)buffer[0] << 8) | buffer[1];

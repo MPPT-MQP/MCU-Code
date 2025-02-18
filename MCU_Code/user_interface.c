@@ -143,8 +143,7 @@ void run_main_screens()
         break;
 
     case 1:
-        if (screenUpdateFlag)
-        {
+        if(true){
             sprintf(displayString1, "%0.2f*C", sensorBuffer[BufferCounter - 1].temperature);
             sprintf(displayString2, "%0.2f W/m^2", sensorBuffer[BufferCounter - 1].irradiance);
             screenUpdateFlag = !screenUpdateFlag;
