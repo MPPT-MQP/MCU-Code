@@ -154,9 +154,9 @@ int main()
     gpio_set_dir(EN_PIN, GPIO_OUT);
     gpio_put(EN_PIN, false);
 
-    //Add Repeating timer to slow down the rate that the algoythm runs at
-    struct repeating_timer algoTimer;
-    add_repeating_timer_us(1000000, AlgoISR, NULL, &algoTimer);
+    // //Add Repeating timer to slow down the rate that the algoythm runs at
+    // struct repeating_timer algoTimer;
+    // add_repeating_timer_us(1000000, AlgoISR, NULL, &algoTimer);
 
     core0InitFlag = true;
     while(core1InitFlag == false){
@@ -217,9 +217,10 @@ int main()
         /*End sensor loop*/
 
         /*Run Algorithm*/
-        if(algoFlag == true){
-            algoFlag = false;
+        // if(algoFlag == true){
+        //     algoFlag = false;
         if (tracking_toggle == 1) {
+            sleep_ms(100);
             //Turn on DC-DC Converter
             gpio_put(EN_PIN, true);
             voltage = sensorBuffer[BufferCounter-1].PM1voltage;
@@ -252,7 +253,7 @@ int main()
             // Turn off DC-DC Converter 
             gpio_put(EN_PIN, false);
         }
-        }
+        // }
 
     }
 }
