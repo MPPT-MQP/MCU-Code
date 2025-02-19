@@ -52,6 +52,7 @@ bool alarmISR(__unused repeating_timer_t *t){
 /// @brief Doorbell ISR handler - read external adc and clear the doorbell
 void doorbellISR(){
     sensorBuffer[BufferCounter].irradiance = readExtADC();
+    printf("\ndoorbell\n");
     multicore_doorbell_clear_current_core(doorbellNumber);
 }
 
@@ -65,9 +66,21 @@ bool AlgoISR(__unused repeating_timer_t *t){
 
 /// @brief Core 1 Main Function
 void core1_main(){
+    configI2C1();
+
+    //Set Pico Clock
+    pcf8523_read(&RTCtime);
+    PicoTime.tm_hour = RTCtime.hour;
+    PicoTime.tm_min = RTCtime.minute;
+    PicoTime.tm_sec = RTCtime.second;
+    PicoTime.tm_year = RTCtime.year;
+    PicoTime.tm_mon = RTCtime.month;
+    PicoTime.tm_mday = RTCtime.day;
+    aon_timer_start_calendar(&PicoTime);
+    
     //Setup External ADC (ADS1115) & a doorbell for core communication
-    doorbellNumber = multicore_doorbell_claim_unused(0x02, true);
     configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
+    doorbellNumber = multicore_doorbell_claim_unused(0x02, true);
     
     //Init doorbell
     uint32_t irqNumber = multicore_doorbell_irq_num(doorbellNumber);
@@ -114,21 +127,11 @@ int main()
     queue_init(&shareQueue, 90, 20);
 
     //Init both I2C0 and I2C1
-    configI2C();
+    configI2C0();
 
     /* RTC Initialization Options - Uncomment to set RTC */
     //pcf8523_set_manually(2025, 2, 16, 12, 45, 11);
     //pcf8523_set_from_PC();
-
-    //Set Pico Clock
-    pcf8523_read(&RTCtime);
-    PicoTime.tm_hour = RTCtime.hour;
-    PicoTime.tm_min = RTCtime.minute;
-    PicoTime.tm_sec = RTCtime.second;
-    PicoTime.tm_year = RTCtime.year;
-    PicoTime.tm_mon = RTCtime.month;
-    PicoTime.tm_mday = RTCtime.day;
-    aon_timer_start_calendar(&PicoTime);
 
     //Make sure SD card save flag is false before starting the core
     saveFlag = false;
@@ -169,8 +172,10 @@ int main()
     }
    
     while (true) {
+        printf("out of loop\n");
         if(algoFlag == true){
             //Set flag back to false
+            printf("In loop\n");
             algoFlag = false;
             //Collect sensor readings and run algorithm 
 

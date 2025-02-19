@@ -48,7 +48,8 @@
 extern uint slice_num;
 
 //Sensor Config I2C both channels
-void configI2C();
+void configI2C0();
+void configI2C1();
 
 //Power Monitor
 float PM_readVoltage(uint8_t address);

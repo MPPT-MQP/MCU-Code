@@ -5,7 +5,7 @@
 struct pcf8523_time_t pcf_datetime;
 
 /// @brief Configure I2C0 and I2C1 at specified ports, pins, and speeds
-void configI2C(){
+void configI2C0(){
     // I2C0 Initialisation. Using it at 300Khz.
     i2c_init(I2C0_PORT, 300*1000);
     
@@ -14,9 +14,11 @@ void configI2C(){
     gpio_pull_up(I2C0_SDA);
     gpio_pull_up(I2C0_SCL);
     // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
+}
 
+void configI2C1(){
     // I2C1 Initialisation. Using it at 300Khz.
-    i2c_init(I2C1_PORT, 400*1000); //might have to run at 100kHz for screen
+    i2c_init(I2C1_PORT, 300*1000); //might have to run at 100kHz for screen
     
     gpio_set_function(I2C1_SDA, GPIO_FUNC_I2C);
     gpio_set_function(I2C1_SCL, GPIO_FUNC_I2C);
