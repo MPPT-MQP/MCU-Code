@@ -39,5 +39,10 @@
     "files.associations": {
         "algorithms.h": "c",
         "oled_screen.h": "c"
-    }
+    },
+    "cSpell.words": [
+        "dotw",
+        "OLED",
+        "Pyranometer"
+    ]
 }

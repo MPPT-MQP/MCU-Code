@@ -112,7 +112,7 @@ const float conversion_factor = 3.3f / (1 << 12);
 /// @brief Read the temperature of the TMP36
 /// @param num_samples number of samples to read from the ADC
 /// @param sampleDelay delay in ms between samples
-/// @return average temperature value in celcius
+/// @return average temperature value in celsius
 float readTempature(uint16_t num_samples, uint16_t sampleDelay){
 
     // Select ADC input 0 (GPIO26)
@@ -305,7 +305,7 @@ void pcf8523_set_from_PC(){
     int year, month, day, hour, minute, second;
 
     fgets(time_buffer, sizeof(time_buffer), stdin);
-    time_buffer[strcspn(time_buffer, "\n")] = 0; // Remove trailing newlin
+    time_buffer[strcspn(time_buffer, "\n")] = 0; // Remove trailing newline
     
     sscanf(time_buffer, "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
   

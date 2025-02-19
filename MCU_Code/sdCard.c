@@ -57,7 +57,7 @@ void copySDBuffer(){
     strcpy(sensorLocalBuffer[counter], test);
     if(removeQueue == false){
         //Queue empty
-        //printf("\nCORE 1: QUEUE EMPTY\n");
+        printf("\nCORE 1: QUEUE EMPTY\n");
     }else{
         if(counter++ > 720){
             counter = 0;
@@ -88,7 +88,7 @@ void writeSD(uint16_t bytes){
     //Write buffer of data to SD card
     if(f_write(&fil, sensorLocalBuffer, bytes, &bytesWritten) != 0){
         //Some error was returned and the write did not successfully complete
-        panic("\n\n\n Error writing to sd card occured \n\n\n");
+        panic("\n\n\n Error writing to sd card occurred \n\n\n");
     }else{
         printf("\n\n Bytes written: %d, Desired: %d", bytesWritten, bytes);
     }
