@@ -192,7 +192,7 @@ float readExtADC(){
     i2c_write_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, &reg1, 1, false);
     i2c_read_blocking(I2C1_PORT, EXT_ADC_ADDDRESS, buffer, 2, false);
 
-    //Combine the two bytes (MSB is recieved first)
+    //Combine the two bytes (MSB is received first)
     combinedBuffer = ((uint16_t)buffer[0] << 8) | buffer[1];
 
     voltage = (float)combinedBuffer;
