@@ -2,7 +2,7 @@
 ### Code Written by: MPPT MQP 2025 (Kyle, Frank, Micaela, Saketh)
 
 #### Code is designed for the RP2350. It should also work with the RP2040 (Pico1) but will need slight adjustments due to the picoSDK.
-#### To run the code, you will need the picoSDK and CMake, which is easially installed using the Pico VSCode extention but manual installs also work
+#### To run the code, you will need the picoSDK and CMake, which is easily installed using the Pico VSCode extension but manual installs also work
 
 ____
 ### List of Files:
@@ -10,8 +10,8 @@ ____
 | File Name | Details |
 | ------------- | ------------- |
 | algorithms.c / .h    | Contains all MPPT algorithms and PID controller  |
-| buttons.c / .h       | Functions that initlize buttons and setup ISR & debouncing  |
-| hw_congig.h          | Config file from no-OS-FatFS SD card library |
+| buttons.c / .h       | Functions that initialize buttons and setup ISR & debouncing  |
+| hw_config.h          | Config file from no-OS-FatFS SD card library |
 | MCUCode.c            | Main code file for both core0 and core1 |
 | oled_screen.c / .h   | Functions to interface with the SSD1306 display IC|
 | PowerMonitor.h       | Defines for the INA740B power monitor |
