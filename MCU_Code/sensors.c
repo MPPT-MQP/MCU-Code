@@ -211,7 +211,8 @@ float readExtADC(){
 /*End external ADC (ADS1115)*/
 
 /*Pyranometer Functions*/
-const float voltage_multiplier = 427.8;
+// const float voltage_multiplier = 427.8;
+const float voltage_multiplier = 547.1956224;
 float readPyranometer(float voltage){
     return (voltage * voltage_multiplier);
 }
