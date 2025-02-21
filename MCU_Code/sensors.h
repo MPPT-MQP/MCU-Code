@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "ADS1115.h"
+#include "TMP102.h"
 
 // I2C0 defines (GP Numbers, not pico pins) (Power monitors only)
 #define I2C0_PORT i2c0
@@ -46,6 +47,9 @@
 #define PCF8523_ADDRESS 0x68
 
 extern uint slice_num;
+
+#define MSB(u16) (((u16) & 0xFF00U) >> 8)
+#define LSB(u16) ((u16) & 0xFFU)
 
 //Sensor Config I2C both channels
 void configI2C0();

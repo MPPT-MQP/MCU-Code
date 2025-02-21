@@ -4,6 +4,7 @@
 
 struct pcf8523_time_t pcf_datetime;
 
+
 /// @brief Configure I2C0 and I2C1 at specified ports, pins, and speeds
 void configI2C0(){
     // I2C0 Initialisation. Using it at 300Khz.
@@ -338,3 +339,50 @@ void pcf8523_set_manually(int year, int month, int day, int hour, int minute, in
 
 }
 /*End PCF8523 Functions*/
+
+/*Start TMP102 Functions*/
+
+void initTMP102(){
+    uint8_t registerCONFIG[3];
+    uint16_t test = TMP102_CONFIG_OS_DISABLE | \
+    TMP102_CONFIG_F_2FAULTS | \
+    TMP102_CONFIG_POL_LOW | \
+    TMP102_CONFIG_TM_COMP | \
+    TMP102_CONFIG_SD_CC | \
+    TMP102_CONFIG_CR_4HZ | \
+    TMP102_CONFIG_EM_12BIT;
+
+    uint16_t tlow = 0xE200; /* Temperature Low Limit is -30 Celsius */
+    uint16_t thigh = 0x5000; /* Temperature High Limit is 80 Celsius */
+    registerCONFIG[0] = TMP102_CONFIG;
+    registerCONFIG[1]= MSB(test);
+    registerCONFIG[2] = LSB(test);
+    // Select config register, then write 16 bits to register
+    i2c_write_blocking(I2C1_PORT, TMP102_ADDRESS, registerCONFIG, 3, false);
+
+    registerCONFIG[0] = TMP102_THIGH;
+    registerCONFIG[1]= (uint8_t)(thigh >> 8); //bit shift MSB 8 bits into 8 bit value
+    registerCONFIG[2] = (uint8_t)(thigh & 0xff); //take LSB 8 bits into 8 bit value
+    i2c_write_blocking(I2C1_PORT, TMP102_ADDRESS, registerCONFIG, 3, false);
+
+    registerCONFIG[0] = TMP102_TLOW;
+    registerCONFIG[1]= (uint8_t)(tlow >> 8); //bit shift MSB 8 bits into 8 bit value
+    registerCONFIG[2] = (uint8_t)(tlow & 0xff); //take LSB 8 bits into 8 bit value
+    i2c_write_blocking(I2C1_PORT, TMP102_ADDRESS, registerCONFIG, 3, false);
+}
+
+float readTMP102(){
+    uint8_t buffer[2];
+    uint8_t tempRegister = TMP102_TEMP;
+    i2c_write_blocking(I2C1_PORT, TMP102_ADDRESS, &tempRegister, 1, false);
+    i2c_read_blocking(I2C1_PORT, TMP102_ADDRESS, buffer, 2, false);
+
+    //Combine the two bytes (MSB is received first)
+    uint16_t combinedBuffer = ((uint16_t)buffer[0] << 8) | buffer[1];
+    combinedBuffer = combinedBuffer >> 4; //Shift the 4 LSB out, not used
+    
+    return ((float)combinedBuffer * 0.0625); //Multiply by scaling factor
+}
+
+
+/*End TMP102 Functions*/
