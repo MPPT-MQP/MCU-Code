@@ -11,7 +11,7 @@ FIL fil;
 FRESULT fr;
 
 //SD Card Core 1 Globals
-char sensorLocalBuffer[725][90];
+char sensorLocalBuffer[725][110];
 
 uint16_t counter = 0;
 
@@ -51,7 +51,7 @@ void initSDFile(){
 /// @brief Copy sensor data from shared queue to local buffer on core 1
 void copySDBuffer(){
     
-    char test[90];
+    char test[110];
     //Returns false if the queue is empty
     bool removeQueue = queue_try_remove(&shareQueue, &test);
     strcpy(sensorLocalBuffer[counter], test);

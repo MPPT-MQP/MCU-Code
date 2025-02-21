@@ -68,6 +68,10 @@ bool AlgoISR(__unused repeating_timer_t *t){
 void core1_main(){
     configI2C1();
 
+    //Setup External ADC (ADS1115) & a doorbell for core communication
+    configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
+    doorbellNumber = multicore_doorbell_claim_unused(0x02, true);
+
     //Set Pico Clock
     pcf8523_read(&RTCtime);
     PicoTime.tm_hour = RTCtime.hour;
@@ -78,9 +82,6 @@ void core1_main(){
     PicoTime.tm_mday = RTCtime.day;
     aon_timer_start_calendar(&PicoTime);
     
-    //Setup External ADC (ADS1115) & a doorbell for core communication
-    configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
-    doorbellNumber = multicore_doorbell_claim_unused(0x02, true);
     
     //Init doorbell
     uint32_t irqNumber = multicore_doorbell_irq_num(doorbellNumber);
@@ -124,7 +125,7 @@ int main()
     stdio_init_all();
 
     //Init Queue
-    queue_init(&shareQueue, 90, 20);
+    queue_init(&shareQueue, 110, 20);
 
     //Init both I2C0 and I2C1
     configI2C0();
@@ -251,7 +252,7 @@ int main()
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
                 //Sprintf to format sensor data
-                char formatString[90];
+                char formatString[110];
                 aon_timer_get_time_calendar(&PicoTime);
                 sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
                 PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
