@@ -62,6 +62,7 @@ float PM_readCurrent(uint8_t address);
 
 //Pyranometer
 float readPyranometer(float voltage);
+float readIrradiance();
 
 //Temp Sensor
 void TMP_ADC_setup();
@@ -100,4 +101,7 @@ void pcf8523_time_to_raw(struct pcf8523_time_t *time, uint8_t *raw);
 void pcf8523_set_from_PC();
 void pcf8523_set_manually(int year, int month, int day, int hour, int minute, int second);
 
+//TMP102 Temperature Sensor
+void initTMP102();
+float readTMP102();
 

@@ -3,7 +3,7 @@
 #include "pico/aon_timer.h"
 
 //Sensor Data Buffer
-struct sensorData sensorBuffer[20];
+struct sensorData sensorBuffer[QUEUE_BUFFER_SIZE];
 uint16_t BufferCounter = 0;
 
 FATFS fs;
@@ -11,7 +11,7 @@ FIL fil;
 FRESULT fr;
 
 //SD Card Core 1 Globals
-char sensorLocalBuffer[725][110];
+char sensorLocalBuffer[SAMPLES_TO_SAVE][110];
 
 uint16_t counter = 0;
 
@@ -51,7 +51,7 @@ void initSDFile(){
 /// @brief Copy sensor data from shared queue to local buffer on core 1
 void copySDBuffer(){
     
-    char test[110];
+    char test[SAMPLE_SIZE];
     //Returns false if the queue is empty
     bool removeQueue = queue_try_remove(&shareQueue, &test);
     strcpy(sensorLocalBuffer[counter], test);
@@ -59,7 +59,7 @@ void copySDBuffer(){
         //Queue empty
         printf("\nCORE 1: QUEUE EMPTY\n");
     }else{
-        if(counter++ > 720){
+        if(counter++ > SAMPLES_TO_SAVE){
             counter = 0;
             saveFlag = true;
         }

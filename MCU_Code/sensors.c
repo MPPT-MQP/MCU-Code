@@ -384,5 +384,18 @@ float readTMP102(){
     return ((float)combinedBuffer * 0.0625); //Multiply by scaling factor
 }
 
-
 /*End TMP102 Functions*/
+
+/*Start ADC Function for Irradiance*/
+float readIrradiance(){
+    // Select ADC input 0 (GPIO26)
+    adc_select_input(0);
+
+    uint32_t adcReading = adc_read();
+
+    // Calculate voltage and temperature using the averaged result
+    float voltage = adcReading * conversion_factor;
+
+    return readPyranometer(voltage);
+}
+/*End Irradiance Functions*/

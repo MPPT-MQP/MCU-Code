@@ -8,6 +8,10 @@
 #include "pico/util/queue.h"
 #include "pico/aon_timer.h"
 
+#define SAMPLES_TO_SAVE 300
+#define SAMPLE_SIZE 110
+#define QUEUE_BUFFER_SIZE 20    
+
 
 extern bool saveFlag;
 

@@ -17,8 +17,10 @@
 #include "pico/time.h"
 
 //Amount of time until alarm isr runs (flag is toggling between true and false)
-//Set the time in ms to half of the desired update rate??
 #define ALARM_TIME_MS 1000
+
+//Rate that the sensors and algorithm run
+#define SENSOR_ALGORITHM_RUN_RATE 200000
 
 //Doorbell to trigger interrupt on core 1
 static uint32_t doorbellNumber;
@@ -41,6 +43,9 @@ bool algoFlag = false;
 bool core1InitFlag = false;
 bool core0InitFlag = false;
 
+//SD card bytes to save
+uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
+
 
 /// @brief ISR handler for the repeating timer on core 1.
 // Return true from ISR to keep the repeating timer running
@@ -49,12 +54,13 @@ bool alarmISR(__unused repeating_timer_t *t){
     return true;
 }
 
-/// @brief Doorbell ISR handler - read external adc and clear the doorbell
-void doorbellISR(){
-    sensorBuffer[BufferCounter].irradiance = readExtADC();
-    printf("\ndoorbell\n");
-    multicore_doorbell_clear_current_core(doorbellNumber);
-}
+// /// @brief Doorbell ISR handler - read external adc and clear the doorbell
+// void doorbellISR(){
+//     sensorBuffer[BufferCounter].temperature = readTMP102();
+//     printf("\n\n\n\nTEMP: %0.3f", sensorBuffer[BufferCounter].temperature);
+//     printf("\ndoorbell\n");
+//     multicore_doorbell_clear_current_core(doorbellNumber);
+// }
 
 /// @brief Set flag to true so that the sensor / algorithm loop runs
 /// @param t Unused
@@ -64,13 +70,15 @@ bool AlgoISR(__unused repeating_timer_t *t){
     return true;
 }
 
+float tempVAL;
 /// @brief Core 1 Main Function
 void core1_main(){
     configI2C1();
 
-    //Setup External ADC (ADS1115) & a doorbell for core communication
-    configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
-    doorbellNumber = multicore_doorbell_claim_unused(0x02, true);
+    initTMP102();
+    // //Setup External ADC (ADS1115) & a doorbell for core communication
+    // configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
+    // doorbellNumber = multicore_doorbell_claim_unused(0x02, true);
 
     //Set Pico Clock
     pcf8523_read(&RTCtime);
@@ -83,10 +91,10 @@ void core1_main(){
     aon_timer_start_calendar(&PicoTime);
     
     
-    //Init doorbell
-    uint32_t irqNumber = multicore_doorbell_irq_num(doorbellNumber);
-    irq_set_exclusive_handler(irqNumber, doorbellISR);
-    irq_set_enabled(irqNumber, true);
+    // //Init doorbell
+    // uint32_t irqNumber = multicore_doorbell_irq_num(doorbellNumber);
+    // irq_set_exclusive_handler(irqNumber, doorbellISR);
+    // irq_set_enabled(irqNumber, true);
     
     // Initialize OLED Screen and Display Welcome
     oled_init();
@@ -110,12 +118,13 @@ void core1_main(){
 
     while(1){
         run_main_screens();
+        tempVAL = readTMP102();
         copySDBuffer();
 
         if(saveFlag == true){
-            irq_set_enabled(irqNumber, false);  //DISABLE doorbell ISR when writing to the SD card
-            writeSD(79750);
-            irq_set_enabled(irqNumber, true);   //ENABLE doorbell ISR after writing to the SD card
+            // irq_set_enabled(irqNumber, false);  //DISABLE doorbell ISR when writing to the SD card
+            writeSD(bytesToSave);
+            // irq_set_enabled(irqNumber, true);   //ENABLE doorbell ISR after writing to the SD card
         }
     }
 }
@@ -125,7 +134,7 @@ int main()
     stdio_init_all();
 
     //Init Queue
-    queue_init(&shareQueue, 110, 20);
+    queue_init(&shareQueue, SAMPLE_SIZE, QUEUE_BUFFER_SIZE);
 
     //Init both I2C0 and I2C1
     configI2C0();
@@ -147,6 +156,8 @@ int main()
     //Temp Sensor ADC Setup
     TMP_ADC_setup();
 
+    
+
     //SD Card Setup (hw_config.c sets the SPI pins)
     sd_init_driver();
     mountSD();
@@ -162,7 +173,7 @@ int main()
 
     //Add repeating timer to slow down the rate that the algorithm & sensor collection runs at
     struct repeating_timer algoTimer;
-    add_repeating_timer_us(200000, AlgoISR, NULL, &algoTimer);
+    add_repeating_timer_us(SENSOR_ALGORITHM_RUN_RATE, AlgoISR, NULL, &algoTimer);
 
     //Set the init flag high and wait for the other core to finish setup
     core0InitFlag = true;
@@ -198,25 +209,30 @@ int main()
             // sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
 
             //Temperature
-            sensorBuffer[BufferCounter].temperature = readTempature(2, 1);
+            // sensorBuffer[BufferCounter].temperature = readTempature(2, 1);
+
+            //Irradiance
+            sensorBuffer[BufferCounter].irradiance = readIrradiance();
+            
             
             //Delay if tracking isn't running (so OLED has enough time to update since interrupt fires fast)
             if(tracking_toggle == 0){
                 sleep_ms(100);
             }
 
-            //Irradiance
-            //If SD card is currently saving, use old value
-            if(saveFlag == true){
-                sensorBuffer[BufferCounter].irradiance = sensorBuffer[BufferCounter-1].irradiance;
-            }else{
-                //Trigger Doorbell
-                multicore_doorbell_set_other_core(doorbellNumber);
-                while(multicore_doorbell_is_set_other_core(doorbellNumber)){
-                    //Wait for light sensor reading to complete
-                    tight_loop_contents();
-                }
-            }
+            //Temperature
+            sensorBuffer[BufferCounter].temperature = tempVAL;
+            // //If SD card is currently saving, use old value
+            // if(saveFlag == true){
+            //     sensorBuffer[BufferCounter].temperature = sensorBuffer[BufferCounter-1].temperature;
+            // }else{
+            //     //Trigger Doorbell
+            //     multicore_doorbell_set_other_core(doorbellNumber);
+            //     while(multicore_doorbell_is_set_other_core(doorbellNumber)){
+            //         //Wait for temperature sensor reading to complete
+            //         tight_loop_contents();
+            //     }
+            // }
             
             //printf("Irradiance: %0.3f", sensorBuffer[BufferCounter].irradiance);
             // Returns irradiance converted voltage value
@@ -232,7 +248,7 @@ int main()
             // sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
             
             //Reset buffer
-            if(BufferCounter++ >= 20){
+            if(BufferCounter++ >= QUEUE_BUFFER_SIZE){
                 BufferCounter = 0;
             }
             /*End sensor loop*/
@@ -252,13 +268,13 @@ int main()
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
                 //Sprintf to format sensor data
-                char formatString[110];
+                char formatString[SAMPLE_SIZE];
                 aon_timer_get_time_calendar(&PicoTime);
                 sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
                 PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
-                sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
-                sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
-                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty);
+                sensorBuffer[BufferCounter-1].PM1voltage, sensorBuffer[BufferCounter-1].PM1current, sensorBuffer[BufferCounter-1].PM1power, 
+                sensorBuffer[BufferCounter-1].PM2voltage, sensorBuffer[BufferCounter-1].PM2current, sensorBuffer[BufferCounter-1].PM2power, sensorBuffer[BufferCounter-1].PM3voltage, 
+                sensorBuffer[BufferCounter-1].PM3current, sensorBuffer[BufferCounter-1].PM3power, sensorBuffer[BufferCounter-1].temperature, sensorBuffer[BufferCounter-1].irradiance, duty);
                 printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
             
                 //Returns false if the queue is full
