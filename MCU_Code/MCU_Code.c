@@ -114,7 +114,7 @@ void core1_main(){
 
         if(saveFlag == true){
             irq_set_enabled(irqNumber, false);  //DISABLE doorbell ISR when writing to the SD card
-            writeSD(64800);
+            writeSD(79750);
             irq_set_enabled(irqNumber, true);   //ENABLE doorbell ISR after writing to the SD card
         }
     }

@@ -14,7 +14,7 @@ extern bool saveFlag;
 void mountSD();
 void initSDFile();
 void copySDBuffer();
-void writeSD(uint16_t bytes);
+void writeSD(uint32_t bytes);
 
 struct sensorData {
     float PM1voltage;

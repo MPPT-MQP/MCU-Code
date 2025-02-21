@@ -67,7 +67,7 @@ void copySDBuffer(){
     
 }
 
-void writeSD(uint16_t bytes){
+void writeSD(uint32_t bytes){
     uint bytesWritten = 0;
     // TODO: Setup fcn to read from buffer data and have unique filename argument
     //Open a file and write to it
