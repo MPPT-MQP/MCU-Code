@@ -25,6 +25,9 @@
 //Doorbell to trigger interrupt on core 1
 static uint32_t doorbellNumber;
 
+//Mutex for temp sensor
+mutex_t temperatureMutex;
+
 //Structs for RTC and A_ON Pico Clock
 struct pcf8523_time_t RTCtime;
 struct tm PicoTime;
@@ -80,6 +83,9 @@ void core1_main(){
     // configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
     // doorbellNumber = multicore_doorbell_claim_unused(0x02, true);
 
+    //Init Mutex for temp sensor readings
+    mutex_init(&temperatureMutex);
+
     //Set Pico Clock
     pcf8523_read(&RTCtime);
     PicoTime.tm_hour = RTCtime.hour;
@@ -118,13 +124,13 @@ void core1_main(){
 
     while(1){
         run_main_screens();
+        mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
         tempVAL = readTMP102();
+        mutex_exit(&temperatureMutex);
         copySDBuffer();
 
         if(saveFlag == true){
-            // irq_set_enabled(irqNumber, false);  //DISABLE doorbell ISR when writing to the SD card
             writeSD(bytesToSave);
-            // irq_set_enabled(irqNumber, true);   //ENABLE doorbell ISR after writing to the SD card
         }
     }
 }
@@ -208,9 +214,6 @@ int main()
             // sensorBuffer[BufferCounter].PM3voltage = PM_readVoltage(PM3);
             // sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
 
-            //Temperature
-            // sensorBuffer[BufferCounter].temperature = readTempature(2, 1);
-
             //Irradiance
             sensorBuffer[BufferCounter].irradiance = readIrradiance();
             
@@ -221,7 +224,15 @@ int main()
             }
 
             //Temperature
-            sensorBuffer[BufferCounter].temperature = tempVAL;
+            bool enterMutex = mutex_try_enter(&temperatureMutex, NULL);
+            if(enterMutex){
+                sensorBuffer[BufferCounter].temperature = tempVAL;
+                mutex_exit(&temperatureMutex);
+            }else if(enterMutex == false){
+                sensorBuffer[BufferCounter].temperature = sensorBuffer[BufferCounter-1].temperature;
+                printf("\n\n\nTESTING: OLD TEMP VALUE");
+            }
+            
             // //If SD card is currently saving, use old value
             // if(saveFlag == true){
             //     sensorBuffer[BufferCounter].temperature = sensorBuffer[BufferCounter-1].temperature;
