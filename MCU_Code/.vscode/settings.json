@@ -37,26 +37,13 @@
     "raspberry-pi-pico.cmakePath": "${HOME}/.pico-sdk/cmake/v3.29.9/bin/cmake",
     "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja",
     "files.associations": {
-        "sdcard.h": "c",
-        "stdlib.h": "c",
-        "user_interface.h": "c",
-        "buttons.h": "c",
+        "algorithms.h": "c",
         "oled_screen.h": "c"
-        "string.h": "c",
-        "sensors.h": "c",
-        "i2c.h": "c",
-        "ads1115.h": "c",
-        "*.tcc": "c",
-        "limits": "c",
-        "numeric": "c",
-        "streambuf": "c",
-        "tuple": "c",
-        "type_traits": "c",
-        "time.h": "c",
-        "pwm.h": "c",
-        "timer.h": "c",
-        "queue.h": "c"
     },
+    "cSpell.words": [
+        "dotw",
+        "OLED",
+        "Pyranometer"
+    ],
     "cortex-debug.variableUseNaturalFormat": false
-
 }
