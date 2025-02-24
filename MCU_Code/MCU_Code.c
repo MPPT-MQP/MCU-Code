@@ -193,7 +193,7 @@ int main()
         printf("out of loop\n");
         if(algoFlag == true){
             //Set flag back to false
-            printf("In loop\n");
+            //printf("In loop\n");
             algoFlag = false;
             //Collect sensor readings and run algorithm 
 
@@ -224,6 +224,8 @@ int main()
             }
 
             //Temperature
+            // sensorBuffer[BufferCounter].temperature = tempVAL;
+
             bool enterMutex = mutex_try_enter(&temperatureMutex, NULL);
             if(enterMutex){
                 sensorBuffer[BufferCounter].temperature = tempVAL;
@@ -293,8 +295,8 @@ int main()
                 if(resultsAdd == false){
                     printf("\nCORE 0: Queue Full Add Error \n");
                 }
-            }
-            else {
+            }else
+            {
                 // Turn off DC-DC Converter 
                 gpio_put(EN_PIN, false);
             }

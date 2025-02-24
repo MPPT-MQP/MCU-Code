@@ -11,7 +11,7 @@ FIL fil;
 FRESULT fr;
 
 //SD Card Core 1 Globals
-char sensorLocalBuffer[SAMPLES_TO_SAVE][110];
+char sensorLocalBuffer[SAMPLES_TO_SAVE+10][110];
 
 uint16_t counter = 0;
 
@@ -57,7 +57,7 @@ void copySDBuffer(){
     strcpy(sensorLocalBuffer[counter], test);
     if(removeQueue == false){
         //Queue empty
-        printf("\nCORE 1: QUEUE EMPTY\n");
+        //printf("\nCORE 1: QUEUE EMPTY\n");
     }else{
         if(counter++ > SAMPLES_TO_SAVE){
             counter = 0;

@@ -44,5 +44,6 @@
         "dotw",
         "OLED",
         "Pyranometer"
-    ]
+    ],
+    "cortex-debug.variableUseNaturalFormat": false
 }
