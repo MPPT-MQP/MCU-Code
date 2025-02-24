@@ -190,7 +190,7 @@ int main()
     }
    
     while (true) {
-        printf("out of loop\n");
+        bool nothingVar = !nothingVar;
         if(algoFlag == true){
             //Set flag back to false
             //printf("In loop\n");

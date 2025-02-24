@@ -45,5 +45,5 @@
         "OLED",
         "Pyranometer"
     ],
-    "cortex-debug.variableUseNaturalFormat": false
+    "cortex-debug.variableUseNaturalFormat": true
 }
