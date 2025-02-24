@@ -36,7 +36,7 @@ struct sensorData {
 
 
 //Sensor Data Buffer
-extern struct sensorData sensorBuffer[20];
+extern struct sensorData sensorBuffer[QUEUE_BUFFER_SIZE];
 extern uint16_t BufferCounter;
 
 extern queue_t shareQueue;
