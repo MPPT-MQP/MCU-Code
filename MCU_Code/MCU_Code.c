@@ -73,6 +73,7 @@ bool AlgoISR(__unused repeating_timer_t *t){
     return true;
 }
 
+//Init LED on Pico if the oled screen is not used
 #ifndef OLED_SCREEN
 int pico_led_init(void) {
     // A device like Pico that uses a GPIO for the LED will define PICO_DEFAULT_LED_PIN
@@ -144,6 +145,7 @@ void core1_main(){
         run_main_screens();
         #endif
 
+        //Create a new csv file when button 3 is pressed to start tracking
         if(initSDFlag == 1){
             initSDFlag = 0;
             initSDFile();
@@ -169,6 +171,7 @@ void core1_main(){
             }
         }
 
+        //If tracking has been turned off, save current local sensor buffer on core 1
         if(partialSaveFlag == 1){
             //Calculate and save the current values in the localSensorBuffer on core 1
             uint32_t localBytestoWrite = localSensorCounter * SAMPLE_SIZE;
