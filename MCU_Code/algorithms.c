@@ -5,7 +5,7 @@ float duty_min = 0.1;
 float duty_max = 0.95;
 static float P_0_step_val = 0.035;
 float P_O_step;
-static float I_C_step_val = 0.0001;
+static float I_C_step_val = 0.025;
 float I_C_step;
 
 float duty;
@@ -13,7 +13,7 @@ float voltage;
 float current;
 float power;
 float temperature;
-float irradiance;
+float irradiance = 1000;
 
 float prevDuty = 0.5;
 float prevVoltage = 0;
@@ -139,6 +139,9 @@ void incremental_conductance(int variable){
     float deltaI = current - prevCurrent;
     float deltaP = power - prevPower;
 
+    float change = deltaI * voltage;
+    float cond = -current * deltaV;
+
     if(variable == 1){
         I_C_step = N * abs(deltaI/deltaV + current/voltage);
     }
@@ -160,11 +163,11 @@ void incremental_conductance(int variable){
         }
     }
     else {
-        if(deltaI/deltaV == -(current/voltage)) {
+        if(change == cond) {
             duty = prevDuty;
         }
         else {
-            if(deltaI/deltaV > -(current/voltage)) {
+            if(change > cond) {
                 duty = prevDuty - I_C_step;
             }
             else {
