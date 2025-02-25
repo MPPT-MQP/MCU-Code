@@ -319,8 +319,8 @@ int main()
                 power = voltage * current;
                 //temperature = sensorBuffer[BufferCounter-1].temperature;
                 //irradiance = sensorBuffer[BufferCounter-1].irradiance;
-                
-                perturb_and_observe(0);
+                duty = 0.7;
+               // perturb_and_observe(0);
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
                 //Sprintf to format sensor data
@@ -331,7 +331,7 @@ int main()
                 sensorBuffer[BufferCounter-1].PM1voltage, sensorBuffer[BufferCounter-1].PM1current, power, 
                 sensorBuffer[BufferCounter-1].PM2voltage, sensorBuffer[BufferCounter-1].PM2current, sensorBuffer[BufferCounter-1].PM2power, sensorBuffer[BufferCounter-1].PM3voltage, 
                 sensorBuffer[BufferCounter-1].PM3current, sensorBuffer[BufferCounter-1].PM3power, sensorBuffer[BufferCounter-1].temperature, sensorBuffer[BufferCounter-1].irradiance, duty);
-                printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
+                //printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
             
                 //Returns false if the queue is full
                 bool resultsAdd = queue_try_add(&shareQueue, &formatString);

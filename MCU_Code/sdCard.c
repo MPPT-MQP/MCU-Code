@@ -34,7 +34,7 @@ void initSDFile(){
     
     
     aon_timer_get_time_calendar(&timeFile);
-    snprintf(CSVName, 40, "%02d - %02d - %02d %02d:%02d:%02d", timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec);
+    snprintf(CSVName, 40, "%02d-%02d-%02d %02d.%02d.%02d.csv", timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec);
     
     const char* filename = CSVName;
     fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
@@ -42,7 +42,7 @@ void initSDFile(){
         panic("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
     }
     //Write inital header data below
-    if (f_printf(&fil, "Timestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2)") < 0) {
+    if (f_printf(&fil, "Timestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2), Duty") < 0) {
         printf("f_printf failed\n");
     }
 
