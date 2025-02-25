@@ -13,7 +13,10 @@ FRESULT fr;
 //SD Card Core 1 Globals
 char sensorLocalBuffer[SAMPLES_TO_SAVE+10][110];
 
-uint16_t counter = 0;
+uint16_t localSensorCounter = 0;
+
+//FileName
+char CSVName[40];
 
 //Mount sd card
 void mountSD(){
@@ -26,12 +29,14 @@ void mountSD(){
 }
 
 void initSDFile(){
+    struct tm timeFile;
     //Open a file and write to it
     
-    //TODO: FIX FILE NAME SETUP WITH CORRECT TIME
-    //char CSVName[20] = "Test.csv";
     
-    const char* const filename = "picoData.csv";
+    aon_timer_get_time_calendar(&timeFile);
+    snprintf(CSVName, 40, "%02d - %02d - %02d %02d:%02d:%02d", timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec);
+    
+    const char* filename = CSVName;
     fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
     if (FR_OK != fr && FR_EXIST != fr) {
         panic("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
@@ -54,13 +59,13 @@ void copySDBuffer(){
     char test[SAMPLE_SIZE];
     //Returns false if the queue is empty
     bool removeQueue = queue_try_remove(&shareQueue, &test);
-    strcpy(sensorLocalBuffer[counter], test);
+    strcpy(sensorLocalBuffer[localSensorCounter], test);
     if(removeQueue == false){
         //Queue empty
         //printf("\nCORE 1: QUEUE EMPTY\n");
     }else{
-        if(counter++ > SAMPLES_TO_SAVE){
-            counter = 0;
+        if(localSensorCounter++ > SAMPLES_TO_SAVE){
+            localSensorCounter = 0;
             saveFlag = true;
         }
     }
@@ -68,18 +73,9 @@ void copySDBuffer(){
 }
 
 void writeSD(uint32_t bytes){
-    uint bytesWritten = 0;
-    // TODO: Setup fcn to read from buffer data and have unique filename argument
-    //Open a file and write to it
-    char CSVName[20] = "picoData.csv";
+    uint bytesWritten = 0;    
 
-    
-
-    // time_t t= time(NULL);
-    // struct tm date = *localtime(&t);
-    //sprintf(CSVName, "%d-%02d-%02d_%02d:%02d.csv", date.tm_year + 1900, date.tm_mon+1, date.tm_mday, date.tm_hour, date.tm_min);
-    
-    const char* const filename = "picoData.csv";
+    const char* filename = CSVName;
     fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
     if (FR_OK != fr && FR_EXIST != fr) {
         panic("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);

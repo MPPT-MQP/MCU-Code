@@ -21,6 +21,9 @@ extern volatile bool button2_state;
 extern volatile bool button3_state;
 extern volatile bool button4_state;
 
+extern volatile bool partialSaveFlag;
+extern volatile bool initSDFlag;
+
 //Function Prototypes
 void buttonsInit();
 void buttonISR(uint gpio, uint32_t events); // ISR for button interrupts

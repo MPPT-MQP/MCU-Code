@@ -7,6 +7,9 @@ volatile bool button2_state = 0;
 volatile bool button3_state = 0;
 volatile bool button4_state = 0;
 
+volatile bool partialSaveFlag = 0;
+volatile bool initSDFlag = 0;
+
 /* Start Debounce Code*/
 #define DEBOUNCE_MS 50
 bool is_debounceing = false;
@@ -60,17 +63,23 @@ void buttonISR(uint gpio, uint32_t events) {
     if(debounce()) return; // Debounce button
     switch(gpio) {
         case BUTTON1PIN:
-            printf("\nButton 1 pressed\n");
+            // printf("\nButton 1 pressed\n");
             button1_state = !button1_state;
         break;
             
         case BUTTON2PIN:
-            printf("\nButton 2 pressed\n");
+            // printf("\nButton 2 pressed\n");
             button2_state = !button2_state;
         break;
 
         case BUTTON3PIN:
-            printf("\nButton 3 pressed\n");
+            // printf("\nButton 3 pressed\n");
+            if(button3_state == 1){
+                partialSaveFlag = true;
+            }
+            if(button3_state == 0){
+                initSDFlag = true;
+            }
             button3_state = !button3_state;
             #ifndef OLED_SCREEN
             tracking_toggle = !tracking_toggle;
@@ -78,7 +87,7 @@ void buttonISR(uint gpio, uint32_t events) {
         break;
         
         case BUTTON4PIN:
-            printf("\nButton 4 pressed\n");
+            // printf("\nButton 4 pressed\n");
             button4_state = !button4_state;
         break;
     }

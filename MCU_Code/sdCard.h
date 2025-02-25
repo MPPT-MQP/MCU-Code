@@ -34,10 +34,10 @@ struct sensorData {
     float irradiance;
 };
 
-
 //Sensor Data Buffer
 extern struct sensorData sensorBuffer[QUEUE_BUFFER_SIZE];
 extern uint16_t BufferCounter;
+extern uint16_t localSensorCounter;
 
 extern queue_t shareQueue;
 

@@ -143,6 +143,16 @@ void core1_main(){
         #ifdef OLED_SCREEN
         run_main_screens();
         #endif
+
+        if(initSDFlag == 1){
+            initSDFlag = 0;
+            initSDFile();
+        }
+        
+        mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
+        tempVAL = readTMP102();
+        mutex_exit(&temperatureMutex);
+        
         #ifndef OLED_SCREEN
         if(tracking_toggle == 1){
             gpio_put(PICO_DEFAULT_LED_PIN, true);
@@ -150,14 +160,21 @@ void core1_main(){
             gpio_put(PICO_DEFAULT_LED_PIN, false);
         }
         #endif
-        mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
-        tempVAL = readTMP102();
-        mutex_exit(&temperatureMutex);
-        copySDBuffer();
+        
+        if(tracking_toggle == 1){
+            copySDBuffer();
 
-        if(saveFlag == true){
-            writeSD(bytesToSave);
+            if(saveFlag == true){
+                writeSD(bytesToSave);
+            }
         }
+
+        if(partialSaveFlag == 1){
+            //Calculate and save the current values in the localSensorBuffer on core 1
+            uint32_t localBytestoWrite = localSensorCounter * SAMPLE_SIZE;
+            writeSD(localBytestoWrite);
+            partialSaveFlag = 0;
+        } 
     }
 }
 
@@ -188,12 +205,9 @@ int main()
     //Temp Sensor ADC Setup
     TMP_ADC_setup();
 
-    
-
     //SD Card Setup (hw_config.c sets the SPI pins)
     sd_init_driver();
     mountSD();
-    initSDFile();
 
     //Init PWM
     pico_pwm_init();
