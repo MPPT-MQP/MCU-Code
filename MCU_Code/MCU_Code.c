@@ -73,6 +73,15 @@ bool AlgoISR(__unused repeating_timer_t *t){
     return true;
 }
 
+int pico_led_init(void) {
+    // A device like Pico that uses a GPIO for the LED will define PICO_DEFAULT_LED_PIN
+    // so we can use normal GPIO functionality to turn the led on and off
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+    return PICO_OK;
+}
+
+
 float tempVAL;
 /// @brief Core 1 Main Function
 void core1_main(){
@@ -85,6 +94,11 @@ void core1_main(){
 
     //Init Mutex for temp sensor readings
     mutex_init(&temperatureMutex);
+
+    #ifndef OLED_SCREEN
+    //LED Init
+    pico_led_init();
+    #endif
 
     //Set Pico Clock
     pcf8523_read(&RTCtime);
@@ -127,6 +141,13 @@ void core1_main(){
     while(1){
         #ifdef OLED_SCREEN
         run_main_screens();
+        #endif
+        #ifndef OLED_SCREEN
+        if(tracking_toggle == 1){
+            gpio_put(PICO_DEFAULT_LED_PIN, true);
+        }else{
+            gpio_put(PICO_DEFAULT_LED_PIN, false);
+        }
         #endif
         mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
         tempVAL = readTMP102();
@@ -289,7 +310,7 @@ int main()
                 aon_timer_get_time_calendar(&PicoTime);
                 sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
                 PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
-                sensorBuffer[BufferCounter-1].PM1voltage, sensorBuffer[BufferCounter-1].PM1current, sensorBuffer[BufferCounter-1].PM1power, 
+                sensorBuffer[BufferCounter-1].PM1voltage, sensorBuffer[BufferCounter-1].PM1current, power, 
                 sensorBuffer[BufferCounter-1].PM2voltage, sensorBuffer[BufferCounter-1].PM2current, sensorBuffer[BufferCounter-1].PM2power, sensorBuffer[BufferCounter-1].PM3voltage, 
                 sensorBuffer[BufferCounter-1].PM3current, sensorBuffer[BufferCounter-1].PM3power, sensorBuffer[BufferCounter-1].temperature, sensorBuffer[BufferCounter-1].irradiance, duty);
                 printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
