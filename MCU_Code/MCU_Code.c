@@ -73,6 +73,7 @@ bool AlgoISR(__unused repeating_timer_t *t){
     return true;
 }
 
+#ifndef OLED_SCREEN
 int pico_led_init(void) {
     // A device like Pico that uses a GPIO for the LED will define PICO_DEFAULT_LED_PIN
     // so we can use normal GPIO functionality to turn the led on and off
@@ -80,7 +81,7 @@ int pico_led_init(void) {
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
     return PICO_OK;
 }
-
+#endif
 
 float tempVAL;
 /// @brief Core 1 Main Function
