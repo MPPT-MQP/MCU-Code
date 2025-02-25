@@ -11,7 +11,7 @@
 #define BUTTON_INTERRUPTS 4
 //Comment this out to disable interrupts
 
-#ifdef OLED_SCREEN
+#ifndef OLED_SCREEN
 extern int tracking_toggle;
 #endif
 
