@@ -72,6 +72,9 @@ void buttonISR(uint gpio, uint32_t events) {
         case BUTTON3PIN:
             printf("\nButton 3 pressed\n");
             button3_state = !button3_state;
+            #ifdef OLED_SCREEN
+            tracking_toggle = !tracking_toggle;
+            #endif
         break;
         
         case BUTTON4PIN:

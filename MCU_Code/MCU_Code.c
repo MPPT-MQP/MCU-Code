@@ -102,9 +102,11 @@ void core1_main(){
     // irq_set_exclusive_handler(irqNumber, doorbellISR);
     // irq_set_enabled(irqNumber, true);
     
+    #ifdef OLED_SCREEN
     // Initialize OLED Screen and Display Welcome
     oled_init();
     welcome_screen();
+    #endif
 
     //Initialize Alarm Pool and repeating timer (IRQ will call on core 1)
     struct repeating_timer alarmTimer;
@@ -123,7 +125,9 @@ void core1_main(){
     }
 
     while(1){
+        #ifdef OLED_SCREEN
         run_main_screens();
+        #endif
         mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
         tempVAL = readTMP102();
         mutex_exit(&temperatureMutex);

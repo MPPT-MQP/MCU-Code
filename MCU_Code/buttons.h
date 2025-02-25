@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
+#include "def.h"
 
 #define BUTTON1PIN 6
 #define BUTTON2PIN 7
@@ -10,7 +11,9 @@
 #define BUTTON_INTERRUPTS 4
 //Comment this out to disable interrupts
 
-// extern int tracking_toggle;
+#ifdef OLED_SCREEN
+extern int tracking_toggle;
+#endif
 
 // Make button state variables accessible in main 
 extern volatile bool button1_state;
