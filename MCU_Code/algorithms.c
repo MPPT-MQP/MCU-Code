@@ -94,7 +94,7 @@ void constant_voltage() {
     if (duty >= duty_max || duty <= duty_min) {
         duty = prevDuty;
     }
-    
+
     prevDuty = duty;
 }
 
@@ -168,11 +168,11 @@ void incremental_conductance(int variable){
         }
     }
     else {
-        if(voltage*(deltaI/deltaV) == -current) {
+        if(voltage*deltaI == -current*deltaV) {
             duty = prevDuty;
         }
         else {
-            if(voltage*(deltaI/deltaV) > -current) {
+            if(voltage*deltaI > -current*deltaV) {
                 duty = prevDuty - I_C_step; 
             }
             else {
@@ -192,18 +192,22 @@ void incremental_conductance(int variable){
 
 void beta_method() {
 
-    float Bmin = -1550.62;
-    float Bmax = -145.50;
+    float Bmin = -320.467;
+    float Bmax = -230.369;
     float Bg= (Bmin+Bmax)/2;
 
     float q=1.6e-19;
     float k=1.38e-23;
     float A=0.945;
-    float N=30;
+    float N=36;
     float T=25;
     float c=q/(k*T*A*N);
     float E;
 
+    if (voltage == 0) {
+        voltage = 0.0001;
+    }
+    
     float B = log(abs(current/voltage))-(c*voltage);
 
     float deltaV = voltage - prevVoltage;
