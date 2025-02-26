@@ -89,8 +89,13 @@ void constant_voltage() {
     pid_init(&cv_pid, 1, 1, 0); // Initialize with example gains 
     float Vref = 17.2;
     float dt = 0.000001; // not sure what to set this too
-    duty = pid_compute(&cv_pid, Vref, voltage, dt); 
+    float error = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
+    duty = (17.2-error)/21.6;
 
+    if (duty >= duty_max || duty <= duty_min) {
+        duty = prevDuty;
+    }
+    prevDuty = duty;
 }
 
 void perturb_and_observe(int variable){
