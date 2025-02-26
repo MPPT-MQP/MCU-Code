@@ -139,8 +139,8 @@ void incremental_conductance(int variable){
     float deltaI = current - prevCurrent;
     float deltaP = power - prevPower;
 
-    float change = deltaI * voltage;
-    float cond = -current * deltaV;
+    //float change = deltaI * voltage;
+   // float cond = -current * deltaV;
 
     if(variable == 1){
         I_C_step = N * abs(deltaI/deltaV + current/voltage);
@@ -163,12 +163,20 @@ void incremental_conductance(int variable){
         }
     }
     else {
-        if(change == cond) {
+        if(deltaI/deltaV == -(current/voltage)) {
             duty = prevDuty;
         }
         else {
-            if(change > cond) {
-                duty = prevDuty - I_C_step;
+            if(deltaI/deltaV > -(current/voltage)) {
+                if((deltaV*deltaI) > 0) {
+                    if(deltaV > 0) {
+                        duty = prevDuty + I_C_step;
+                    } else {
+                        duty = prevDuty - I_C_step;
+                    }
+                } else {
+                    duty = prevDuty - I_C_step;
+                }
             }
             else {
                 duty = prevDuty + I_C_step; 
