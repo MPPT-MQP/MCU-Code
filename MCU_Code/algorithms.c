@@ -5,7 +5,7 @@ float duty_min = 0.1;
 float duty_max = 0.95;
 static float P_0_step_val = 0.035;
 float P_O_step;
-static float I_C_step_val = 0.025;
+static float I_C_step_val = 0.04;
 float I_C_step;
 
 float duty;
@@ -13,7 +13,7 @@ float voltage;
 float current;
 float power;
 float temperature;
-float irradiance = 1000;
+float irradiance;
 
 float prevDuty = 0.5;
 float prevVoltage = 0;
@@ -89,12 +89,12 @@ void constant_voltage() {
     pid_init(&cv_pid, 1, 1, 0); // Initialize with example gains 
     float Vref = 17.2;
     float dt = 0.000001; // not sure what to set this too
-    float error = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
-    duty = (17.2-error)/21.6;
+    duty = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
 
     if (duty >= duty_max || duty <= duty_min) {
         duty = prevDuty;
     }
+    
     prevDuty = duty;
 }
 
@@ -168,20 +168,12 @@ void incremental_conductance(int variable){
         }
     }
     else {
-        if(deltaI/deltaV == -(current/voltage)) {
+        if(voltage*(deltaI/deltaV) == -current) {
             duty = prevDuty;
         }
         else {
-            if(deltaI/deltaV > -(current/voltage)) {
-                if((deltaV*deltaI) > 0) {
-                    if(deltaV > 0) {
-                        duty = prevDuty + I_C_step;
-                    } else {
-                        duty = prevDuty - I_C_step;
-                    }
-                } else {
-                    duty = prevDuty - I_C_step;
-                }
+            if(voltage*(deltaI/deltaV) > -current) {
+                duty = prevDuty - I_C_step; 
             }
             else {
                 duty = prevDuty + I_C_step; 
@@ -264,10 +256,8 @@ void temperature_parametric() {
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
     }
-    else {
-        duty = duty_raw;
-        prevDuty = duty;
-    }
+    prevDuty = duty;
+
 }
 
 void particle_swarm_optimization() {
