@@ -207,7 +207,7 @@ void beta_method() {
     if (voltage == 0) {
         voltage = 0.0001;
     }
-    
+
     float B = log(abs(current/voltage))-(c*voltage);
 
     float deltaV = voltage - prevVoltage;
@@ -255,9 +255,9 @@ void temperature_parametric() {
     float B1 = -0.0003;
     float B2 = -0.088;
     float Vmpp = B0 + B1*irradiance +B2*temperature;
-    float duty_raw = voltage - Vmpp;
+    duty = voltage - Vmpp;
 
-    if (duty_raw >= duty_max || duty_raw <= duty_min) {
+    if (duty >= duty_max || duty <= duty_min) {
         duty = prevDuty;
     }
     prevDuty = duty;
@@ -379,17 +379,14 @@ void ripple_correlation_control() {
     pid_init(&rcc_pid1, 200, 5, 0);  
     float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt); // not sure about setpoint here
 
-    float PID2_input = PID1_output - error2;
+    float PID2_input = PID1_output - voltage_gain;
     pid_init(&rcc_pid2, 0.000000002, -0.001, 0); 
-    float duty_raw = pid_compute(&rcc_pid2, 0.69, voltage, dt); // not sure about setpoint here 
+    duty = pid_compute(&rcc_pid2, 0, PID2_input, dt); // not sure about setpoint here 
 
-    if (duty_raw >= duty_max || duty_raw <= duty_min) {
+    if (duty >= duty_max || duty <= duty_min) {
         duty = prevDuty;
     }
-    else {
-        duty = duty_raw;
-        prevDuty = duty;
-    }
+    prevDuty = duty;
 
 }
 
