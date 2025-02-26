@@ -50,10 +50,10 @@ void buttonsInit(void) {
 
     #ifdef BUTTON_INTERRUPTS
     // enable interrupts with rising edge -> 0x08
-    gpio_set_irq_enabled_with_callback(BUTTON1PIN, GPIO_IRQ_EDGE_FALL, true, &buttonISR);
-    gpio_set_irq_enabled(BUTTON2PIN, GPIO_IRQ_EDGE_FALL, true);
-    gpio_set_irq_enabled(BUTTON3PIN, GPIO_IRQ_EDGE_FALL, true);
-    gpio_set_irq_enabled(BUTTON4PIN, GPIO_IRQ_EDGE_FALL, true);
+    gpio_set_irq_enabled_with_callback(BUTTON1PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
+    gpio_set_irq_enabled(BUTTON2PIN, GPIO_IRQ_EDGE_RISE, true);
+    gpio_set_irq_enabled(BUTTON3PIN, GPIO_IRQ_EDGE_RISE, true);
+    gpio_set_irq_enabled(BUTTON4PIN, GPIO_IRQ_EDGE_RISE, true);
     #endif
 
 }
