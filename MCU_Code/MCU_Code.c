@@ -329,10 +329,16 @@ int main()
                 current = sensorBuffer[BufferCounter].PM1current;
                 //power = sensorBuffer[BufferCounter].PM1power;
                 power = voltage * current;
-                //temperature = sensorBuffer[BufferCounter].temperature;
-                //irradiance = sensorBuffer[BufferCounter].irradiance;
-                duty = 0.7;
-               // perturb_and_observe(0);
+                //temperature = sensorBuffer[BufferCounter-1].temperature;
+                //irradiance = sensorBuffer[BufferCounter-1].irradiance;
+                //duty = 0.7;
+                //perturb_and_observe(0);
+                //incremental_conductance(0);
+                //beta_method();
+                //ripple_correlation_control();
+                //particle_swarm_optimization();
+                //constant_voltage();
+                temperature_parametric();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
                 //Sprintf to format sensor data
