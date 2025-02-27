@@ -17,7 +17,7 @@ extern bool saveFlag;
 
 void mountSD();
 void initSDFile();
-void copySDBuffer();
+void copySDBuffer(char* test);
 void writeSD(uint32_t bytes);
 
 struct sensorData {
@@ -32,6 +32,7 @@ struct sensorData {
     float PM3power;
     float temperature;
     float irradiance;
+    float duty;
 };
 
 //Sensor Data Buffer
@@ -40,6 +41,8 @@ extern uint16_t BufferCounter;
 extern uint16_t localSensorCounter;
 
 extern queue_t shareQueue;
+
+
 
 //Extern Time Structs
 extern struct pcf8523_time_t RTCtime;

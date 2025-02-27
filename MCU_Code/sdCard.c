@@ -54,22 +54,14 @@ void initSDFile(){
 }
 
 /// @brief Copy sensor data from shared queue to local buffer on core 1
-void copySDBuffer(){
+void copySDBuffer(char* test){
     
-    char test[SAMPLE_SIZE];
-    //Returns false if the queue is empty
-    bool removeQueue = queue_try_remove(&shareQueue, &test);
     strcpy(sensorLocalBuffer[localSensorCounter], test);
-    if(removeQueue == false){
-        //Queue empty
-        bool fakeEmpty = !fakeEmpty;
-    }else{
-        if(localSensorCounter++ > SAMPLES_TO_SAVE){
-            localSensorCounter = 0;
-            saveFlag = true;
-        }
+
+    if(localSensorCounter++ > SAMPLES_TO_SAVE){
+        localSensorCounter = 0;
+        saveFlag = true;
     }
-    
 }
 
 void writeSD(uint32_t bytes){

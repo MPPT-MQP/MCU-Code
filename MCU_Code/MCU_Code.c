@@ -84,6 +84,77 @@ int pico_led_init(void) {
 }
 #endif
 
+volatile bool bufA_Main = true;
+volatile bool bufB_Main = false;
+volatile bool notDoneFlag = false;
+
+//Ping Pong Buffer
+#define PING_PONG_SIZE 150
+struct sensorData sensorBuffer_A[PING_PONG_SIZE];
+struct sensorData sensorBuffer_B[PING_PONG_SIZE];
+//Mutex
+mutex_t pingPongMutex;
+
+void pingPongMain(struct sensorData array, uint32_t bufACounter, uint32_t bufBCounter){
+    if(bufA_Main){
+        sensorBuffer_A[bufACounter] = array;
+        if(bufACounter++ >= PING_PONG_SIZE - 1){
+            bufACounter = 0;
+            bufA_Main = false;
+            bufB_Main = true;
+            mutex_enter_blocking(&pingPongMutex);
+            notDoneFlag = true;
+            mutex_exit(&pingPongMutex);
+        }
+    }else if(bufB_Main){
+        sensorBuffer_B[bufBCounter] = array;
+        if(bufBCounter++ >= PING_PONG_SIZE - 1){
+            bufBCounter = 0;
+            bufA_Main = true;
+            bufB_Main = false;
+            mutex_enter_blocking(&pingPongMutex);
+            notDoneFlag = true;
+            mutex_exit(&pingPongMutex);
+        }
+    }
+}
+
+char tempString[SAMPLE_SIZE];
+void pingPongCore1(uint32_t bufACounter, uint32_t bufBCounter){
+    if(!bufA_Main && notDoneFlag){
+        aon_timer_get_time_calendar(&PicoTime);
+        sprintf(tempString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
+        PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
+        sensorBuffer_A[bufACounter].PM1voltage, sensorBuffer_A[bufACounter].PM1current, sensorBuffer_A[bufACounter].PM1power, 
+        sensorBuffer_A[bufACounter].PM2voltage, sensorBuffer_A[bufACounter].PM2current, sensorBuffer_A[bufACounter].PM2power, sensorBuffer_A[bufACounter].PM3voltage, 
+        sensorBuffer_A[bufACounter].PM3current, sensorBuffer_A[bufACounter].PM3power, sensorBuffer_A[bufACounter].temperature, sensorBuffer_A[bufACounter].irradiance, sensorBuffer_A[bufACounter].duty);
+         
+        if(bufACounter++ >= PING_PONG_SIZE - 1){
+            bufACounter = 0;
+            mutex_enter_blocking(&pingPongMutex);
+            notDoneFlag = false;
+            mutex_exit(&pingPongMutex);
+        }
+        
+
+    }else if(!bufB_Main && notDoneFlag){
+        aon_timer_get_time_calendar(&PicoTime);
+        sprintf(tempString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
+        PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
+        sensorBuffer_B[bufBCounter].PM1voltage, sensorBuffer_B[bufBCounter].PM1current, sensorBuffer_B[bufBCounter].PM1power, 
+        sensorBuffer_B[bufBCounter].PM2voltage, sensorBuffer_B[bufBCounter].PM2current, sensorBuffer_B[bufBCounter].PM2power, sensorBuffer_B[bufBCounter].PM3voltage, 
+        sensorBuffer_B[bufBCounter].PM3current, sensorBuffer_B[bufBCounter].PM3power, sensorBuffer_B[bufBCounter].temperature, sensorBuffer_B[bufBCounter].irradiance, sensorBuffer_B[bufBCounter].duty);
+                
+        if(bufBCounter++ >= PING_PONG_SIZE - 1){
+            bufBCounter = 0;
+            mutex_enter_blocking(&pingPongMutex);
+            notDoneFlag = false;
+            mutex_exit(&pingPongMutex);
+        }
+        
+    }
+}
+
 float tempVAL;
 /// @brief Core 1 Main Function
 void core1_main(){
@@ -96,6 +167,9 @@ void core1_main(){
 
     //Init Mutex for temp sensor readings
     mutex_init(&temperatureMutex);
+
+    //Mutex init
+    mutex_init(&pingPongMutex);
 
     //Take first temp reading if core 0 needs it
     mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
@@ -119,11 +193,6 @@ void core1_main(){
     aon_timer_start_calendar(&PicoTime);
     
     
-    // //Init doorbell
-    // uint32_t irqNumber = multicore_doorbell_irq_num(doorbellNumber);
-    // irq_set_exclusive_handler(irqNumber, doorbellISR);
-    // irq_set_enabled(irqNumber, true);
-    
     #ifdef OLED_SCREEN
     // Initialize OLED Screen and Display Welcome
     oled_init();
@@ -137,6 +206,10 @@ void core1_main(){
 
     //Setup Buttons
     buttonsInit();
+
+    //Ping Pong Counters
+    uint32_t bufACounter = 0;
+    uint32_t bufBCounter = 0;
 
     //Set flag and wait for both to be true
     core1InitFlag = true;
@@ -171,7 +244,11 @@ void core1_main(){
         #endif
         
         if(tracking_toggle == 1){
-            copySDBuffer();
+            
+            pingPongCore1(bufACounter, bufBCounter);
+            if(notDoneFlag){
+                copySDBuffer(tempString);
+            }
 
             if(saveFlag == true){
                 writeSD(bytesToSave);
@@ -232,6 +309,10 @@ int main()
     //Add repeating timer to slow down the rate that the algorithm & sensor collection runs at
     struct repeating_timer algoTimer;
     add_repeating_timer_us(SENSOR_ALGORITHM_RUN_RATE, AlgoISR, NULL, &algoTimer);
+
+    //Ping Pong
+    uint32_t bufACounter = 0;
+    uint32_t bufBCounter = 0;
 
     //Set the init flag high and wait for the other core to finish setup
     core0InitFlag = true;
@@ -341,23 +422,10 @@ int main()
                 temperature_parametric();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
-                //Sprintf to format sensor data
-                char formatString[SAMPLE_SIZE];
-                aon_timer_get_time_calendar(&PicoTime);
-                sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
-                PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
-                sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, power, 
-                sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
-                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty);
-                //printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
-            
-                //Returns false if the queue is full
-                bool resultsAdd = queue_try_add(&shareQueue, &formatString);
-                if(resultsAdd == false){
-                    printf("\nCORE 0: Queue Full Add Error \n");
-                }
-            }else
-            {
+                //Save sensor readings into the ping pong buffer
+                pingPongMain(sensorBuffer[BufferCounter], bufACounter, bufBCounter);
+
+            }else{
                 // Turn off DC-DC Converter 
                 gpio_put(EN_PIN, false);
             }
