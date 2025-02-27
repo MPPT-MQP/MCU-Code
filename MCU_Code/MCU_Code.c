@@ -39,12 +39,12 @@ queue_t shareQueue;
 bool saveFlag = false;
 
 //Flags to run algorithms or update OLED with sensor values (updated by ISRs with repeating timers)
-bool screenUpdateFlag = false;
-bool algoFlag = false;
+volatile bool screenUpdateFlag = false;
+volatile bool algoFlag = false;
 
 //Sync flags so both cores wait until all inits have finished
-bool core1InitFlag = false;
-bool core0InitFlag = false;
+volatile bool core1InitFlag = false;
+volatile bool core0InitFlag = false;
 
 //SD card bytes to save
 uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
@@ -96,6 +96,12 @@ void core1_main(){
 
     //Init Mutex for temp sensor readings
     mutex_init(&temperatureMutex);
+
+    //Take first temp reading if core 0 needs it
+    mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
+    tempVAL = readTMP102();
+    sensorBuffer[QUEUE_BUFFER_SIZE - 1].temperature = tempVAL;  //Set previous value from 0 to temp value if core 0 needs it on startup
+    mutex_exit(&temperatureMutex);
 
     #ifndef OLED_SCREEN
     //LED Init
@@ -161,6 +167,7 @@ void core1_main(){
         }else{
             gpio_put(PICO_DEFAULT_LED_PIN, false);
         }
+        sleep_us(4);
         #endif
         
         if(tracking_toggle == 1){
@@ -187,6 +194,8 @@ int main()
 
     //Init Queue
     queue_init(&shareQueue, SAMPLE_SIZE, QUEUE_BUFFER_SIZE);
+    // int spinlockNum = spin_lock_claim_unused(true);
+    // queue_init_with_spinlock(&shareQueue, SAMPLE_SIZE, QUEUE_BUFFER_SIZE, spinlockNum);
 
     //Init both I2C0 and I2C1
     configI2C0();
@@ -233,8 +242,7 @@ int main()
     }
    
     while (true) {
-        bool nothingVar = !nothingVar;
-        if(algoFlag == true){
+        if(algoFlag){
             //Set flag back to false
             //printf("In loop\n");
             algoFlag = false;
@@ -270,12 +278,19 @@ int main()
             // sensorBuffer[BufferCounter].temperature = tempVAL;
 
             bool enterMutex = mutex_try_enter(&temperatureMutex, NULL);
-            if(enterMutex){
+            if(enterMutex == true){
                 sensorBuffer[BufferCounter].temperature = tempVAL;
                 mutex_exit(&temperatureMutex);
             }else if(enterMutex == false){
-                sensorBuffer[BufferCounter].temperature = sensorBuffer[BufferCounter-1].temperature;
-                printf("\n\n\nTESTING: OLD TEMP VALUE");
+                uint8_t oldBufferCounter;
+                if(BufferCounter == 0){
+                    //Wrap around to avoid trying to read the -1 value in an array
+                    oldBufferCounter = QUEUE_BUFFER_SIZE - 1;
+                }else{
+                    oldBufferCounter = BufferCounter - 1; 
+                }
+                sensorBuffer[BufferCounter].temperature = sensorBuffer[oldBufferCounter].temperature;
+                printf("\nOLD TEMP: %f", sensorBuffer[BufferCounter].temperature);
             }
             
             // //If SD card is currently saving, use old value
@@ -303,22 +318,19 @@ int main()
             // sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
             // sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
             
-            //Reset buffer
-            if(BufferCounter++ >= QUEUE_BUFFER_SIZE){
-                BufferCounter = 0;
-            }
+            
             /*End sensor loop*/
 
             /*Run Algorithm*/
             if (tracking_toggle == 1) {
                 //Turn on DC-DC Converter
                 gpio_put(EN_PIN, true);
-                voltage = sensorBuffer[BufferCounter-1].PM1voltage;
-                current = sensorBuffer[BufferCounter-1].PM1current;
-                //power = sensorBuffer[BufferCounter-1].PM1power;
+                voltage = sensorBuffer[BufferCounter].PM1voltage;
+                current = sensorBuffer[BufferCounter].PM1current;
+                //power = sensorBuffer[BufferCounter].PM1power;
                 power = voltage * current;
-                //temperature = sensorBuffer[BufferCounter-1].temperature;
-                //irradiance = sensorBuffer[BufferCounter-1].irradiance;
+                //temperature = sensorBuffer[BufferCounter].temperature;
+                //irradiance = sensorBuffer[BufferCounter].irradiance;
                 duty = 0.7;
                // perturb_and_observe(0);
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
@@ -328,9 +340,9 @@ int main()
                 aon_timer_get_time_calendar(&PicoTime);
                 sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
                 PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
-                sensorBuffer[BufferCounter-1].PM1voltage, sensorBuffer[BufferCounter-1].PM1current, power, 
-                sensorBuffer[BufferCounter-1].PM2voltage, sensorBuffer[BufferCounter-1].PM2current, sensorBuffer[BufferCounter-1].PM2power, sensorBuffer[BufferCounter-1].PM3voltage, 
-                sensorBuffer[BufferCounter-1].PM3current, sensorBuffer[BufferCounter-1].PM3power, sensorBuffer[BufferCounter-1].temperature, sensorBuffer[BufferCounter-1].irradiance, duty);
+                sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, power, 
+                sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
+                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty);
                 //printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
             
                 //Returns false if the queue is full
@@ -343,6 +355,14 @@ int main()
                 // Turn off DC-DC Converter 
                 gpio_put(EN_PIN, false);
             }
+            /*End algorithm loop*/
+
+            
+            //Reset buffer
+            if(BufferCounter++ >= QUEUE_BUFFER_SIZE){
+                BufferCounter = 0;
+            }
+
         }else{
             //Wait for flag to be high so main loop runs
             tight_loop_contents();

@@ -62,7 +62,7 @@ void copySDBuffer(){
     strcpy(sensorLocalBuffer[localSensorCounter], test);
     if(removeQueue == false){
         //Queue empty
-        //printf("\nCORE 1: QUEUE EMPTY\n");
+        bool fakeEmpty = !fakeEmpty;
     }else{
         if(localSensorCounter++ > SAMPLES_TO_SAVE){
             localSensorCounter = 0;
