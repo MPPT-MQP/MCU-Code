@@ -94,10 +94,7 @@ void constant_voltage() {
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
     }
-    else {
-        duty = duty_raw;
-    }
-    
+
     prevDuty = duty;
 }
 
@@ -352,6 +349,38 @@ void particle_swarm_optimization() {
     }
     prevDuty = duty;
 
+}
+
+void ripple_correlation_control() {
+
+    float voltage_gain = voltage * 0.9;
+    float current_gain = current * 100;
+    float power_gain = voltage_gain * current_gain;
+
+    float LPF_Beta = 0.0015;
+
+    float LPF1_output = LPF_Beta * power_gain + (1 - LPF_Beta) * prevPower_gain;
+    float LPF2_output = LPF_Beta * voltage_gain + (1 - LPF_Beta) * prevVoltage_gain;
+
+    float error1 = power_gain - LPF1_output;
+    float error2 = voltage_gain - LPF2_output;
+
+    float dt = 0.000001;
+    float PID1_input = error1 * error2;
+    pid_init(&rcc_pid1, 200, 5, 0);  
+    float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt); // not sure about setpoint here
+
+    float PID2_input = PID1_output - voltage_gain;
+    pid_init(&rcc_pid2, 0.000000002, -0.001, 0); 
+    float duty_raw = pid_compute(&rcc_pid2, 0, PID2_input, dt); // not sure about setpoint here 
+
+    if (duty_raw >= duty_max || duty_raw <= duty_min) {
+        duty = prevDuty;
+    }
+    else {
+        duty = duty_raw;  
+    }
+    prevDuty = duty;
 }
 
 /* END ALGORITHM FUNCTIONS */
