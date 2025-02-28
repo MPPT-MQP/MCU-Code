@@ -125,10 +125,7 @@ void constant_voltage() {
     float Vref = 17.2;
     float dt = 0.000000001; // not sure what to set this too
     float difference = voltage-Vref;
-    printf("Difference: %0.3f\n", difference);
-    float duty_raw = pid_compute(&cv_pid, Vref, voltage, dt); 
-    //printf("Raw Duty Cycle PID: %0.3f\n", duty_raw_pid);
-    //float duty_raw = fabsf(duty_raw_pid);
+    float duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
     printf("Raw Duty Cycle: %0.3f\n", duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
@@ -415,7 +412,7 @@ void particle_swarm_optimization() {
     else {
         duty = duty_raw;
     }
-    
+
     prevDuty = duty;
 
 }
