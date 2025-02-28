@@ -19,3 +19,4 @@ void beta_method();
 void particle_swarm_optimization();
 void constant_voltage();
 void ripple_correlation_control();
+int sign(float num);

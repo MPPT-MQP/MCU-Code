@@ -290,7 +290,7 @@ int main()
                     oldBufferCounter = BufferCounter - 1; 
                 }
                 sensorBuffer[BufferCounter].temperature = sensorBuffer[oldBufferCounter].temperature;
-                printf("\nOLD TEMP: %f", sensorBuffer[BufferCounter].temperature);
+                //printf("\nOLD TEMP: %f", sensorBuffer[BufferCounter].temperature);
             }
             
             // //If SD card is currently saving, use old value
@@ -336,9 +336,9 @@ int main()
                 //incremental_conductance(0);
                 //beta_method();
                 //ripple_correlation_control();
-                //particle_swarm_optimization();
+                particle_swarm_optimization();
                 //constant_voltage();
-                temperature_parametric();
+                //temperature_parametric();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
                 //Sprintf to format sensor data
