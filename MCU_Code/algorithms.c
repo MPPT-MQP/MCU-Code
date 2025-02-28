@@ -6,7 +6,7 @@ float duty_min = 0.1;
 float duty_max = 0.95;
 static float P_0_step_val = 0.035;
 float P_O_step;
-static float I_C_step_val = 0.025;
+static float I_C_step_val = 0.0172;
 float I_C_step;
 
 float duty;
@@ -40,7 +40,7 @@ PIDController rcc_pid1;
 PIDController rcc_pid2;
 
 // Structure to hold particle information for PSO
-struct Particle {
+/*struct Particle {
     double x[10];
     double v[10];
     double y[10];
@@ -50,8 +50,8 @@ struct Particle {
     double bgx;
     unsigned int k;
     unsigned int iteration;
-};
-/*
+};*/
+
 typedef struct {
     double *x;
     double *v;
@@ -63,7 +63,6 @@ typedef struct {
     uint32_t k;
     uint32_t iteration;
 } Particle;
-*/
 
 /* PID functions */
 void pid_init(PIDController *pid, float kp, float ki, float kd) {
@@ -103,9 +102,16 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
 void constant_voltage() {
     pid_init(&cv_pid, 1, 1, 0); // Initialize with example gains 
+    float duty_raw;
     float Vref = 17.2;
     float dt = 0.1; // not sure what to set this too
-    float duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
+    float error = voltage-Vref;
+    if (error < 0.01){
+        duty_raw = prevDuty;
+    }
+    else {
+        duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
+    }
     printf("Raw Duty Cycle: %0.3f\n", duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
@@ -297,6 +303,7 @@ void temperature_parametric() {
 
 }
 
+/*
 void particle_swarm_optimization() {
 
     // PSO Specification
@@ -392,8 +399,8 @@ void particle_swarm_optimization() {
 
     prevDuty = duty;
 
-}
-/*
+} */
+
 // PSO without Irradiance ? 
 void particle_swarm_optimization() {
     static Particle p;
@@ -406,7 +413,7 @@ void particle_swarm_optimization() {
     const double pmax = 0.95;
     float in = voltage * current;
 
-    if (!initialized) {
+   // if (!initialized) {
         p.x = (double *)malloc(N * sizeof(double));
         p.v = (double *)calloc(N, sizeof(double));
         p.y = (double *)calloc(N, sizeof(double));
@@ -421,7 +428,7 @@ void particle_swarm_optimization() {
             p.x[i] = pmin + (pmax - pmin) * i / (N - 1);
         }
         initialized = 1;
-    } else {
+    //} else {
         p.y[p.k] = in;
 
         if (p.y[p.k] > p.by[p.k]) {
@@ -454,9 +461,10 @@ void particle_swarm_optimization() {
             p.k = 0;
             p.iteration++;
         }
-    }
+   // }
 
     float duty_raw = p.bgx;
+    printf("Raw Duty: %0.3f", duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -467,7 +475,7 @@ void particle_swarm_optimization() {
     prevDuty = duty;
 
 }
-*/
+
 void ripple_correlation_control() {
 
     float voltage_gain = voltage * 0.9;
