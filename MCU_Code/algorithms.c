@@ -82,12 +82,7 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
     float proportional = pid->kp * error;
 
     // Integral term
-    // Update integral term with anti-windup
-    if (fabs(pid->output_limit) > pid->integral) { 
-        pid->integral += error; 
-    } else {
-        pid->integral = pid->output_limit * sign(pid->output_limit); // Clamp integral
-    }
+    pid->integral += error; 
     float integral = pid->ki * pid->integral;
 
     // Derivative term
@@ -96,25 +91,12 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
     // Calculate total output
     float output = proportional + integral + derivative;
 
-    // Saturate output to avoid windup
-    if (output > pid->output_limit) {
-        output = pid->output_limit;
-    } else if (output < -pid->output_limit) {
-        output = -pid->output_limit;
-    }
-
     // Update previous error
     pid->prev_error = error;
 
     return output;
 }
 
-// Helper function to get sign of a number
-int sign(float num) {
-    if (num > 0) return 1;
-    else if (num < 0) return -1;
-    else return 0;
-}
 /* End PID Functions*/
 
 
@@ -133,7 +115,7 @@ void constant_voltage() {
     } else {
         duty = duty_raw;
     }
-
+    
     prevDuty = duty;
 }
 
