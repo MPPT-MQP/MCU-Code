@@ -82,7 +82,7 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
     float proportional = pid->kp * error;
 
     // Integral term
-    pid->integral += error; 
+    pid->integral += error * dt; 
     float integral = pid->ki * pid->integral;
 
     // Derivative term
@@ -105,7 +105,7 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 void constant_voltage() {
     pid_init(&cv_pid, 1, 1, 0); // Initialize with example gains 
     float Vref = 17.2;
-    float dt = 0.000000001; // not sure what to set this too
+    float dt = 0.1; // not sure what to set this too
     float difference = voltage-Vref;
     float duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
     printf("Raw Duty Cycle: %0.3f\n", duty_raw);
@@ -115,7 +115,7 @@ void constant_voltage() {
     } else {
         duty = duty_raw;
     }
-    
+
     prevDuty = duty;
 }
 
