@@ -72,7 +72,6 @@ void pid_init(PIDController *pid, float kp, float ki, float kd) {
     pid->kd = kd;
     pid->integral = 0;
     pid->prev_error = 0;
-    pid->output_limit = -0.95;
 }
 
 float pid_compute(PIDController *pid, float setpoint, float actual_value, float dt) {
@@ -106,7 +105,6 @@ void constant_voltage() {
     pid_init(&cv_pid, 1, 1, 0); // Initialize with example gains 
     float Vref = 17.2;
     float dt = 0.1; // not sure what to set this too
-    float difference = voltage-Vref;
     float duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
     printf("Raw Duty Cycle: %0.3f\n", duty_raw);
 
@@ -169,9 +167,6 @@ void incremental_conductance(int variable){
     float deltaV = voltage - prevVoltage;
     float deltaI = current - prevCurrent;
     float deltaP = power - prevPower;
-
-    //float change = deltaI * voltage;
-   // float cond = -current * deltaV;
 
     if(variable == 1){
         I_C_step = N * abs(deltaI/deltaV + current/voltage);
@@ -399,6 +394,7 @@ void particle_swarm_optimization() {
 
 }
 /*
+// PSO without Irradiance ? 
 void particle_swarm_optimization() {
     static Particle p;
     static int initialized = 0;
@@ -486,7 +482,7 @@ void ripple_correlation_control() {
     float error1 = power_gain - LPF1_output;
     float error2 = voltage_gain - LPF2_output;
 
-    float dt = 0.000001;
+    float dt = 0.1;
     float PID1_input = error1 * error2;
     pid_init(&rcc_pid1, 200, 5, 0);  
     float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt); // not sure about setpoint here
