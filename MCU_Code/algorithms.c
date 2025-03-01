@@ -6,7 +6,7 @@ float duty_min = 0.1;
 float duty_max = 0.95;
 static float P_0_step_val = 0.035;
 float P_O_step;
-static float I_C_step_val = 0.0172;
+static float I_C_step_val = 0.025;
 float I_C_step;
 
 float duty;
@@ -64,6 +64,9 @@ typedef struct {
     uint32_t iteration;
 } Particle;
 
+int initialized = 0;
+float global_save = 0.5;
+
 /* PID functions */
 void pid_init(PIDController *pid, float kp, float ki, float kd) {
     pid->kp = kp;
@@ -101,24 +104,28 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 /* ALGORITHM FUNCTIONS */
 
 void constant_voltage() {
-    pid_init(&cv_pid, 1, 1, 0); // Initialize with example gains 
+    pid_init(&cv_pid, 0.1, 1, 0); // Initialize with example gains 
     float duty_raw;
-    float Vref = 17.2;
-    float dt = 0.1; // not sure what to set this too
+    float Vref = 17.48;
+    float dt = 0.000001; // not sure what to set this too
     float error = voltage-Vref;
-    if (error < 0.01){
-        duty_raw = prevDuty;
-    }
-    else {
-        duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt); 
-    }
-    printf("Raw Duty Cycle: %0.3f\n", duty_raw);
+    printf("Voltage: %0.3f ", voltage);
+    printf("Error: %0.3f ", error);
+    //if (fabsf(error) < 0.000000001){
+       //  duty_raw = prevDuty;
+    // }
+    // else {
+    //duty_raw = prevDuty-pid_compute(&cv_pid, 0, voltage-Vref, dt); 
+   // }
+    duty_raw = 17.48/19.24;
+    printf("Raw Duty Cycle: %0.3f ", duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
     } else {
         duty = duty_raw;
     }
+    printf("Duty Cycle: %0.3f\n", duty);
 
     prevDuty = duty;
 }
@@ -181,32 +188,19 @@ void incremental_conductance(int variable){
         I_C_step = I_C_step_val;
     }
 
-    if (deltaV ==  0) {
-        if (deltaI == 0){
-            duty_raw = prevDuty; 
+    if (deltaV !=  0) {
+        if((deltaP/deltaV) > 0) {
+            duty_raw = prevDuty + I_C_step;
+        } else {
+            duty_raw = prevDuty - I_C_step;
         }
-        else {
-            if(deltaI > 0){
-                duty_raw = prevDuty - I_C_step;
-            }
-            else {
-                duty_raw = prevDuty + I_C_step;
-            } 
-        }
-    }
-    else {
-        if((voltage*deltaI) == (-current*deltaV)) {
-            duty_raw = prevDuty;
-        }
-        else {
-            if((voltage*deltaI) > (-current*deltaV)) {
-                duty_raw = prevDuty - I_C_step; 
-            }
-            else {
-                duty_raw = prevDuty + I_C_step; 
-            }
-        }
-    }
+    } else {
+        if (deltaI > 0) {
+            duty_raw = prevDuty + I_C_step;
+        } else {
+            duty_raw = prevDuty - I_C_step;
+        } 
+    }  
 
     printf("Duty Raw: %0.3f\n", duty_raw);
 
@@ -226,8 +220,8 @@ void beta_method() {
 
     float duty_raw;
 
-    float Bmin = -320.467;
-    float Bmax = -230.369;
+    float Bmin = -1550.62;
+    float Bmax = -145.50;
     float Bg= (Bmin+Bmax)/2;
 
     float q=1.6e-19;
@@ -239,7 +233,7 @@ void beta_method() {
     float E;
 
 
-    float B = log(fabs(current/voltage))-(c*voltage);
+    float B = log(fabsf(current/voltage))-(c*voltage);
     printf("Beta: %0.3f\n", B);
 
     float deltaV = voltage - prevVoltage;
@@ -265,6 +259,7 @@ void beta_method() {
         }
     }
     else  {
+        printf("Bg: %0.3f, B: %0.3f", Bg, B);
         E = (Bg-B)*4;
         printf("Error: %0.3f\n", E);
         duty_raw=prevDuty+E;
@@ -292,6 +287,8 @@ void temperature_parametric() {
     float B2 = -0.088;
     float Vmpp = B0 + B1*irradiance +B2*temperature;
     float duty_raw = voltage - Vmpp;
+
+    printf("Duty Raw: %0.3f", duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -404,16 +401,17 @@ void particle_swarm_optimization() {
 // PSO without Irradiance ? 
 void particle_swarm_optimization() {
     static Particle p;
-    static int initialized = 0;
+    //static int initialized = 0;
     const double w = 0.25;  // Inertia weight
     const double c1 = 0.375; // Cognitive parameter
     const double c2 = 0.375; // Social parameter
-    const int N = 20;   // Number of particles
+    const int N = 30;   // Number of particles
     const double pmin = 0.1; 
     const double pmax = 0.95;
     float in = voltage * current;
+    
 
-   // if (!initialized) {
+   if (!initialized) {
         p.x = (double *)malloc(N * sizeof(double));
         p.v = (double *)calloc(N, sizeof(double));
         p.y = (double *)calloc(N, sizeof(double));
@@ -428,7 +426,7 @@ void particle_swarm_optimization() {
             p.x[i] = pmin + (pmax - pmin) * i / (N - 1);
         }
         initialized = 1;
-    //} else {
+    } else {
         p.y[p.k] = in;
 
         if (p.y[p.k] > p.by[p.k]) {
@@ -458,12 +456,14 @@ void particle_swarm_optimization() {
 
         p.k++;
         if (p.k >= N) {
+            global_save = p.bgx;
             p.k = 0;
+            initialized = 0;
             p.iteration++;
         }
-   // }
+    }
 
-    float duty_raw = p.bgx;
+    float duty_raw = global_save;
     printf("Raw Duty: %0.3f", duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
@@ -490,14 +490,16 @@ void ripple_correlation_control() {
     float error1 = power_gain - LPF1_output;
     float error2 = voltage_gain - LPF2_output;
 
-    float dt = 0.1;
+    float dt = 0.000001;
     float PID1_input = error1 * error2;
     pid_init(&rcc_pid1, 200, 5, 0);  
     float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt); // not sure about setpoint here
 
     float PID2_input = PID1_output - voltage_gain;
     pid_init(&rcc_pid2, 0.000000002, -0.001, 0); 
-    float duty_raw = pid_compute(&rcc_pid2, 0, PID2_input, dt); // not sure about setpoint here 
+    float duty_raw = prevDuty-pid_compute(&rcc_pid2, 0, PID2_input, dt); // not sure about setpoint here 
+
+    printf("Duty Raw: %0.3f\n", duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
