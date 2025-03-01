@@ -6,7 +6,7 @@ float duty_min = 0.1;
 float duty_max = 0.95;
 static float P_0_step_val = 0.035;
 float P_O_step;
-static float I_C_step_val = 0.025;
+static float I_C_step_val = 0.035;
 float I_C_step;
 
 float duty;
@@ -188,17 +188,21 @@ void incremental_conductance(int variable){
         I_C_step = I_C_step_val;
     }
 
-    if (deltaV !=  0) {
-        if((deltaP/deltaV) > 0) {
-            duty_raw = prevDuty + I_C_step;
-        } else {
-            duty_raw = prevDuty - I_C_step;
+    if (deltaV ==  0) {
+        if(deltaI == 0) {
+            duty_raw = prevDuty;
+        } else if (deltaI > 0) {
+            duty_raw = prevDuty+I_C_step;
+        }else {
+            duty_raw = prevDuty-I_C_step;
         }
     } else {
-        if (deltaI > 0) {
-            duty_raw = prevDuty + I_C_step;
+        if (deltaI/deltaV == -current/voltage) {
+            duty_raw = prevDuty;
+        } else if(deltaI/deltaV > -current/voltage) {
+            duty_raw = prevDuty-I_C_step;
         } else {
-            duty_raw = prevDuty - I_C_step;
+            duty_raw = prevDuty+I_C_step;
         } 
     }  
 
