@@ -31,11 +31,10 @@ typedef struct {
     float kp, ki, kd; // Gains for P, I, and D terms
     float integral;   // Integral term accumulator
     float prev_error; // Previous error for derivative calculation
-    float output_limit;
 } PIDController;
 
 // PID Controller Instances for Each Algorithm 
-PIDController cv_pid;
+PIDController cv_pid = {1, 1, 0, 0, 0};
 PIDController rcc_pid1;
 PIDController rcc_pid2;
 
@@ -68,26 +67,27 @@ int initialized = 0;
 float global_save = 0.5;
 
 /* PID functions */
-void pid_init(PIDController *pid, float kp, float ki, float kd) {
-    pid->kp = kp;
-    pid->ki = ki;
-    pid->kd = kd;
-    pid->integral = 0;
-    pid->prev_error = 0;
-}
-
 float pid_compute(PIDController *pid, float setpoint, float actual_value, float dt) {
     float error = setpoint - actual_value;
+    //printf("PID Error: %0.3f ", error);
 
     // Proportional term
     float proportional = pid->kp * error;
 
     // Integral term
-    pid->integral += error * dt; 
+    if(pid->integral < -0.95){
+        pid->integral = -0.95;
+    } else{
+        pid->integral += error * dt; 
+    }
+    
+    
     float integral = pid->ki * pid->integral;
 
     // Derivative term
     float derivative = pid->kd * (error - pid->prev_error) * dt;
+
+    printf("Error: %0.3f, Proportional: %0.3f, Integral: %0.3f\n", error, proportional, integral);
 
     // Calculate total output
     float output = proportional + integral + derivative;
@@ -104,28 +104,21 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 /* ALGORITHM FUNCTIONS */
 
 void constant_voltage() {
-    pid_init(&cv_pid, 0.1, 1, 0); // Initialize with example gains 
     float duty_raw;
     float Vref = 17.48;
-    float dt = 0.000001; // not sure what to set this too
+    float dt = 0.01; // not sure what to set this too
     float error = voltage-Vref;
-    printf("Voltage: %0.3f ", voltage);
-    printf("Error: %0.3f ", error);
-    //if (fabsf(error) < 0.000000001){
-       //  duty_raw = prevDuty;
-    // }
-    // else {
-    //duty_raw = prevDuty-pid_compute(&cv_pid, 0, voltage-Vref, dt); 
-   // }
-    duty_raw = 17.48/19.24;
-    printf("Raw Duty Cycle: %0.3f ", duty_raw);
+    //printf("Voltage: %0.3f ", voltage);
+    //printf("Error: %0.3f ", error);
+    duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt);
+    printf("Raw Duty Cycle: %0.3f\n", duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
     } else {
         duty = duty_raw;
     }
-    printf("Duty Cycle: %0.3f\n", duty);
+    //printf("Duty Cycle: %0.3f\n", duty);
 
     prevDuty = duty;
 }
@@ -161,6 +154,8 @@ void perturb_and_observe(int variable){
         }
     }
 
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
     }
@@ -176,24 +171,31 @@ void perturb_and_observe(int variable){
 void incremental_conductance(int variable){
 
     float duty_raw;
-    float N = 0.00025;
+    float N = 0.06;
     float deltaV = voltage - prevVoltage;
     float deltaI = current - prevCurrent;
     float deltaP = power - prevPower;
 
-    if(variable == 1){
-        I_C_step = N * abs(deltaI/deltaV + current/voltage);
+    if(variable == 1 && deltaV != 0){
+        if(deltaP/deltaV < 0.035) {
+            I_C_step = N * fabsf(deltaP/deltaV);
+        } else {
+            I_C_step = I_C_step_val;
+        }
     }
     else {
         I_C_step = I_C_step_val;
     }
+
+    printf("IC Step: %0.3f\n", I_C_step);
 
     if (deltaV ==  0) {
         if(deltaI == 0) {
             duty_raw = prevDuty;
         } else if (deltaI > 0) {
             duty_raw = prevDuty+I_C_step;
-        }else {
+        }
+        else {
             duty_raw = prevDuty-I_C_step;
         }
     } else {
@@ -201,12 +203,13 @@ void incremental_conductance(int variable){
             duty_raw = prevDuty;
         } else if(deltaI/deltaV > -current/voltage) {
             duty_raw = prevDuty-I_C_step;
-        } else {
+        } 
+        else {
             duty_raw = prevDuty+I_C_step;
         } 
     }  
 
-    printf("Duty Raw: %0.3f\n", duty_raw);
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -217,6 +220,7 @@ void incremental_conductance(int variable){
     
     prevDuty = duty;
     prevVoltage = voltage;
+    prevCurrent = current;
     prevPower = power; 
 }
 
