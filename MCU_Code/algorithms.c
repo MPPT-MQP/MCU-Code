@@ -31,10 +31,11 @@ typedef struct {
     float kp, ki, kd; // Gains for P, I, and D terms
     float integral;   // Integral term accumulator
     float prev_error; // Previous error for derivative calculation
+    float output;
 } PIDController;
 
 // PID Controller Instances for Each Algorithm 
-PIDController cv_pid = {1, 1, 0, 0, 0};
+PIDController cv_pid = {0.1, 1, 0, 0, 0};
 PIDController rcc_pid1;
 PIDController rcc_pid2;
 
@@ -68,29 +69,42 @@ float global_save = 0.5;
 
 /* PID functions */
 float pid_compute(PIDController *pid, float setpoint, float actual_value, float dt) {
+    float output;
     float error = setpoint - actual_value;
     //printf("PID Error: %0.3f ", error);
 
     // Proportional term
-    float proportional = pid->kp * error;
+    float proportional = pid->kp * fabs(error);
 
     // Integral term
-    if(pid->integral < -0.95){
-        pid->integral = -0.95;
-    } else{
-        pid->integral += error * dt; 
+    if (pid->output > 0.95) {
+
+        pid->integral -= fabs(error) * dt;  // Adjust integral to prevent windup
+
+    } else {
+
+        pid->integral += fabs(error) * dt;  // Adjust integral to prevent windup
+
     }
-    
-    
     float integral = pid->ki * pid->integral;
 
     // Derivative term
     float derivative = pid->kd * (error - pid->prev_error) * dt;
 
-    printf("Error: %0.3f, Proportional: %0.3f, Integral: %0.3f\n", error, proportional, integral);
-
     // Calculate total output
-    float output = proportional + integral + derivative;
+    pid->output = proportional + integral + derivative;
+    // Saturate output if needed
+    if (pid->output > 0.95) {
+        output = 0.95;
+    }
+    else if (pid->output < 0.1) {
+        output = 0.1;
+    }
+    else {
+        output = pid->output;
+    }
+
+    printf("Error: %0.3f, Proportional: %0.3f, Integral: %0.3f, Output: %0.3f\n", error, proportional, integral, pid->output);
 
     // Update previous error
     pid->prev_error = error;
@@ -106,8 +120,8 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 void constant_voltage() {
     float duty_raw;
     float Vref = 17.48;
-    float dt = 0.01; // not sure what to set this too
-    float error = voltage-Vref;
+    float dt = 0.2; // not sure what to set this too
+    //float error = voltage-Vref;
     //printf("Voltage: %0.3f ", voltage);
     //printf("Error: %0.3f ", error);
     duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt);
@@ -484,6 +498,7 @@ void particle_swarm_optimization() {
 
 }
 
+/*
 void ripple_correlation_control() {
 
     float voltage_gain = voltage * 0.9;
@@ -517,5 +532,6 @@ void ripple_correlation_control() {
     }
     prevDuty = duty;
 }
+    */
 
 /* END ALGORITHM FUNCTIONS */
