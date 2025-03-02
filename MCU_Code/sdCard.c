@@ -58,7 +58,7 @@ void copySDBuffer(char* test){
     
     strcpy(sensorLocalBuffer[localSensorCounter], test);
 
-    if(localSensorCounter++ > SAMPLES_TO_SAVE){
+    if(localSensorCounter++ >= SAMPLES_TO_SAVE - 2){
         localSensorCounter = 0;
         saveFlag = true;
     }

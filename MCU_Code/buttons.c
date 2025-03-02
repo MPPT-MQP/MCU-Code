@@ -11,7 +11,7 @@ volatile bool partialSaveFlag = 0;
 volatile bool initSDFlag = 0;
 
 /* Start Debounce Code*/
-#define DEBOUNCE_MS 50
+#define DEBOUNCE_MS 15
 bool is_debounceing = false;
 
 int64_t debounce_alarm_callback(alarm_id_t id, void *user_data) {
@@ -60,7 +60,7 @@ void buttonsInit(void) {
 
 // Button Interrupt Service Routine
 void buttonISR(uint gpio, uint32_t events) {
-    if(debounce()) return; // Debounce button
+    // if(debounce()) return; // Debounce button
     switch(gpio) {
         case BUTTON1PIN:
             // printf("\nButton 1 pressed\n");

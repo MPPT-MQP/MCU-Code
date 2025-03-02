@@ -84,6 +84,7 @@ int pico_led_init(void) {
 }
 #endif
 
+//Ping Pong Flags
 volatile bool bufA_Main = true;
 volatile bool bufB_Main = false;
 volatile bool notDoneFlag = false;
@@ -92,14 +93,23 @@ volatile bool notDoneFlag = false;
 #define PING_PONG_SIZE 150
 struct sensorData sensorBuffer_A[PING_PONG_SIZE];
 struct sensorData sensorBuffer_B[PING_PONG_SIZE];
+struct tm timestamps[PING_PONG_SIZE];
+struct tm timestampB[PING_PONG_SIZE];
 //Mutex
 mutex_t pingPongMutex;
 
-void pingPongMain(struct sensorData array, uint32_t bufACounter, uint32_t bufBCounter){
+//Ping Pong Counters
+uint32_t bufACounterMain = 0;
+uint32_t bufBCounterMain = 0;
+uint32_t bufACounter = 0;
+uint32_t bufBCounter = 0;
+void pingPongMain(struct sensorData array){
     if(bufA_Main){
-        sensorBuffer_A[bufACounter] = array;
-        if(bufACounter++ >= PING_PONG_SIZE - 1){
-            bufACounter = 0;
+        sensorBuffer_A[bufACounterMain] = array;
+        aon_timer_get_time_calendar(&PicoTime);
+        timestamps[bufACounterMain] = PicoTime;
+        if(bufACounterMain++ >= PING_PONG_SIZE - 1){
+            bufACounterMain = 0;
             bufA_Main = false;
             bufB_Main = true;
             mutex_enter_blocking(&pingPongMutex);
@@ -107,9 +117,11 @@ void pingPongMain(struct sensorData array, uint32_t bufACounter, uint32_t bufBCo
             mutex_exit(&pingPongMutex);
         }
     }else if(bufB_Main){
-        sensorBuffer_B[bufBCounter] = array;
-        if(bufBCounter++ >= PING_PONG_SIZE - 1){
-            bufBCounter = 0;
+        sensorBuffer_B[bufBCounterMain] = array;
+        aon_timer_get_time_calendar(&PicoTime);
+        timestampB[bufBCounterMain] = PicoTime;
+        if(bufBCounterMain++ >= PING_PONG_SIZE - 1){
+            bufBCounterMain = 0;
             bufA_Main = true;
             bufB_Main = false;
             mutex_enter_blocking(&pingPongMutex);
@@ -120,11 +132,10 @@ void pingPongMain(struct sensorData array, uint32_t bufACounter, uint32_t bufBCo
 }
 
 char tempString[SAMPLE_SIZE];
-void pingPongCore1(uint32_t bufACounter, uint32_t bufBCounter){
+void pingPongCore1(){
     if(!bufA_Main && notDoneFlag){
-        aon_timer_get_time_calendar(&PicoTime);
         sprintf(tempString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
-        PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
+        timestamps[bufACounter].tm_hour, timestamps[bufACounter].tm_min, timestamps[bufACounter].tm_sec,
         sensorBuffer_A[bufACounter].PM1voltage, sensorBuffer_A[bufACounter].PM1current, sensorBuffer_A[bufACounter].PM1power, 
         sensorBuffer_A[bufACounter].PM2voltage, sensorBuffer_A[bufACounter].PM2current, sensorBuffer_A[bufACounter].PM2power, sensorBuffer_A[bufACounter].PM3voltage, 
         sensorBuffer_A[bufACounter].PM3current, sensorBuffer_A[bufACounter].PM3power, sensorBuffer_A[bufACounter].temperature, sensorBuffer_A[bufACounter].irradiance, sensorBuffer_A[bufACounter].duty);
@@ -140,7 +151,7 @@ void pingPongCore1(uint32_t bufACounter, uint32_t bufBCounter){
     }else if(!bufB_Main && notDoneFlag){
         aon_timer_get_time_calendar(&PicoTime);
         sprintf(tempString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
-        PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
+        timestampB[bufBCounter].tm_hour, timestampB[bufBCounter].tm_min, timestampB[bufBCounter].tm_sec,
         sensorBuffer_B[bufBCounter].PM1voltage, sensorBuffer_B[bufBCounter].PM1current, sensorBuffer_B[bufBCounter].PM1power, 
         sensorBuffer_B[bufBCounter].PM2voltage, sensorBuffer_B[bufBCounter].PM2current, sensorBuffer_B[bufBCounter].PM2power, sensorBuffer_B[bufBCounter].PM3voltage, 
         sensorBuffer_B[bufBCounter].PM3current, sensorBuffer_B[bufBCounter].PM3power, sensorBuffer_B[bufBCounter].temperature, sensorBuffer_B[bufBCounter].irradiance, sensorBuffer_B[bufBCounter].duty);
@@ -223,12 +234,6 @@ void core1_main(){
         #ifdef OLED_SCREEN
         run_main_screens();
         #endif
-
-        //Create a new csv file when button 3 is pressed to start tracking
-        if(initSDFlag == 1){
-            initSDFlag = 0;
-            initSDFile();
-        }
         
         mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
         tempVAL = readTMP102();
@@ -243,9 +248,9 @@ void core1_main(){
         sleep_us(4);
         #endif
         
-        if(tracking_toggle == 1){
+        if(tracking_toggle > 0){
             
-            pingPongCore1(bufACounter, bufBCounter);
+            pingPongCore1();
             if(notDoneFlag){
                 copySDBuffer(tempString);
             }
@@ -310,10 +315,6 @@ int main()
     struct repeating_timer algoTimer;
     add_repeating_timer_us(SENSOR_ALGORITHM_RUN_RATE, AlgoISR, NULL, &algoTimer);
 
-    //Ping Pong
-    uint32_t bufACounter = 0;
-    uint32_t bufBCounter = 0;
-
     //Set the init flag high and wait for the other core to finish setup
     core0InitFlag = true;
     while(core1InitFlag == false){
@@ -328,6 +329,12 @@ int main()
             //printf("In loop\n");
             algoFlag = false;
             //Collect sensor readings and run algorithm 
+
+            //Create a new csv file when button 3 is pressed to start tracking
+            if(initSDFlag == 1){
+                initSDFlag = 0;
+                initSDFile();
+            }
 
             //Power Monitor Status Printouts (Should print "TI")
             // PM_printManID(PM1);
@@ -423,7 +430,7 @@ int main()
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
                 //Save sensor readings into the ping pong buffer
-                pingPongMain(sensorBuffer[BufferCounter], bufACounter, bufBCounter);
+                pingPongMain(sensorBuffer[BufferCounter]);
 
             }else{
                 // Turn off DC-DC Converter 
