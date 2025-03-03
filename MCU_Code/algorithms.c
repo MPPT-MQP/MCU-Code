@@ -315,7 +315,7 @@ void temperature_parametric() {
     float Vmpp = B0 + B1*irradiance +B2*temperature;
     float duty_raw = voltage - Vmpp;
 
-    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f, Temperature: %0.3f, Irradiance: %0.3f\n", voltage, current, duty_raw, temperature, irradiance);
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f, Temperature: %0.3f, Irradiance: %0.3f", voltage, current, duty_raw, temperature, irradiance);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -323,6 +323,8 @@ void temperature_parametric() {
     else {
         duty = duty_raw;
     }
+
+    printf(", Actual Duty: %0.3f\n", duty);
     prevDuty = duty;
 
 }
