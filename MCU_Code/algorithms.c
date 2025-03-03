@@ -37,10 +37,10 @@ typedef struct {
 // PID Controller Instances for Each Algorithm 
 PIDController cv_pid = {0.1, 1, 0, 0, 0};
 PIDController rcc_pid1 = {200, 5, 0, 0, 0};
-PIDController rcc_pid2 = {0.000000002, -0.001, 0, 0, 0};
+PIDController rcc_pid2 = {2e-9, -0.001, 0, 0, 0};
 
 // Structure to hold particle information for PSO
-/*struct Particle {
+struct Particle {
     double x[10];
     double v[10];
     double y[10];
@@ -50,9 +50,11 @@ PIDController rcc_pid2 = {0.000000002, -0.001, 0, 0, 0};
     double bgx;
     unsigned int k;
     unsigned int iteration;
-};*/
+};
 
-typedef struct {
+struct Particle p;
+
+/*typedef struct {
     double *x;
     double *v;
     double *y;
@@ -64,8 +66,10 @@ typedef struct {
     uint32_t iteration;
 } Particle;
 
+static Particle p;
+
 int initialized = 0;
-float global_save = 0.5;
+float global_save = 0.5;*/
 
 /* PID functions */
 float pid_compute(PIDController *pid, float setpoint, float actual_value, float dt) {
@@ -323,7 +327,6 @@ void temperature_parametric() {
 
 }
 
-/*
 void particle_swarm_optimization() {
 
     // PSO Specification
@@ -338,7 +341,6 @@ void particle_swarm_optimization() {
     float out;
 
     // Partical Variables
-    struct Particle p;
     float prevIrradiance;
     int initialized = 0;
 
@@ -419,11 +421,11 @@ void particle_swarm_optimization() {
 
     prevDuty = duty;
 
-} */
+} 
 
 // PSO without Irradiance ? 
-void particle_swarm_optimization() {
-    static Particle p;
+/*void particle_swarm_optimization() {
+    
     //static int initialized = 0;
     const double w = 0.25;  // Inertia weight
     const double c1 = 0.375; // Cognitive parameter
@@ -497,7 +499,7 @@ void particle_swarm_optimization() {
     }
     prevDuty = duty;
 
-}
+}*/
 
 
 void ripple_correlation_control() {
