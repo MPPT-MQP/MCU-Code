@@ -36,8 +36,8 @@ typedef struct {
 
 // PID Controller Instances for Each Algorithm 
 PIDController cv_pid = {0.1, 1, 0, 0, 0};
-PIDController rcc_pid1;
-PIDController rcc_pid2;
+PIDController rcc_pid1 = {200, 5, 0, 0, 0};
+PIDController rcc_pid2 = {0.000000002, -0.001, 0, 0, 0};
 
 // Structure to hold particle information for PSO
 /*struct Particle {
@@ -93,6 +93,7 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
     // Calculate total output
     pid->output = proportional + integral + derivative;
+    
     // Saturate output if needed
     if (pid->output > 0.95) {
         output = 0.95;
@@ -498,7 +499,7 @@ void particle_swarm_optimization() {
 
 }
 
-/*
+
 void ripple_correlation_control() {
 
     float voltage_gain = voltage * 0.9;
@@ -513,14 +514,12 @@ void ripple_correlation_control() {
     float error1 = power_gain - LPF1_output;
     float error2 = voltage_gain - LPF2_output;
 
-    float dt = 0.000001;
-    float PID1_input = error1 * error2;
-    pid_init(&rcc_pid1, 200, 5, 0);  
+    float dt = 0.2;
+    float PID1_input = error1 * error2; 
     float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt); // not sure about setpoint here
 
     float PID2_input = PID1_output - voltage_gain;
-    pid_init(&rcc_pid2, 0.000000002, -0.001, 0); 
-    float duty_raw = prevDuty-pid_compute(&rcc_pid2, 0, PID2_input, dt); // not sure about setpoint here 
+    float duty_raw = pid_compute(&rcc_pid2, 0, PID2_input, dt); // not sure about setpoint here 
 
     printf("Duty Raw: %0.3f\n", duty_raw);
 
@@ -532,6 +531,6 @@ void ripple_correlation_control() {
     }
     prevDuty = duty;
 }
-    */
+
 
 /* END ALGORITHM FUNCTIONS */
