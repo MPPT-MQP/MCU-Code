@@ -35,7 +35,7 @@ typedef struct {
 } PIDController;
 
 // PID Controller Instances for Each Algorithm 
-PIDController cv_pid = {0.1, 1, 0, 0, 0};
+PIDController cv_pid = {0.5, 1, 0, 0, 0};
 PIDController rcc_pid1 = {200, 5, 0, 0, 0};
 PIDController rcc_pid2 = {2e-9, -0.001, 0, 0, 0};
 
@@ -124,7 +124,7 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
 void constant_voltage() {
     float duty_raw;
-    float Vref = 17.48;
+    float Vref = 19.39;
     float dt = 0.2; // not sure what to set this too
     //float error = voltage-Vref;
     //printf("Voltage: %0.3f ", voltage);
@@ -315,7 +315,7 @@ void temperature_parametric() {
     float Vmpp = B0 + B1*irradiance +B2*temperature;
     float duty_raw = voltage - Vmpp;
 
-    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f, Temperature: %0.3f, Irradiance: %0.3f\n", voltage, current, duty_raw, temperature, irradiance);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
