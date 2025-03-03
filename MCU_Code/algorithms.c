@@ -9,7 +9,7 @@ float P_O_step;
 static float I_C_step_val = 0.035;
 float I_C_step;
 
-float duty;
+float duty = 0.1;
 float voltage;
 float current;
 float power;
@@ -121,6 +121,16 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
 
 /* ALGORITHM FUNCTIONS */
+
+void duty_sweep(){
+
+    if (duty >= 0.95) {
+        duty = 0.1;
+    } else {
+        duty += 0.01;
+    }
+    printf("Voltage: %0.3f, Current: %0.3f, Duty: %0.3f\n", voltage, current, duty);
+}
 
 void constant_voltage() {
     float duty_raw;
