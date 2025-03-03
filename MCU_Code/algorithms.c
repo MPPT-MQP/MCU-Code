@@ -109,7 +109,7 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
         output = pid->output;
     }
 
-    printf("Error: %0.3f, Proportional: %0.3f, Integral: %0.3f, Output: %0.3f\n", error, proportional, integral, pid->output);
+    //printf("Error: %0.3f, Proportional: %0.3f, Integral: %0.3f, Output: %0.3f\n", error, proportional, integral, pid->output);
 
     // Update previous error
     pid->prev_error = error;
@@ -130,7 +130,7 @@ void constant_voltage() {
     //printf("Voltage: %0.3f ", voltage);
     //printf("Error: %0.3f ", error);
     duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt);
-    printf("Raw Duty Cycle: %0.3f\n", duty_raw);
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -206,7 +206,7 @@ void incremental_conductance(int variable){
         I_C_step = I_C_step_val;
     }
 
-    printf("IC Step: %0.3f\n", I_C_step);
+    //printf("IC Step: %0.3f\n", I_C_step);
 
     if (deltaV ==  0) {
         if(deltaI == 0) {
@@ -261,7 +261,7 @@ void beta_method() {
 
 
     float B = log(fabsf(current/voltage))-(c*voltage);
-    printf("Beta: %0.3f\n", B);
+    //printf("Beta: %0.3f\n", B);
 
     float deltaV = voltage - prevVoltage;
     float deltaP = power - prevPower;
@@ -292,7 +292,7 @@ void beta_method() {
         duty_raw=prevDuty+E;
     }
 
-    printf("Duty Raw: %0.3f\n", duty_raw);
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
     
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -315,7 +315,7 @@ void temperature_parametric() {
     float Vmpp = B0 + B1*irradiance +B2*temperature;
     float duty_raw = voltage - Vmpp;
 
-    printf("Duty Raw: %0.3f", duty_raw);
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -411,6 +411,8 @@ void particle_swarm_optimization() {
     // Output Best Solution
     double best = p.bgx;
     float duty_raw = best / 21.96;
+
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -523,7 +525,7 @@ void ripple_correlation_control() {
     float PID2_input = PID1_output - voltage_gain;
     float duty_raw = pid_compute(&rcc_pid2, 0, PID2_input, dt); // not sure about setpoint here 
 
-    printf("Duty Raw: %0.3f\n", duty_raw);
+    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
