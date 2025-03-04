@@ -338,7 +338,8 @@ int main()
                 //ripple_correlation_control();
                 //particle_swarm_optimization();
                 //constant_voltage();
-                temperature_parametric();
+                //temperature_parametric();
+                duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
                 //Sprintf to format sensor data
