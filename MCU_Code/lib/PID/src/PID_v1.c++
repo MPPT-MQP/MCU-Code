@@ -263,3 +263,28 @@ float PID::GetKi()       { return dispKi; }
 float PID::GetKd()       { return dispKd; }
 int PID::GetMode()       { return inAuto ? AUTOMATIC : MANUAL; }
 int PID::GetDirection()  { return controllerDirection; }
+
+
+
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+void* PIDClass_create(float Input, float Output, float Setpoint, float Kp, float Ki, float Kd, int ControllerDirection){
+    return new PID(&Input, &Output, &Setpoint, Kp, Ki, Kd, P_ON_E, ControllerDirection);
+}
+
+void PIDClass_release(void* pidclass) {
+   delete static_cast<PID*>(pidclass);
+}
+
+void PIDClass_compute(void* pidclass){
+    static_cast<PID*>(pidclass)->Compute();
+}
+
+void PIDClass_setOutputLimits(void* pidclass, float min, float max){
+    static_cast<PID*>(pidclass)->SetOutputLimits(min, max);
+}
+#ifdef __cplusplus
+}
+#endif
