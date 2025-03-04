@@ -3,6 +3,44 @@
 
 #include "PID.h"
 
+/*#include "PID.h"
+#include <stdio.h>
+
+int main() {
+    PIDController pid;
+
+    // Define output limits for your system
+    float output_min = 0.0f;  // Minimum duty cycle (e.g., 0%)
+    float output_max = 1.0f;  // Maximum duty cycle (e.g., 100%)
+
+    // Initialize the PID controller with gains and output limits
+    PID_init(&pid, 0.1f, 0.01f, 0.05f, 0.1f, output_min, output_max);
+
+    float setpoint = 100.0f; // Desired voltage for MPPT
+    float measurement = 0.0f; // Current voltage measurement
+    float dt = 0.1f; // Time step
+
+    while (1) {
+        // Get new voltage measurement here (e.g., from ADC)
+
+        // Compute control output using PID
+        float control_output = PID_update(&pid, setpoint, measurement, dt);
+
+        // Apply control_output to your system (e.g., adjust PWM duty cycle)
+        printf("Control Output: %f\n", control_output);
+
+        // Simulate system response for testing (replace with actual hardware interaction)
+        measurement += control_output * 0.1f;
+
+        // Wait for next time step (simulate delay)
+    }
+
+    return 0;
+}
+
+
+*/
+
 void PID_init(PIDController *pid, float Kp, float Ki, float Kd, float Kb, float output_min, float output_max) {
     pid->Kp = Kp;
     pid->Ki = Ki;
