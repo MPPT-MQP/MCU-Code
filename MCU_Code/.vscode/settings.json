@@ -73,7 +73,8 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "utility": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "pid_v1.h": "c"
     },
     "cSpell.words": [
         "dotw",

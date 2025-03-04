@@ -119,12 +119,12 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
 /* End PID Functions*/
 
-
 /* ALGORITHM FUNCTIONS */
 
+float Vref = 19.39;
 void constant_voltage() {
     float duty_raw;
-    float Vref = 19.39;
+    
     float dt = 0.2; // not sure what to set this too
     //float error = voltage-Vref;
     //printf("Voltage: %0.3f ", voltage);
