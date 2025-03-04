@@ -122,6 +122,17 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 /* ALGORITHM FUNCTIONS */
 
 float Vref = 19.39;
+
+void duty_sweep(){
+
+    if (duty >= 0.95) {
+        duty = 0.1;
+    } else {
+        duty += 0.01;
+    }
+    printf("Voltage: %0.3f, Current: %0.3f, Duty: %0.3f\n", voltage, current, duty);
+}
+
 void constant_voltage() {
     float duty_raw;
     
