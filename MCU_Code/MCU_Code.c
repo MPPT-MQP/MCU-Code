@@ -237,7 +237,7 @@ int main()
     struct repeating_timer algoTimer;
     add_repeating_timer_us(SENSOR_ALGORITHM_RUN_RATE, AlgoISR, NULL, &algoTimer);
 
-    pidClass = PIDClass_create(voltage - 19.39, duty, 1, 1, 0, 0, 0);
+    pidClass = PIDClass_create(voltage - 15.8, duty, 1, 1, 0, 0, 0);
     PIDClass_setOutputLimits(pidClass, 0.1, 0.9);
 
     //Set the init flag high and wait for the other core to finish setup
@@ -345,7 +345,7 @@ int main()
                 //ripple_correlation_control();
                 //particle_swarm_optimization();
                 constant_voltage();
-                printf("Voltage: %0.3f, PIDin: %0.3f, Duty Raw: %0.3f\n", voltage, voltage-19.39, duty);
+                printf("Voltage: %0.3f, PIDin: %0.3f, Duty Raw: %0.3f\n", voltage, voltage-15.8, duty);
                 //temperature_parametric();
                 //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
