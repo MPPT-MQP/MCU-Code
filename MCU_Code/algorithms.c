@@ -35,7 +35,7 @@ typedef struct {
 } PIDController;
 
 // PID Controller Instances for Each Algorithm 
-PIDController cv_pid = {0.5, 1, 0, 0, 0};
+PIDController cv_pid = {1, 1, 0, 0, 0};
 PIDController rcc_pid1 = {200, 5, 0, 0, 0};
 PIDController rcc_pid2 = {2e-9, -0.001, 0, 0, 0};
 
@@ -132,12 +132,12 @@ void duty_sweep(){
 }
 
 float Vref = 19.39;
-void* pidClass = PIDClass_create(voltage, Vref, 0, 1, 1, 0, 1);
+//void* pidClass = PIDClass_create(voltage, Vref, 0, 1, 1, 0, 1);
 
 void constant_voltage() {
     float duty_raw;
     
-    float dt = 0.2; // not sure what to set this too
+    float dt = 0.1; // not sure what to set this too
     //float error = voltage-Vref;
     //printf("Voltage: %0.3f ", voltage);
     //printf("Error: %0.3f ", error);
@@ -343,28 +343,30 @@ void temperature_parametric() {
 
 void particle_swarm_optimization() {
 
+    float test_irradiance = 1000;
+
     // PSO Specification
     double w =  0.5;  // Inertia weight
     double c1 = 1.5; // Cognitive parameter
     double c2 = 1.5; // Social parameter
     int N = 10;   // Number of particles
 
-    float pmin = 0.01 * irradiance + 5.25;
+    float pmin = 0.01 * test_irradiance + 5.25;
     float pmax = 20;
 
     float out;
 
     // Partical Variables
-    float prevIrradiance;
+    float prevIrradiance = test_irradiance;
     int initialized = 0;
 
     // Ensure prev_G is initialized
     if (!initialized) {
-        prevIrradiance = irradiance;
+        prevIrradiance = test_irradiance;
     }
 
     // Ensure p is initialized
-    if (!initialized || (irradiance != prevIrradiance)) {
+    if (!initialized || (test_irradiance != prevIrradiance)) {
         // Reset particles
         // p.x = linspace(pmin, pmax, N);
         for (int i = 0; i < N; i++) {
@@ -382,12 +384,11 @@ void particle_swarm_optimization() {
         p.iteration = 1;
 
         // Update previous G
-        prevIrradiance = irradiance;
+        prevIrradiance = test_irradiance;
         initialized = 1;
 
         // Output first particle position
         out = p.x[p.k];
-        return;
     }
 
     // Input Update
