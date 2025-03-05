@@ -143,7 +143,7 @@ void constant_voltage() {
     //printf("Voltage: %0.3f ", voltage);
     //printf("Error: %0.3f ", error);
     //duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt);
-    // PIDClass_compute(pidClass);
+    PIDClass_compute(pidClass);
     // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
     // if (duty_raw >= duty_max || duty_raw <= duty_min) {

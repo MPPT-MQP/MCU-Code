@@ -270,8 +270,8 @@ int PID::GetDirection()  { return controllerDirection; }
 extern "C"{
 #endif
 
-void* PIDClass_create(float Input, float Output, float Setpoint, float Kp, float Ki, float Kd, int ControllerDirection){
-    return new PID(&Input, &Output, &Setpoint, Kp, Ki, Kd, P_ON_E, ControllerDirection);
+void* PIDClass_create(float *Input, float *Output, float *Setpoint, float Kp, float Ki, float Kd, int ControllerDirection){
+    return new PID(Input, Output, Setpoint, Kp, Ki, Kd, P_ON_E, ControllerDirection);
 }
 
 void PIDClass_release(void* pidclass) {
@@ -284,6 +284,10 @@ void PIDClass_compute(void* pidclass){
 
 void PIDClass_setOutputLimits(void* pidclass, float min, float max){
     static_cast<PID*>(pidclass)->SetOutputLimits(min, max);
+}
+
+void PIDClass_setMode(void* pidclass, int mode){
+    static_cast<PID*>(pidclass)->SetMode(mode);
 }
 #ifdef __cplusplus
 }

@@ -101,13 +101,15 @@ class PID
 #ifdef __cplusplus
 extern "C"{
 #endif
-void* PIDClass_create(float Input, float Output, float Setpoint, float Kp, float Ki, float Kd, int ControllerDirection);
+void* PIDClass_create(float *Input, float *Output, float *Setpoint, float Kp, float Ki, float Kd, int ControllerDirection);
 
 void PIDClass_release(void* pidclass);
 
 void PIDClass_compute(void* pidclass);
 
 void PIDClass_setOutputLimits(void* pidclass, float min, float max);
+
+void PIDClass_setMode(void* pidClass, int mode);
 #ifdef __cplusplus
 }
 #endif
