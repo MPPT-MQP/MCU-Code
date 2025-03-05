@@ -131,27 +131,29 @@ void duty_sweep(){
     printf("Voltage: %0.3f, Current: %0.3f, Duty: %0.3f\n", voltage, current, duty);
 }
 
-float Vref = 19.39;
-void* pidClass = PIDClass_create(voltage, Vref, 0, 1, 1, 0, 1);
+
+
+extern void* pidClass;
 
 void constant_voltage() {
     float duty_raw;
-    
+    float Vref = 19.39;
     float dt = 0.2; // not sure what to set this too
     //float error = voltage-Vref;
     //printf("Voltage: %0.3f ", voltage);
     //printf("Error: %0.3f ", error);
-    duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt);
-    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+    //duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt);
+    PIDClass_compute(pidClass);
+    // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
-    if (duty_raw >= duty_max || duty_raw <= duty_min) {
-        duty = prevDuty;
-    } else {
-        duty = duty_raw;
-    }
-    //printf("Duty Cycle: %0.3f\n", duty);
+    // if (duty_raw >= duty_max || duty_raw <= duty_min) {
+    //     duty = prevDuty;
+    // } else {
+    //     duty = duty_raw;
+    // }
+    // //printf("Duty Cycle: %0.3f\n", duty);
 
-    prevDuty = duty;
+    // prevDuty = duty;
 }
 
 void perturb_and_observe(int variable){

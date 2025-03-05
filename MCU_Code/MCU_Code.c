@@ -16,6 +16,10 @@
 #include "pico/multicore.h"
 #include "pico/time.h"
 
+
+//PID class
+void* pidClass;
+
 //Amount of time until alarm isr runs (flag is toggling between true and false)
 #define ALARM_TIME_MS 1000
 
@@ -233,6 +237,9 @@ int main()
     struct repeating_timer algoTimer;
     add_repeating_timer_us(SENSOR_ALGORITHM_RUN_RATE, AlgoISR, NULL, &algoTimer);
 
+    pidClass = PIDClass_create(voltage - 19.39, duty, 1, 1, 0, 0, 0);
+    PIDClass_setOutputLimits(pidClass, 0.1, 0.9);
+
     //Set the init flag high and wait for the other core to finish setup
     core0InitFlag = true;
     while(core1InitFlag == false){
@@ -337,9 +344,10 @@ int main()
                 //beta_method();
                 //ripple_correlation_control();
                 //particle_swarm_optimization();
-                //constant_voltage();
+                constant_voltage();
+                printf("Voltage: %0.3f, PIDin: %0.3f, Duty Raw: %0.3f\n", voltage, voltage-19.39, duty);
                 //temperature_parametric();
-                duty_sweep();
+                //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
                 //Sprintf to format sensor data
