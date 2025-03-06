@@ -24,6 +24,8 @@ float prevPower = 0;
 // RCC Variables
 float prevVoltage_gain = 0;
 float prevCurrent_gain = 0;
+float LPF1_prevOutput = 0;
+float LPF2_prevOutput = 0;
 float prevPower_gain = 0;
 float rcc1_input;
 float rcc1_setpoint;
@@ -316,6 +318,7 @@ void beta_method() {
     }
     else  {
         E = (Ba-Bg)*4;
+        printf("error: %0.3f", E);
         duty_raw=prevDuty+E;
     }
 
@@ -462,20 +465,33 @@ void ripple_correlation_control() {
     float power_gain = voltage_gain * current_gain;
 
     float LPF_Beta = 0.0015;
-
-    float LPF1_output = LPF_Beta * power_gain + (1 - LPF_Beta) * prevPower_gain;
-    float LPF2_output = LPF_Beta * voltage_gain + (1 - LPF_Beta) * prevVoltage_gain;
+    
+    float LPF1_output = (LPF_Beta * power_gain) + (LPF_Beta * prevPower_gain) - ((LPF_Beta - 1) * LPF1_prevOutput);
+    LPF1_output /= (1+LPF_Beta);
+    printf("LPF1 Output: %0.3f, ", LPF1_output);
+    float LPF2_output = (LPF_Beta * voltage_gain) + (LPF_Beta * prevVoltage_gain) - ((LPF_Beta - 1) * LPF2_prevOutput);
+    LPF2_output /= (1+LPF_Beta);
+    printf("LPF2 Output: %0.3f, ", LPF2_output);
 
     float error1 = power_gain - LPF1_output;
+    printf("Error 1: %0.3f, ", error1);
     float error2 = voltage_gain - LPF2_output;
+    printf("Error 2: %0.3f, ", error1);
 
     rcc1_input = error1 * error2;
     rcc1_setpoint = 0;
     PIDClass_compute(rcc1_pidClass);
+    printf("RCC1 PID: %0.3f, ", rcc1_output);
 
-    rcc2_input = rcc1_output;
-    rcc2_setpoint = voltage_gain;
+    rcc2_input = rcc1_output - voltage_gain;
+    rcc2_setpoint = 0;
     PIDClass_compute(rcc2_pidClass);
+
+    prevVoltage_gain = voltage_gain;
+    prevPower_gain = power_gain;
+    LPF1_prevOutput = LPF1_output;
+    LPF2_prevOutput = LPF2_output;
+
 
     // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
