@@ -74,7 +74,8 @@
         "typeinfo": "cpp",
         "utility": "cpp",
         "vector": "cpp",
-        "pid_v1.h": "c"
+        "pid_v1.h": "c",
+        "multicore.h": "c"
     },
     "cSpell.words": [
         "dotw",

@@ -18,7 +18,9 @@
 
 
 //PID class
-void* pidClass;
+void* cv_pidClass;
+void* rcc1_pidClass;
+void* rcc2_pidClass;
 
 //Amount of time until alarm isr runs (flag is toggling between true and false)
 #define ALARM_TIME_MS 1000
@@ -238,11 +240,19 @@ int main()
     add_repeating_timer_us(SENSOR_ALGORITHM_RUN_RATE, AlgoISR, NULL, &algoTimer);
 
 
-    
-    float setpoint = 15.8;
-    pidClass = PIDClass_create(&voltage, &duty, &setpoint, 0.01, 0.1, 0, 1);
-    PIDClass_setOutputLimits(pidClass, 0.1, 0.9);
-    PIDClass_setMode(pidClass, 1);
+    // Initialize PID Controllers
+    float cv_setpoint = 15.8;
+    cv_pidClass = PIDClass_create(&voltage, &duty, &cv_setpoint, 0.01, 0.1, 0, 1);
+    PIDClass_setOutputLimits(cv_pidClass, 0.1, 0.9);
+    PIDClass_setMode(cv_pidClass, 1);
+
+    rcc1_pidClass = PIDClass_create(&rcc1_input, &rcc1_output, &rcc1_setpoint, 200, 5, 0, 1);
+    PIDClass_setOutputLimits(rcc1_pidClass, 0.1, 0.9);
+    PIDClass_setMode(rcc1_pidClass, 1);
+
+    rcc2_pidClass = PIDClass_create(&rcc2_input, &duty, &rcc2_setpoint, 2e-09, -0.009, 0, 1);
+    PIDClass_setOutputLimits(rcc2_pidClass, 0.1, 0.9);
+    PIDClass_setMode(rcc2_pidClass, 1);
 
     //Set the init flag high and wait for the other core to finish setup
     core0InitFlag = true;

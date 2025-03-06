@@ -25,6 +25,11 @@ float prevPower = 0;
 float prevVoltage_gain = 0;
 float prevCurrent_gain = 0;
 float prevPower_gain = 0;
+float rcc1_input;
+float rcc1_setpoint;
+float rcc1_output;
+float rcc2_input;
+float rcc2_setpoint;
 
 // Structure for PID controller 
 typedef struct {
@@ -133,7 +138,9 @@ void duty_sweep(){
 
 
 
-extern void* pidClass;
+extern void* cv_pidClass;
+extern void* rcc1_pidClass;
+extern void* rcc2_pidClass;
 
 void constant_voltage() {
     float duty_raw;
@@ -143,7 +150,7 @@ void constant_voltage() {
     //printf("Voltage: %0.3f ", voltage);
     //printf("Error: %0.3f ", error);
     //duty_raw = pid_compute(&cv_pid, 0, voltage-Vref, dt);
-    PIDClass_compute(pidClass);
+    PIDClass_compute(cv_pidClass);
     // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
     // if (duty_raw >= duty_max || duty_raw <= duty_min) {
@@ -442,85 +449,6 @@ void particle_swarm_optimization() {
 
 } 
 
-// PSO without Irradiance ? 
-/*void particle_swarm_optimization() {
-    
-    //static int initialized = 0;
-    const double w = 0.25;  // Inertia weight
-    const double c1 = 0.375; // Cognitive parameter
-    const double c2 = 0.375; // Social parameter
-    const int N = 30;   // Number of particles
-    const double pmin = 0.1; 
-    const double pmax = 0.95;
-    float in = voltage * current;
-    
-
-   if (!initialized) {
-        p.x = (double *)malloc(N * sizeof(double));
-        p.v = (double *)calloc(N, sizeof(double));
-        p.y = (double *)calloc(N, sizeof(double));
-        p.bx = (double *)calloc(N, sizeof(double));
-        p.by = (double *)calloc(N, sizeof(double));
-        p.bg = pmin;
-        p.bgx = pmin;
-        p.k = 0;
-        p.iteration = 1;
-
-        for (int i = 0; i < N; i++) {
-            p.x[i] = pmin + (pmax - pmin) * i / (N - 1);
-        }
-        initialized = 1;
-    } else {
-        p.y[p.k] = in;
-
-        if (p.y[p.k] > p.by[p.k]) {
-            p.bx[p.k] = p.x[p.k];
-            p.by[p.k] = p.y[p.k];
-
-            if (p.y[p.k] > p.bg) {
-                p.bg = p.y[p.k];
-                p.bgx = p.x[p.k];
-            }
-        }
-
-        double r1 = (double)rand() / (double)RAND_MAX;
-        double r2 = (double)rand() / (double)RAND_MAX;
-
-        p.v[p.k] = w * p.v[p.k] + c1 * r1 * (p.bx[p.k] - p.x[p.k]) + c2 * r2 * (p.bgx - p.x[p.k]);
-        p.x[p.k] += p.v[p.k];
-
-        //p.x[p.k] = fmax(pmin, fmin(pmax, p.x[p.k]));
-
-        if (p.x[p.k] <= pmin) {
-            p.x[p.k] = pmin;
-        }
-        if (p.x[p.k] >= pmax) {
-            p.x[p.k] = pmax;
-        }
-
-        p.k++;
-        if (p.k >= N) {
-            global_save = p.bgx;
-            p.k = 0;
-            initialized = 0;
-            p.iteration++;
-        }
-    }
-
-    float duty_raw = global_save;
-    printf("Raw Duty: %0.3f", duty_raw);
-
-    if (duty_raw >= duty_max || duty_raw <= duty_min) {
-        duty = prevDuty;
-    }
-    else {
-        duty = duty_raw;
-    }
-    prevDuty = duty;
-
-}*/
-
-
 void ripple_correlation_control() {
 
     float voltage_gain = voltage * 0.9;
@@ -535,22 +463,23 @@ void ripple_correlation_control() {
     float error1 = power_gain - LPF1_output;
     float error2 = voltage_gain - LPF2_output;
 
-    float dt = 0.2;
-    float PID1_input = error1 * error2; 
-    float PID1_output = pid_compute(&rcc_pid1, 0, PID1_input, dt); // not sure about setpoint here
+    rcc1_input = error1 * error2;
+    rcc1_setpoint = 0;
+    PIDClass_compute(rcc1_pidClass);
 
-    float PID2_input = PID1_output - voltage_gain;
-    float duty_raw = pid_compute(&rcc_pid2, 0, PID2_input, dt); // not sure about setpoint here 
+    rcc2_input = rcc1_output;
+    rcc2_setpoint = voltage_gain;
+    PIDClass_compute(rcc2_pidClass);
 
-    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+    // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
-    if (duty_raw >= duty_max || duty_raw <= duty_min) {
-        duty = prevDuty;
-    }
-    else {
-        duty = duty_raw;  
-    }
-    prevDuty = duty;
+    // if (duty_raw >= duty_max || duty_raw <= duty_min) {
+    //     duty = prevDuty;
+    // }
+    // else {
+    //     duty = duty_raw;  
+    // }
+    // prevDuty = duty;
 }
 
 
