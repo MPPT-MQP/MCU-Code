@@ -196,7 +196,7 @@ void perturb_and_observe(int variable){
         }
     }
 
-    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+    // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -272,7 +272,7 @@ void beta_method() {
 
     float q=1.6e-19;
     float k=1.38e-23;
-    float A=1.0255;
+    float A=0.985;
     float N=36;
     float T=25;
     float c=q/(k*(T+273.15)*A*N);
@@ -280,8 +280,8 @@ void beta_method() {
 
     // Beta Min: 1000 W/m^2, 45 deg C
     float cmin = q/(k*318.15*A*N);
-    float Vmpp_min = 23.373;
-    float Impp_min = 0.3389;
+    float Vmpp_min = 20.644;
+    float Impp_min = 0.0085;
     
     // Beta Max: 200 W/m^2, -25 deg C
     float cmax = q/(k*248.15*A*N); 
@@ -317,12 +317,12 @@ void beta_method() {
         }
     }
     else  {
-        E = (Ba-Bg)*4;
-        printf("error: %0.3f", E);
+        E = (Ba-Bg)*0.5;
+        printf("\nerror: %0.3f", E);
         duty_raw=prevDuty+E;
     }
 
-    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+    // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
     
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -443,7 +443,7 @@ void particle_swarm_optimization() {
 
     // Output Best Solution
     double best = p.bgx;
-    float duty_raw = best / 21.96;
+    float duty_raw = best / 21.96; //*********************Ask what the 21.96 is
 
     printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 

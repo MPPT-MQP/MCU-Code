@@ -353,14 +353,14 @@ int main()
                 temperature = sensorBuffer[BufferCounter].temperature;
                 irradiance = sensorBuffer[BufferCounter].irradiance;
                 //duty = 0.7;
-                //perturb_and_observe(0);
+                // perturb_and_observe(0);
                 //incremental_conductance(0);
-                //beta_method();
-                ripple_correlation_control();
+                // beta_method();
+                // ripple_correlation_control();
                 //particle_swarm_optimization();
                 //constant_voltage();
-                printf("Voltage: %0.3f, Duty: %0.3f, PID Out: %0.3f\n", voltage, duty);
-                //temperature_parametric();
+                printf("Voltage: %0.3f, Duty: %0.3f, Current: %0.3f\n", voltage, duty, current);
+                temperature_parametric();
                 //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 
