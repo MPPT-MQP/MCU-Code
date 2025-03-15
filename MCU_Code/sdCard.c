@@ -75,7 +75,7 @@ void copySDBuffer(){
 void writeSD(uint32_t bytes){
     uint bytesWritten = 0;    
 
-    const char* filename = CSVName;
+    const char* filename = CSVName;//this is bad???? getting written to a random spot on the heap??
     fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
     if (FR_OK != fr && FR_EXIST != fr) {
         panic("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
