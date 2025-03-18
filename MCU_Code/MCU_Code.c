@@ -55,6 +55,96 @@ volatile bool core0InitFlag = false;
 //SD card bytes to save
 uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
 
+//Algo Selection and abbreviations
+char algorithms[9][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "RCC", "PSO", "TMP", "AofA"};
+//algorithm_toggle = 0; //0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=RCC, 7=PSO, 8=TMP, 9=AofA
+void selectAlgo(int algoToggleNum){
+    switch (algoToggleNum){
+        case CV:
+            constant_voltage();
+            break;
+        case B:
+            beta_method();
+            break;
+        case PNO:
+            perturb_and_observe(0);
+            break;
+        case PNOV:
+            perturb_and_observe(1);
+            break;
+        case INC:
+            incremental_conductance(0);
+            break;
+        case INCV:
+            incremental_conductance(1);
+            break;
+        case RCC:
+            ripple_correlation_control();
+            break;
+        case PSO:
+            particle_swarm_optimization();
+            break;
+        case TMP:
+            temperature_parametric();
+            break;
+        case AofA:
+            //algo of algo goes here
+            break;
+    }
+}
+
+void init_algo(int algoToggleNum){
+    //PIDClass_release();
+    switch (algoToggleNum){
+        case CV:
+            //Change PID controller
+            float cv_setpoint = 15.8;
+            cv_pidClass = PIDClass_create(&voltage, &duty, &cv_setpoint, 0.01, 0.1, 0, 1);
+            PIDClass_setOutputLimits(cv_pidClass, 0.1, 0.9);
+            PIDClass_setMode(cv_pidClass, 1);
+            break;
+        // case B:
+            
+        //     break;
+        // case PNO:
+            
+        //     break;
+        // case PNOV:
+            
+        //     break;
+        // case INC:
+            
+        //     break;
+        // case INCV:
+            
+        //     break;
+        case RCC:
+            //PID init
+                int rcc1_setpoint = 0;
+                rcc1_pidClass = PIDClass_create(&rcc1_input, &rcc1_output, &rcc1_setpoint, 200, 5, 0, 1);
+                PIDClass_setOutputLimits(rcc1_pidClass, 0.1, 0.9);
+                PIDClass_setMode(rcc1_pidClass, 1);
+
+                int rcc2_setpoint = 0;
+                rcc2_pidClass = PIDClass_create(&rcc2_input, &duty, &rcc2_setpoint, 2e-09, -0.009, 0, 1);
+                PIDClass_setOutputLimits(rcc2_pidClass, 0.1, 0.9);
+                PIDClass_setMode(rcc2_pidClass, 1);
+            break;
+        // case PSO:
+            
+        //     break;
+        // case TMP:
+            
+        //     break;
+        // case AofA:
+        //     //algo of algo goes here
+        //     break;
+        default:
+        
+            break;
+    }
+}
+
 
 /// @brief ISR handler for the repeating timer on core 1.
 // Return true from ISR to keep the repeating timer running
@@ -239,20 +329,8 @@ int main()
     struct repeating_timer algoTimer;
     add_repeating_timer_us(SENSOR_ALGORITHM_RUN_RATE, AlgoISR, NULL, &algoTimer);
 
-
-    // Initialize PID Controllers
-    float cv_setpoint = 15.8;
-    cv_pidClass = PIDClass_create(&voltage, &duty, &cv_setpoint, 0.01, 0.1, 0, 1);
-    PIDClass_setOutputLimits(cv_pidClass, 0.1, 0.9);
-    PIDClass_setMode(cv_pidClass, 1);
-
-    rcc1_pidClass = PIDClass_create(&rcc1_input, &rcc1_output, &rcc1_setpoint, 200, 5, 0, 1);
-    PIDClass_setOutputLimits(rcc1_pidClass, 0.1, 0.9);
-    PIDClass_setMode(rcc1_pidClass, 1);
-
-    rcc2_pidClass = PIDClass_create(&rcc2_input, &duty, &rcc2_setpoint, 2e-09, -0.009, 0, 1);
-    PIDClass_setOutputLimits(rcc2_pidClass, 0.1, 0.9);
-    PIDClass_setMode(rcc2_pidClass, 1);
+    //Initialize any necessary PID controllers and values for desired algorithm to run
+    init_algo(ALGO_TOGGLE);
 
     //Set the init flag high and wait for the other core to finish setup
     core0InitFlag = true;
@@ -352,15 +430,12 @@ int main()
                 power = voltage * current;
                 temperature = sensorBuffer[BufferCounter].temperature;
                 irradiance = sensorBuffer[BufferCounter].irradiance;
-                //duty = 0.7;
-                // perturb_and_observe(0);
-                //incremental_conductance(0);
-                // beta_method();
-                // ripple_correlation_control();
-                //particle_swarm_optimization();
-                //constant_voltage();
+
+                //Run algorithm
+                selectAlgo(ALGO_TOGGLE);
+
                 printf("Voltage: %0.3f, Duty: %0.3f, Current: %0.3f\n", voltage, duty, current);
-                temperature_parametric();
+                
                 //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
                 

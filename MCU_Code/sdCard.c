@@ -1,6 +1,7 @@
 #include "sdCard.h"
 #include <time.h>
 #include "pico/aon_timer.h"
+#include "def.h"
 
 //Sensor Data Buffer
 struct sensorData sensorBuffer[QUEUE_BUFFER_SIZE];
@@ -11,12 +12,62 @@ FIL fil;
 FRESULT fr;
 
 //SD Card Core 1 Globals
-char sensorLocalBuffer[SAMPLES_TO_SAVE+10][110];
+char sensorLocalBuffer[SAMPLES_TO_SAVE+10][SAMPLE_SIZE];
 
 uint16_t localSensorCounter = 0;
 
 //FileName
-char CSVName[40];
+char CSVName[45];
+
+//Select name for the created CSV file
+void createCSVName(int algoToggleNum){
+    struct tm timeFile;
+    aon_timer_get_time_calendar(&timeFile);
+
+    switch (algoToggleNum){
+        case CV:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[CV]);
+            break;
+        case B:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[B]);
+            break;
+        case PNO:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[PNO]);
+            break;
+        case PNOV:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[PNOV]);
+            break;
+        case INC:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[INC]);
+            break;
+        case INCV:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[INCV]);
+            break;
+        case RCC:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[RCC]);
+            break;
+        case PSO:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[PSO]);
+            break;
+        case TMP:
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[TMP]);
+            break;
+        case AofA:
+            //algo of algo goes here
+            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[AofA]);
+            break;
+    }
+}
 
 //Mount sd card
 void mountSD(){
@@ -29,12 +80,8 @@ void mountSD(){
 }
 
 void initSDFile(){
-    struct tm timeFile;
+    
     //Open a file and write to it
-    
-    
-    aon_timer_get_time_calendar(&timeFile);
-    snprintf(CSVName, 40, "%02d-%02d-%02d %02d.%02d.%02d.csv", timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec);
     
     const char* filename = CSVName;
     fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
@@ -42,7 +89,7 @@ void initSDFile(){
         panic("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
     }
     //Write inital header data below
-    if (f_printf(&fil, "Timestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2), Duty") < 0) {
+    if (f_printf(&fil, "Timestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2), Duty, Algorithm") < 0) {
         printf("f_printf failed\n");
     }
 
