@@ -437,12 +437,14 @@ int main()
                 irradiance = sensorBuffer[BufferCounter].irradiance;
 
                 //Run algorithm
+                //duty = 0.7;
+                //duty_sweep();
                 selectAlgo(ALGO_TOGGLE);
 
                 printf("Voltage: %0.3f, Duty: %0.3f, Current: %0.3f\n", voltage, duty, current);
                 
                 //duty_sweep();
-                pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
+                pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*DCDCFreq);
                 
                 //Sprintf to format sensor data
                 char formatString[SAMPLE_SIZE];
