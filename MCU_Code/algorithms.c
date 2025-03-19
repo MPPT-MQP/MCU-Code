@@ -274,14 +274,15 @@ void beta_method() {
     float c=q/(k*(T+273.15)*A*N);
     float E;
 
-    // Beta Min: 1000 W/m^2, 45 deg C
-    float cmin = q/(k*318.15*A*N);
-    float Vmpp_min = 20.644;
-    float Impp_min = 0.0085;
-    
-    // Beta Max: 200 W/m^2, -25 deg C
-    float cmax = q/(k*248.15*A*N); 
-    float Vmpp_max = 16.826;
+    // Beta Min: 200 W/m^2, -25 deg C
+    float cmin = q/(k*248.15*A*N); 
+    float Vmpp_min = 23.373;
+    float Impp_min = 0.3389;
+
+    // Beta Max: 1000 W/m^2, 45 deg C
+    float cmax = q/(k*318.15*A*N);
+    float Vmpp_max = 15.57;
+    // float Vmpp_max = 16.826;
     float Impp_max = 1.7478;
     
     float Bmin = log(Impp_min/Vmpp_min)-(cmin*Vmpp_min);
@@ -293,7 +294,7 @@ void beta_method() {
     float deltaV = voltage - prevVoltage;
     float deltaP = power - prevPower;
 
-    if ((Ba < Bmin) && (Ba > Bmax)) {
+    if ((Ba < Bmax) && (Ba > Bmin)) {
         // Switch to P&O
         if (deltaP < 0) {
             if (deltaV < 0){
@@ -313,7 +314,7 @@ void beta_method() {
         }
     }
     else  {
-        E = (Ba-Bg)*0.000001;
+        E = (Ba-Bg)*4;
         printf("\nerror: %0.3f", E);
         duty_raw=prevDuty+E;
     }

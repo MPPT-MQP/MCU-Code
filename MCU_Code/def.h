@@ -21,6 +21,6 @@
 #define TMP 8
 #define AofA 9
 
-#define DCDCFreq 3125
+#define DCDCFreq 1250
 
 extern char algorithms[10][5];
