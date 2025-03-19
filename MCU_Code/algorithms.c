@@ -140,11 +140,6 @@ void duty_sweep(){
 }
 
 
-
-extern void* cv_pidClass;
-extern void* rcc1_pidClass;
-extern void* rcc2_pidClass;
-
 void constant_voltage() {
     float duty_raw;
     float Vref = 19.39;
@@ -298,7 +293,7 @@ void beta_method() {
     float deltaV = voltage - prevVoltage;
     float deltaP = power - prevPower;
 
-    if ((Ba < Bmax) && (Ba > Bmin)) {
+    if ((Ba < Bmin) && (Ba > Bmax)) {
         // Switch to P&O
         if (deltaP < 0) {
             if (deltaV < 0){
@@ -318,12 +313,12 @@ void beta_method() {
         }
     }
     else  {
-        E = (Ba-Bg)*0.5;
+        E = (Ba-Bg)*0.000001;
         printf("\nerror: %0.3f", E);
         duty_raw=prevDuty+E;
     }
 
-    // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+    printf("Bmin: %0.3f, Bmax: %0.3f, Ba: %0.3f\n", Bmin, Bmax, Ba);
     
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -345,7 +340,7 @@ void temperature_parametric() {
     float B2 = -0.088;
     TMP_Vmpp = B0 + B1*irradiance +B2*temperature;
     // float duty_raw = voltage - Vmpp;
-
+    PIDClass_compute(TMP_pidClass);
     // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f, Temperature: %0.3f, Irradiance: %0.3f", voltage, current, duty_raw, temperature, irradiance);
 
     // if (duty_raw >= duty_max || duty_raw <= duty_min) {
@@ -355,7 +350,7 @@ void temperature_parametric() {
     //     duty = duty_raw;
     // }
 
-    printf(", Actual Duty: %0.3f\n", duty);
+    printf("Vmpp: %0.3f\n", TMP_Vmpp);
     prevDuty = duty;
 
 }

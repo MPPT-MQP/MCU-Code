@@ -136,7 +136,7 @@ void init_algo(int algoToggleNum){
         //     break;
         case TMP:
             //TMP PID controller
-            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 0.01, 5, 0, 1);
+            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 0.01, 0.1, 0, 1);
             PIDClass_setOutputLimits(TMP_pidClass, 0.1, 0.9);
             PIDClass_setMode(TMP_pidClass, 1);
             break;
