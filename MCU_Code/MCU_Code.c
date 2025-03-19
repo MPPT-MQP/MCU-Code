@@ -21,6 +21,7 @@
 void* cv_pidClass;
 void* rcc1_pidClass;
 void* rcc2_pidClass;
+void* TMP_pidClass;
 
 //Amount of time until alarm isr runs (flag is toggling between true and false)
 #define ALARM_TIME_MS 1000
@@ -133,14 +134,17 @@ void init_algo(int algoToggleNum){
         // case PSO:
             
         //     break;
-        // case TMP:
-            
-        //     break;
+        case TMP:
+            //TMP PID controller
+            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 0.01, 5, 0, 1);
+            PIDClass_setOutputLimits(TMP_pidClass, 0.1, 0.9);
+            PIDClass_setMode(TMP_pidClass, 1);
+            break;
         // case AofA:
         //     //algo of algo goes here
         //     break;
         default:
-        
+
             break;
     }
 }

@@ -17,6 +17,7 @@ extern float rcc1_setpoint;
 extern float rcc1_output;
 extern float rcc2_input;
 extern float rcc2_setpoint;
+extern float TMP_Vmpp;
 
 void perturb_and_observe(int variable);
 void incremental_conductance(int variable);
