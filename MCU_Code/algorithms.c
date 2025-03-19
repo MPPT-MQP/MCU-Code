@@ -20,6 +20,8 @@ float prevDuty = 0.5;
 float prevVoltage = 0;
 float prevCurrent = 0;
 float prevPower = 0;
+float prevIrradiance = 0;
+float prevTemperature = 0;
 
 // RCC Variables
 float prevVoltage_gain = 0;
@@ -33,6 +35,11 @@ float rcc1_output;
 float rcc2_input;
 float rcc2_setpoint;
 float TMP_Vmpp;
+
+//Algorithm of Algorithms
+float temperature_hystersis = 5;
+float irradiance_hysteresis = 50;
+int prevAlgo = 0;
 
 // Structure for PID controller 
 typedef struct {
@@ -499,6 +506,118 @@ void ripple_correlation_control() {
     //     duty = duty_raw;  
     // }
     // prevDuty = duty;
+}
+
+void algorithm_of_algorithms() {
+
+    int switch_algo_flag = 0;
+
+    float deltaG = irradiance - prevIrradiance;
+    float deltaT = temperature - prevTemperature;
+
+    if(fabs(deltaG) > irradiance_hysteresis && fabs(deltaT) > temperature_hystersis) {
+        switch_algo_flag = 1;
+    }
+
+    int conditions[34][3] = {   
+        // Temperature, Irradiance, Algorithm Toggle
+        {1000, 25, 0},
+        {900, 25, 0},
+        {800, 25, 8},
+        {700, 25, 8},
+        {600, 25, 8},
+        {500, 25, 7},
+        {400, 25, 4},
+        {300, 25, 8},
+        {200, 25, 4},
+
+        {1000, 40, 8},
+        {1000, 35, 7},
+        {1000, 30, 7},
+        {1000, 20, 7},
+        {1000, 15, 8},
+        {1000, 10, 7},
+        {1000, 5, 7},
+        {1000, 0, 8},
+        {1000, -5, 8},
+        {1000, -10, 8},
+        {1000, -15, 8},
+        {1000, -20, 8},
+        {1000, -25, 8},
+
+        {800, 20, 8},
+        {600, 10, 8},
+        {400, 0, 4},
+        {400, 30, 4},
+        {400, 35, 4},
+        {400, 40, 7},
+        {300, 30, 8},
+        {300, 35, 2},
+        {300, 40, 2},
+        {200, 30, 4},
+        {200, 35, 4},
+        {200, 40, 2},
+    };
+
+    if(switch_algo_flag == 1) {
+
+        int best_list[34][3];
+        float differences[34];
+        float previousDiff = 0;
+        int k = 0;
+
+        for(int i = 0; i<34; i++) {
+            differences[i] = fabs(conditions[i][0] - irradiance);
+           
+        }
+        
+        float minVal = differences[0];
+        for (int i = 0; i<34; i++) {
+            if(differences[i] < minVal) {
+                minVal = differences[i];
+            }
+        }
+
+        for(int i = 0; i<34; i++) {
+            if(differences[i] == minVal) {
+                for(int j = 0; j<3; j++) {
+                    best_list[k][j] = conditions[i][j];
+                }
+                k++;
+            }
+        }
+
+        int best_list_size = 0;
+        for(int i = 0; i < 34; i++) {
+            if(best_list[i][0] != 0) {
+                best_list_size++;
+            }
+        }
+
+        float differences_temp[best_list_size];
+        
+        for(int i = 0; i< best_list_size; i++) {
+            differences_temp[i] = fabs(best_list[i][1] - temperature);
+        }
+
+        float minVal_temp = differences_temp[0];
+        for (int i = 0; i<best_list_size; i++) {
+            if(differences_temp[i] < minVal_temp) {
+                minVal_temp = differences_temp[i];
+            }
+        }
+
+        for (int i = 0; i< best_list_size; i++) {
+            if(best_list[i][0] == minVal && best_list[i][1] == minVal_temp) {
+                selectAlgo(best_list[i][2]);
+                prevAlgo = best_list[i][2];
+            }
+        }
+    }
+
+    prevIrradiance = irradiance;
+    prevTemperature = temperature;
+
 }
 
 

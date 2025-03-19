@@ -89,7 +89,7 @@ void selectAlgo(int algoToggleNum){
             temperature_parametric();
             break;
         case AofA:
-            //algo of algo goes here
+            algorithm_of_algorithms();
             break;
     }
 }
