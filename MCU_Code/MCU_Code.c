@@ -57,7 +57,7 @@ volatile bool core0InitFlag = false;
 uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
 
 //Algo Selection and abbreviations
-char algorithms[9][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "RCC", "PSO", "TMP", "AofA"};
+char algorithms[10][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "RCC", "PSO", "TMP", "AofA"};
 //algorithm_toggle = 0; //0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=RCC, 7=PSO, 8=TMP, 9=AofA
 void selectAlgo(int algoToggleNum){
     switch (algoToggleNum){
@@ -121,12 +121,12 @@ void init_algo(int algoToggleNum){
         //     break;
         case RCC:
             //PID init
-                int rcc1_setpoint = 0;
+                float rcc1_setpoint = 0;
                 rcc1_pidClass = PIDClass_create(&rcc1_input, &rcc1_output, &rcc1_setpoint, 200, 5, 0, 1);
                 PIDClass_setOutputLimits(rcc1_pidClass, 0.1, 0.9);
                 PIDClass_setMode(rcc1_pidClass, 1);
 
-                int rcc2_setpoint = 0;
+                float rcc2_setpoint = 0;
                 rcc2_pidClass = PIDClass_create(&rcc2_input, &duty, &rcc2_setpoint, 2e-09, -0.009, 0, 1);
                 PIDClass_setOutputLimits(rcc2_pidClass, 0.1, 0.9);
                 PIDClass_setMode(rcc2_pidClass, 1);
@@ -335,6 +335,7 @@ int main()
 
     //Initialize any necessary PID controllers and values for desired algorithm to run
     init_algo(ALGO_TOGGLE);
+    createCSVName(ALGO_TOGGLE);
 
     //Set the init flag high and wait for the other core to finish setup
     core0InitFlag = true;

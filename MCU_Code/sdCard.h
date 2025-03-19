@@ -19,6 +19,7 @@ void mountSD();
 void initSDFile();
 void copySDBuffer();
 void writeSD(uint32_t bytes);
+void createCSVName(int algoToggleNum);
 
 struct sensorData {
     float PM1voltage;

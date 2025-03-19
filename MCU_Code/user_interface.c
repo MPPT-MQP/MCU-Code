@@ -18,7 +18,7 @@ int select_num = 0;
 char *current_tracking = "START TRACKING";
 char *tracking_status[] = {"START TRACKING", "STOP TRACKING"};
 char *current_algorithm = "CV";
-char *algorithms[] = {"CV", "BETA", "P&O", "P&O VAR", "INC-COND", "INC-COND VAR", "RCC", "PSO", "A-of-A"};
+char *algorithms_ui[] = {"CV", "BETA", "P&O", "P&O VAR", "INC-COND", "INC-COND VAR", "RCC", "PSO", "A-of-A"};
 char *current_mode = "BUCK";
 char *mode[] = {"MODE: BUCK", "MODE: CC", "MODE: BOTH"};
 char *current_sd_card = "SD CARD: ON";
@@ -94,7 +94,7 @@ void run_main_screens()
             }
             char *tracking_status_selected[] = {"START TRACKING<", "STOP TRACKING<"};
             current_tracking = tracking_status_selected[tracking_toggle];
-            current_algorithm = algorithms[algorithm_toggle];
+            current_algorithm = algorithms_ui[algorithm_toggle];
             current_mode = mode[mode_toggle];
             char *screen0[] = {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
             int x_distances0[] = {1, 1, 1, 1};
@@ -112,7 +112,7 @@ void run_main_screens()
                 button3_state = !button3_state;
             }
             current_tracking = tracking_status[tracking_toggle];
-            current_algorithm = algorithms[algorithm_toggle];
+            current_algorithm = algorithms_ui[algorithm_toggle];
             current_mode = mode[mode_toggle];
             char *screen01[] = {current_tracking, "SET ALGORITHM<", current_algorithm, current_mode};
             int x_distances01[] = {1, 1, 1, 1};
@@ -132,7 +132,7 @@ void run_main_screens()
             }
             char *mode_selected[] = {"MODE: BUCK<", "MODE: CC<", "MODE: BOTH<"};
             current_tracking = tracking_status[tracking_toggle];
-            current_algorithm = algorithms[algorithm_toggle];
+            current_algorithm = algorithms_ui[algorithm_toggle];
             current_mode = mode_selected[mode_toggle];
             char *screen02[] = {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
             int x_distances02[] = {1, 1, 1, 1};
