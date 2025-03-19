@@ -562,24 +562,23 @@ void algorithm_of_algorithms() {
     if(switch_algo_flag == 1) {
 
         int best_list[34][3];
-        float differences[34];
-        float previousDiff = 0;
+        float irradiance_differences[34];
         int k = 0;
 
         for(int i = 0; i<34; i++) {
-            differences[i] = fabs(conditions[i][0] - irradiance);
+            irradiance_differences[i] = fabs(conditions[i][0] - irradiance);
            
         }
         
-        float minVal = differences[0];
+        float minVal_irradiance = irradiance_differences[0];
         for (int i = 0; i<34; i++) {
-            if(differences[i] < minVal) {
-                minVal = differences[i];
+            if(irradiance_differences[i] < minVal_irradiance) {
+                minVal_irradiance = irradiance_differences[i];
             }
         }
 
         for(int i = 0; i<34; i++) {
-            if(differences[i] == minVal) {
+            if(irradiance_differences[i] == minVal_irradiance) {
                 for(int j = 0; j<3; j++) {
                     best_list[k][j] = conditions[i][j];
                 }
@@ -594,25 +593,28 @@ void algorithm_of_algorithms() {
             }
         }
 
-        float differences_temp[best_list_size];
+        float temp_differences[best_list_size];
         
         for(int i = 0; i< best_list_size; i++) {
-            differences_temp[i] = fabs(best_list[i][1] - temperature);
+            temp_differences[i] = fabs(best_list[i][1] - temperature);
         }
 
-        float minVal_temp = differences_temp[0];
+        float minVal_temp = temp_differences[0];
         for (int i = 0; i<best_list_size; i++) {
-            if(differences_temp[i] < minVal_temp) {
-                minVal_temp = differences_temp[i];
+            if(temp_differences[i] < minVal_temp) {
+                minVal_temp = temp_differences[i];
             }
         }
 
         for (int i = 0; i< best_list_size; i++) {
-            if(best_list[i][0] == minVal && best_list[i][1] == minVal_temp) {
+            if(best_list[i][0] == minVal_irradiance && best_list[i][1] == minVal_temp) {
                 selectAlgo(best_list[i][2]);
                 prevAlgo = best_list[i][2];
             }
         }
+    }
+    else {
+        selectAlgo(prevAlgo);
     }
 
     prevIrradiance = irradiance;
