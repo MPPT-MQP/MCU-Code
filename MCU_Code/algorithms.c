@@ -32,6 +32,7 @@ float rcc1_setpoint;
 float rcc1_output;
 float rcc2_input;
 float rcc2_setpoint;
+float TMP_Vmpp;
 
 // Structure for PID controller 
 typedef struct {
@@ -361,7 +362,7 @@ void temperature_parametric() {
 
 void particle_swarm_optimization() {
 
-    float test_irradiance = 1000;
+    //float test_irradiance = 1000;
 
     // PSO Specification
     double w =  0.5;  // Inertia weight
@@ -369,22 +370,22 @@ void particle_swarm_optimization() {
     double c2 = 1.5; // Social parameter
     int N = 10;   // Number of particles
 
-    float pmin = 0.01 * test_irradiance + 5.25;
+    float pmin = 0.01 * irradiance + 5.25;
     float pmax = 20;
 
     float out;
 
     // Partical Variables
-    float prevIrradiance = test_irradiance;
+    float prevIrradiance = irradiance;
     int initialized = 0;
 
     // Ensure prev_G is initialized
     if (!initialized) {
-        prevIrradiance = test_irradiance;
+        prevIrradiance = irradiance;
     }
 
     // Ensure p is initialized
-    if (!initialized || (test_irradiance != prevIrradiance)) {
+    if (!initialized || (irradiance != prevIrradiance)) {
         // Reset particles
         // p.x = linspace(pmin, pmax, N);
         for (int i = 0; i < N; i++) {
@@ -402,7 +403,7 @@ void particle_swarm_optimization() {
         p.iteration = 1;
 
         // Update previous G
-        prevIrradiance = test_irradiance;
+        prevIrradiance = irradiance;
         initialized = 1;
 
         // Output first particle position
