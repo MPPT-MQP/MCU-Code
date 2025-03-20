@@ -362,6 +362,7 @@ int main()
             // //Power Monitors
             sensorBuffer[BufferCounter].PM1voltage = PM_readVoltage(PM1);
             sensorBuffer[BufferCounter].PM1current = PM_readCurrent(PM1);
+            sensorBuffer[BufferCounter].PM1power = PM_readPower(PM1);
 
             sensorBuffer[BufferCounter].PM2voltage = PM_readVoltage(PM2);
             sensorBuffer[BufferCounter].PM2current = PM_readCurrent(PM2);
@@ -431,8 +432,8 @@ int main()
                 gpio_put(EN_PIN, true);
                 voltage = sensorBuffer[BufferCounter].PM1voltage;
                 current = sensorBuffer[BufferCounter].PM1current;
-                //power = sensorBuffer[BufferCounter].PM1power;
-                power = voltage * current;
+                power = sensorBuffer[BufferCounter].PM1power;
+                // power = voltage * current;
                 temperature = sensorBuffer[BufferCounter].temperature;
                 irradiance = sensorBuffer[BufferCounter].irradiance;
 
@@ -449,7 +450,7 @@ int main()
                 aon_timer_get_time_calendar(&PicoTime);
                 sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
                 PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
-                sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, power, 
+                sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
                 sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
                 sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty);
                 //printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);

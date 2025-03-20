@@ -99,6 +99,54 @@ float PM_readCurrent(uint8_t address){
     return current;
 }
 
+/// @brief Read power monitor power
+/// @param address I2C address of the power monitor
+/// @return power read by monitor
+float PM_readPower(uint8_t address){
+    uint32_t combinedBuffer = 0;
+    float power;
+    uint8_t buffer[3];
+    uint8_t reg = INA740_power_register;
+    i2c_write_blocking(I2C0_PORT, address, &reg, 1, true);
+    i2c_read_blocking(I2C0_PORT, address, buffer, 3, false);
+    
+    //Combine the three bytes
+    combinedBuffer = ((uint16_t)buffer[0] << 16) | ((uint16_t)buffer[1] << 8) | buffer[2];
+
+    // Value is returned unsigned and always positive
+    power = (float)combinedBuffer;
+    //scale factor (240uW / LSB)
+    power = (power * 240) / 1000000;
+    
+    // printf("\nPower: %f", power);
+    
+    return power;
+}
+
+/// @brief Config power monitor settings
+/// @param address I2C address of the power monitor
+void PM_config(uint8_t address){
+    uint32_t combinedBuffer = 0;
+    float power;
+    uint8_t reg[2];
+    reg[0] = INA740_adc_config_register;
+
+    //DEFAULT CONFIGURATION
+    // reg[1] = INA740_adc_config_register_mode_Continuoustemperaturecurrentandbusvoltage |
+    //          INA740_adc_config_register_vbusct_1052us |
+    //          INA740_adc_config_register_vsenct_1052us |
+    //          INA740_adc_config_register_tct_1052us |
+    //          INA740_adc_config_register_avg_1;
+
+    reg[1] = INA740_adc_config_register_mode_Continuoustemperaturecurrentandbusvoltage |
+             INA740_adc_config_register_vbusct_1052us |
+             INA740_adc_config_register_vsenct_1052us |
+             INA740_adc_config_register_tct_1052us |
+             INA740_adc_config_register_avg_64;
+    i2c_write_blocking(I2C0_PORT, address, &reg, 2, true);
+
+}
+
 /*End Power Monitor Functions*/
 
 /*Temperature ADC Reading and Conversion*/
