@@ -18,6 +18,10 @@ extern float rcc1_output;
 extern float rcc2_input;
 extern float rcc2_setpoint;
 extern float TMP_Vmpp;
+extern void* cv_pidClass;
+extern void* rcc1_pidClass;
+extern void* rcc2_pidClass;
+extern void* TMP_pidClass;
 
 void perturb_and_observe(int variable);
 void incremental_conductance(int variable);
@@ -27,3 +31,6 @@ void particle_swarm_optimization();
 void constant_voltage();
 void ripple_correlation_control();
 void duty_sweep();
+void algorithm_of_algorithms();
+void selectAlgo(int algoToggleNum);
+

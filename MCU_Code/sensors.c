@@ -1,6 +1,7 @@
 #include "sensors.h"
 #include "sdCard.h"
 #include <string.h>
+#include "def.h"
 
 struct pcf8523_time_t pcf_datetime;
 
@@ -205,7 +206,7 @@ void pico_pwm_init(){
     slice_num = pwm_gpio_to_slice_num(PWM_PIN);
 
     // Set frequency to 40kHz
-    pwm_set_wrap(slice_num, 3125);
+    pwm_set_wrap(slice_num, DCDCFreq);
 
     pwm_set_enabled(slice_num, true);
 }

@@ -89,7 +89,7 @@ void selectAlgo(int algoToggleNum){
             temperature_parametric();
             break;
         case AofA:
-            //algo of algo goes here
+            algorithm_of_algorithms();
             break;
     }
 }
@@ -136,7 +136,7 @@ void init_algo(int algoToggleNum){
         //     break;
         case TMP:
             //TMP PID controller
-            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 0.01, 5, 0, 1);
+            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 0.01, 0.1, 0, 1);
             PIDClass_setOutputLimits(TMP_pidClass, 0.1, 0.9);
             PIDClass_setMode(TMP_pidClass, 1);
             break;
@@ -438,12 +438,14 @@ int main()
                 irradiance = sensorBuffer[BufferCounter].irradiance;
 
                 //Run algorithm
+                //duty = 0.7;
+                //duty_sweep();
                 selectAlgo(ALGO_TOGGLE);
 
                 printf("Voltage: %0.3f, Duty: %0.3f, Current: %0.3f\n", voltage, duty, current);
                 
                 //duty_sweep();
-                pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*3125);
+                pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*DCDCFreq);
                 
                 //Sprintf to format sensor data
                 char formatString[SAMPLE_SIZE];

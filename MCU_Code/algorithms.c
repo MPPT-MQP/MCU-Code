@@ -20,6 +20,8 @@ float prevDuty = 0.5;
 float prevVoltage = 0;
 float prevCurrent = 0;
 float prevPower = 0;
+float prevIrradiance = 0;
+float prevTemperature = 0;
 
 // RCC Variables
 float prevVoltage_gain = 0;
@@ -33,6 +35,11 @@ float rcc1_output;
 float rcc2_input;
 float rcc2_setpoint;
 float TMP_Vmpp;
+
+//Algorithm of Algorithms
+float temperature_hystersis = 5;
+float irradiance_hysteresis = 50;
+int prevAlgo = 0;
 
 // Structure for PID controller 
 typedef struct {
@@ -139,11 +146,6 @@ void duty_sweep(){
     printf("Voltage: %0.3f, Current: %0.3f, Duty: %0.3f\n", voltage, current, duty);
 }
 
-
-
-extern void* cv_pidClass;
-extern void* rcc1_pidClass;
-extern void* rcc2_pidClass;
 
 void constant_voltage() {
     float duty_raw;
@@ -279,14 +281,15 @@ void beta_method() {
     float c=q/(k*(T+273.15)*A*N);
     float E;
 
-    // Beta Min: 1000 W/m^2, 45 deg C
-    float cmin = q/(k*318.15*A*N);
-    float Vmpp_min = 20.644;
-    float Impp_min = 0.0085;
-    
-    // Beta Max: 200 W/m^2, -25 deg C
-    float cmax = q/(k*248.15*A*N); 
-    float Vmpp_max = 16.826;
+    // Beta Min: 200 W/m^2, -25 deg C
+    float cmin = q/(k*248.15*A*N); 
+    float Vmpp_min = 23.373;
+    float Impp_min = 0.3389;
+
+    // Beta Max: 1000 W/m^2, 45 deg C
+    float cmax = q/(k*318.15*A*N);
+    float Vmpp_max = 15.57;
+    // float Vmpp_max = 16.826;
     float Impp_max = 1.7478;
     
     float Bmin = log(Impp_min/Vmpp_min)-(cmin*Vmpp_min);
@@ -318,12 +321,12 @@ void beta_method() {
         }
     }
     else  {
-        E = (Ba-Bg)*0.5;
+        E = (Ba-Bg)*4;
         printf("\nerror: %0.3f", E);
         duty_raw=prevDuty+E;
     }
 
-    // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+    printf("Bmin: %0.3f, Bmax: %0.3f, Ba: %0.3f\n", Bmin, Bmax, Ba);
     
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
@@ -345,7 +348,7 @@ void temperature_parametric() {
     float B2 = -0.088;
     TMP_Vmpp = B0 + B1*irradiance +B2*temperature;
     // float duty_raw = voltage - Vmpp;
-
+    PIDClass_compute(TMP_pidClass);
     // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f, Temperature: %0.3f, Irradiance: %0.3f", voltage, current, duty_raw, temperature, irradiance);
 
     // if (duty_raw >= duty_max || duty_raw <= duty_min) {
@@ -355,7 +358,7 @@ void temperature_parametric() {
     //     duty = duty_raw;
     // }
 
-    printf(", Actual Duty: %0.3f\n", duty);
+    printf("Vmpp: %0.3f\n", TMP_Vmpp);
     prevDuty = duty;
 
 }
@@ -503,6 +506,120 @@ void ripple_correlation_control() {
     //     duty = duty_raw;  
     // }
     // prevDuty = duty;
+}
+
+void algorithm_of_algorithms() {
+
+    int switch_algo_flag = 0;
+
+    float deltaG = irradiance - prevIrradiance;
+    float deltaT = temperature - prevTemperature;
+
+    if(fabs(deltaG) > irradiance_hysteresis && fabs(deltaT) > temperature_hystersis) {
+        switch_algo_flag = 1;
+    }
+
+    int conditions[34][3] = {   
+        // Temperature, Irradiance, Algorithm Toggle
+        {1000, 25, 0},
+        {900, 25, 0},
+        {800, 25, 8},
+        {700, 25, 8},
+        {600, 25, 8},
+        {500, 25, 7},
+        {400, 25, 4},
+        {300, 25, 8},
+        {200, 25, 4},
+
+        {1000, 40, 8},
+        {1000, 35, 7},
+        {1000, 30, 7},
+        {1000, 20, 7},
+        {1000, 15, 8},
+        {1000, 10, 7},
+        {1000, 5, 7},
+        {1000, 0, 8},
+        {1000, -5, 8},
+        {1000, -10, 8},
+        {1000, -15, 8},
+        {1000, -20, 8},
+        {1000, -25, 8},
+
+        {800, 20, 8},
+        {600, 10, 8},
+        {400, 0, 4},
+        {400, 30, 4},
+        {400, 35, 4},
+        {400, 40, 7},
+        {300, 30, 8},
+        {300, 35, 2},
+        {300, 40, 2},
+        {200, 30, 4},
+        {200, 35, 4},
+        {200, 40, 2},
+    };
+
+    if(switch_algo_flag == 1) {
+
+        int best_list[34][3];
+        float irradiance_differences[34];
+        int k = 0;
+
+        for(int i = 0; i<34; i++) {
+            irradiance_differences[i] = fabs(conditions[i][0] - irradiance);
+           
+        }
+        
+        float minVal_irradiance = irradiance_differences[0];
+        for (int i = 0; i<34; i++) {
+            if(irradiance_differences[i] < minVal_irradiance) {
+                minVal_irradiance = irradiance_differences[i];
+            }
+        }
+
+        for(int i = 0; i<34; i++) {
+            if(irradiance_differences[i] == minVal_irradiance) {
+                for(int j = 0; j<3; j++) {
+                    best_list[k][j] = conditions[i][j];
+                }
+                k++;
+            }
+        }
+
+        int best_list_size = 0;
+        for(int i = 0; i < 34; i++) {
+            if(best_list[i][0] != 0) {
+                best_list_size++;
+            }
+        }
+
+        float temp_differences[best_list_size];
+        
+        for(int i = 0; i< best_list_size; i++) {
+            temp_differences[i] = fabs(best_list[i][1] - temperature);
+        }
+
+        float minVal_temp = temp_differences[0];
+        for (int i = 0; i<best_list_size; i++) {
+            if(temp_differences[i] < minVal_temp) {
+                minVal_temp = temp_differences[i];
+            }
+        }
+
+        for (int i = 0; i< best_list_size; i++) {
+            if(best_list[i][0] == minVal_irradiance && best_list[i][1] == minVal_temp) {
+                selectAlgo(best_list[i][2]);
+                prevAlgo = best_list[i][2];
+            }
+        }
+    }
+    else {
+        selectAlgo(prevAlgo);
+    }
+
+    prevIrradiance = irradiance;
+    prevTemperature = temperature;
+
 }
 
 
