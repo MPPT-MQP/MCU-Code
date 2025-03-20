@@ -470,11 +470,11 @@ void ripple_correlation_control() {
 
     float LPF_Beta = 0.0015;
     
-    float LPF1_output = (LPF_Beta * power_gain) + (LPF_Beta * prevPower_gain) - ((LPF_Beta - 1) * LPF1_prevOutput);
-    LPF1_output /= (1+LPF_Beta);
+    float LPF1_output = (LPF_Beta * power_gain) + (1-LPF_Beta) * LPF1_prevOutput;
+    LPF1_prevOutput = LPF1_output;
     printf("LPF1 Output: %0.3f, ", LPF1_output);
-    float LPF2_output = (LPF_Beta * voltage_gain) + (LPF_Beta * prevVoltage_gain) - ((LPF_Beta - 1) * LPF2_prevOutput);
-    LPF2_output /= (1+LPF_Beta);
+    float LPF2_output = (LPF_Beta * voltage_gain) + (1-LPF_Beta) * LPF2_prevOutput;
+    LPF2_prevOutput = LPF2_output;
     printf("LPF2 Output: %0.3f, ", LPF2_output);
 
     float error1 = power_gain - LPF1_output;
@@ -485,10 +485,10 @@ void ripple_correlation_control() {
     rcc1_input = error1 * error2;
     rcc1_setpoint = 0;
     PIDClass_compute(rcc1_pidClass);
-    printf("RCC1 PID: %0.3f, ", rcc1_output);
+    printf("RCC1 PID: %0.3f\n", rcc1_output);
 
-    rcc2_input = rcc1_output - voltage_gain;
-    rcc2_setpoint = 0;
+    rcc2_input = voltage_gain;
+    rcc2_setpoint = rcc1_output;
     PIDClass_compute(rcc2_pidClass);
 
     prevVoltage_gain = voltage_gain;

@@ -317,6 +317,8 @@ int main()
     //Temp Sensor ADC Setup
     TMP_ADC_setup();
 
+    PM_config(PM1);
+
     //SD Card Setup (hw_config.c sets the SPI pins)
     sd_init_driver();
     mountSD();
@@ -442,7 +444,7 @@ int main()
                 //duty_sweep();
                 selectAlgo(ALGO_TOGGLE);
 
-                printf("Voltage: %0.3f, Duty: %0.3f, Current: %0.3f\n", voltage, duty, current);
+                printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f\n", voltage, current, power, duty);
                 
                 //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*DCDCFreq);

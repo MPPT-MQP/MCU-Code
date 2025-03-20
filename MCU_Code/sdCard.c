@@ -4,7 +4,7 @@
 #include "def.h"
 
 //Sensor Data Buffer
-struct sensorData sensorBuffer[QUEUE_BUFFER_SIZE];
+struct sensorData sensorBuffer[QUEUE_BUFFER_SIZE] = {0};
 uint16_t BufferCounter = 0;
 
 FATFS fs;

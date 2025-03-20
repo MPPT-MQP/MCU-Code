@@ -147,7 +147,7 @@ void PM_config(uint8_t address){
 
     reg[1] = MSB(INAsettings);
     reg[2] = LSB(INAsettings);
-    i2c_write_blocking(I2C0_PORT, address, reg, 2, true);
+    i2c_write_blocking(I2C0_PORT, address, reg, 3, true);
 
 }
 
