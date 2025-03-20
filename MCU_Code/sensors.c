@@ -127,24 +127,27 @@ float PM_readPower(uint8_t address){
 /// @brief Config power monitor settings
 /// @param address I2C address of the power monitor
 void PM_config(uint8_t address){
-    uint32_t combinedBuffer = 0;
+    uint16_t INAsettings;
     float power;
-    uint8_t reg[2];
+    uint8_t reg[3];
     reg[0] = INA740_adc_config_register;
 
     //DEFAULT CONFIGURATION
-    // reg[1] = INA740_adc_config_register_mode_Continuoustemperaturecurrentandbusvoltage |
+    // INAsettings = INA740_adc_config_register_mode_Continuoustemperaturecurrentandbusvoltage |
     //          INA740_adc_config_register_vbusct_1052us |
     //          INA740_adc_config_register_vsenct_1052us |
     //          INA740_adc_config_register_tct_1052us |
     //          INA740_adc_config_register_avg_1;
 
-    reg[1] = INA740_adc_config_register_mode_Continuoustemperaturecurrentandbusvoltage |
-             INA740_adc_config_register_vbusct_1052us |
-             INA740_adc_config_register_vsenct_1052us |
-             INA740_adc_config_register_tct_1052us |
-             INA740_adc_config_register_avg_64;
-    i2c_write_blocking(I2C0_PORT, address, &reg, 2, true);
+    INAsettings =   INA740_adc_config_register_mode_Continuoustemperaturecurrentandbusvoltage |
+                    INA740_adc_config_register_vbusct_1052us |
+                    INA740_adc_config_register_vsenct_1052us |
+                    INA740_adc_config_register_tct_1052us |
+                    INA740_adc_config_register_avg_64;
+
+    reg[1] = MSB(INAsettings);
+    reg[2] = LSB(INAsettings);
+    i2c_write_blocking(I2C0_PORT, address, reg, 2, true);
 
 }
 
