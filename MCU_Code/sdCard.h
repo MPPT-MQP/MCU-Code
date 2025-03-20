@@ -9,7 +9,7 @@
 #include "pico/aon_timer.h"
 
 #define SAMPLES_TO_SAVE 300
-#define SAMPLE_SIZE 110
+#define SAMPLE_SIZE 150
 #define QUEUE_BUFFER_SIZE 20    
 
 

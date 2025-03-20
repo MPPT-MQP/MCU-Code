@@ -12,7 +12,7 @@ FIL fil;
 FRESULT fr;
 
 //SD Card Core 1 Globals
-char sensorLocalBuffer[SAMPLES_TO_SAVE+10][SAMPLE_SIZE];
+char sensorLocalBuffer[SAMPLES_TO_SAVE+10][SAMPLE_SIZE] = {0};
 
 uint16_t localSensorCounter = 0;
 

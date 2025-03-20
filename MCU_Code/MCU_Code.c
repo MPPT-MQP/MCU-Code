@@ -59,6 +59,7 @@ uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
 //Algo Selection and abbreviations
 char algorithms[10][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "RCC", "PSO", "TMP", "AofA"};
 //algorithm_toggle = 0; //0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=RCC, 7=PSO, 8=TMP, 9=AofA
+
 void selectAlgo(int algoToggleNum){
     switch (algoToggleNum){
         case CV:
@@ -337,6 +338,10 @@ int main()
     init_algo(ALGO_TOGGLE);
     createCSVName(ALGO_TOGGLE);
 
+    //Set name of algo to print in sd file
+    char selectedAlgo[5];
+    snprintf(selectedAlgo, 5, "%s", algorithms[ALGO_TOGGLE]);
+
     //Set the init flag high and wait for the other core to finish setup
     core0InitFlag = true;
     while(core1InitFlag == false){
@@ -428,8 +433,18 @@ int main()
 
             /*Run Algorithm*/
             if (tracking_toggle == 1) {
+                
+                //Get starting timestamp for elapsed time
+                absolute_time_t startTime;
+                if(timeFlag == true){
+                    startTime = get_absolute_time();
+                    timeFlag = false;
+                }
+
                 //Turn on DC-DC Converter
                 gpio_put(EN_PIN, true);
+
+                //Copy sensor readings into globals for algorithm access
                 voltage = sensorBuffer[BufferCounter].PM1voltage;
                 current = sensorBuffer[BufferCounter].PM1current;
                 power = sensorBuffer[BufferCounter].PM1power;
@@ -450,11 +465,16 @@ int main()
                 //Sprintf to format sensor data
                 char formatString[SAMPLE_SIZE];
                 aon_timer_get_time_calendar(&PicoTime);
-                sprintf(formatString, "\n%02d:%02d:%02d, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f", 
-                PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec,
+
+                absolute_time_t currTime = get_absolute_time();
+                uint64_t elapsedTime_us = absolute_time_diff_us(startTime, currTime);
+                uint32_t elaspedTime_ms = us_to_ms(elapsedTime_us);
+
+                sprintf(formatString, "\n%02d:%02d:%02d, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %s", 
+                PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec, elaspedTime_ms,
                 sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
                 sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
-                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty);
+                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty, selectedAlgo);
                 //printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
             
                 //Returns false if the queue is full
