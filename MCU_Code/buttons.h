@@ -23,6 +23,7 @@ extern volatile bool button4_state;
 
 extern volatile bool partialSaveFlag;
 extern volatile bool initSDFlag;
+extern volatile bool timeFlag;
 
 //Function Prototypes
 void buttonsInit();

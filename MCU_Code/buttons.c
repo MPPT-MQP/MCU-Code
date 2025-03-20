@@ -9,6 +9,7 @@ volatile bool button4_state = 0;
 
 volatile bool partialSaveFlag = 0;
 volatile bool initSDFlag = 0;
+volatile bool timeFlag = 0;
 
 /* Start Debounce Code*/
 #define DEBOUNCE_MS 50
@@ -79,6 +80,7 @@ void buttonISR(uint gpio, uint32_t events) {
             }
             if(button3_state == 0){
                 initSDFlag = true;
+                timeFlag = true;
             }
             button3_state = !button3_state;
             #ifndef OLED_SCREEN
