@@ -60,6 +60,7 @@ float PM_readVoltage(uint8_t address);
 void PM_printManID(uint8_t address);
 float PM_readCurrent(uint8_t address);
 float PM_readPower(uint8_t address);
+void PM_config(uint8_t address);
 
 //Pyranometer
 float readPyranometer(float voltage);
