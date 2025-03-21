@@ -89,7 +89,7 @@ void initSDFile(){
         panic("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
     }
     //Write inital header data below
-    if (f_printf(&fil, "Timestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2), Duty, Algorithm") < 0) {
+    if (f_printf(&fil, "Timestamp, Elapsed Time, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2), Duty, Algorithm") < 0) {
         printf("f_printf failed\n");
     }
 
