@@ -464,14 +464,14 @@ void particle_swarm_optimization() {
 
 void ripple_correlation_control() {
 
-    float voltage_gain = voltage * 0.9;
+    float voltage_gain = voltage * 0.33;
     printf("Voltage Gain: %0.3f, ", voltage_gain);
     float current_gain = current * 100;
     printf("Current Gain: %0.3f, ", current_gain);
     float power_gain = voltage_gain * current_gain;
     printf("Power Gain: %0.3f, ", power_gain);
 
-    float LPF_Beta = 0.795;
+    float LPF_Beta = 0.8;
     
     float LPF1_output = (LPF_Beta * power_gain) + ((1-LPF_Beta) * LPF1_prevOutput);
     //LPF1_prevOutput = LPF1_output;
@@ -490,15 +490,14 @@ void ripple_correlation_control() {
     PIDClass_compute(rcc1_pidClass);
     printf("RCC1 PID: %0.3f\n", rcc1_output);
 
-    rcc2_input = rcc1_output;
-    rcc2_setpoint = voltage_gain;
+    rcc2_input = voltage_gain;
+    rcc2_setpoint = rcc1_output;
     PIDClass_compute(rcc2_pidClass);
 
     prevVoltage_gain = voltage_gain;
     prevPower_gain = power_gain;
     LPF1_prevOutput = LPF1_output;
     LPF2_prevOutput = LPF2_output;
-
 
     // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
 
@@ -523,7 +522,7 @@ void algorithm_of_algorithms() {
     }
 
     int conditions[34][3] = {   
-        // Temperature, Irradiance, Algorithm Toggle
+        // Irradiance (W/m^2), Temperature (deg C), Algorithm Toggle
         {1000, 25, 0},
         {900, 25, 0},
         {800, 25, 8},

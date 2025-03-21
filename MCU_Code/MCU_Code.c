@@ -123,12 +123,12 @@ void init_algo(int algoToggleNum){
         case RCC:
             //PID init
                 float rcc1_setpoint = 0;
-                rcc1_pidClass = PIDClass_create(&rcc1_input, &rcc1_output, &rcc1_setpoint, 99, 2, 0, 1); //200 5
+                rcc1_pidClass = PIDClass_create(&rcc1_input, &rcc1_output, &rcc1_setpoint, 50, 5, 0, 1); //200 5
                 PIDClass_setOutputLimits(rcc1_pidClass, 0, 30);
                 PIDClass_setMode(rcc1_pidClass, 1);
 
                 float rcc2_setpoint = 0;
-                rcc2_pidClass = PIDClass_create(&rcc2_input, &duty, &rcc2_setpoint, 0.01, 0.1, 0, 1); //2e-9 -0.009
+                rcc2_pidClass = PIDClass_create(&rcc2_input, &duty, &rcc2_setpoint, 2e-9, -0.009, 0, 1); //2e-9 -0.009
                 PIDClass_setOutputLimits(rcc2_pidClass, 0.1, 0.9);
                 PIDClass_setMode(rcc2_pidClass, 1);
             break;
