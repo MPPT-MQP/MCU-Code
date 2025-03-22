@@ -462,6 +462,7 @@ void particle_swarm_optimization() {
 
 } 
 
+/*
 void ripple_correlation_control() {
 
     float voltage_gain = voltage * 0.33;
@@ -469,16 +470,12 @@ void ripple_correlation_control() {
     float current_gain = current * 100;
     printf("Current Gain: %0.3f, ", current_gain);
     float power_gain = voltage_gain * current_gain;
-    printf("Power Gain: %0.3f, ", power_gain);
-
-    float LPF_Beta = 0.8;
+    printf("Power Gain: %0.3f\n", power_gain);
     
-    float LPF1_output = (LPF_Beta * power_gain) + ((1-LPF_Beta) * LPF1_prevOutput);
-    //LPF1_prevOutput = LPF1_output;
+    float LPF1_output = power_gain/(1+(0.000005*LPF1_prevOutput));
     printf("LPF1 Output: %0.3f, ", LPF1_output);
-    float LPF2_output = (LPF_Beta * voltage_gain) + ((1-LPF_Beta) * LPF2_prevOutput);
-    //LPF2_prevOutput = LPF2_output;
-    printf("LPF2 Output: %0.3f, ", LPF2_output);
+    float LPF2_output = voltage_gain/(1+(0.0015*LPF2_prevOutput));
+    printf("LPF2 Output: %0.3f\n", LPF2_output);
 
     float error1 = power_gain - LPF1_output;
     printf("Error 1: %0.3f, ", error1);
@@ -509,7 +506,7 @@ void ripple_correlation_control() {
     // }
     // prevDuty = duty;
 }
-
+*/
 void algorithm_of_algorithms() {
 
     int switch_algo_flag = 0;

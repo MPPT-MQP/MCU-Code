@@ -49,10 +49,10 @@ void createCSVName(int algoToggleNum){
             snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
             timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[INCV]);
             break;
-        case RCC:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[RCC]);
-            break;
+        // case RCC:
+        //     snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+        //     timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[RCC]);
+        //     break;
         case PSO:
             snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
             timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[PSO]);
