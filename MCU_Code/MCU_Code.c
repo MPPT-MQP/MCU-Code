@@ -15,7 +15,9 @@
 #include <time.h>
 #include "pico/multicore.h"
 #include "pico/time.h"
+#include "def.h"
 
+//extern char selectedAlgo[5];
 
 //PID class
 void* cv_pidClass;
@@ -55,6 +57,9 @@ volatile bool core0InitFlag = false;
 
 //SD card bytes to save
 uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
+
+//Current Algorithm
+char selectedAlgo[5];
 
 //Algo Selection and abbreviations
 char algorithms[11][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "RCC", "PSO", "TMP", "AofA", "DSW"};
@@ -103,8 +108,8 @@ void init_algo(int algoToggleNum){
     switch (algoToggleNum){
         case CV:
             //Change PID controller
-            float cv_setpoint = 15.8;
-            cv_pidClass = PIDClass_create(&voltage, &duty, &cv_setpoint, 0.01, 0.1, 0, 1);
+            float cv_setpoint = 17.4;
+            cv_pidClass = PIDClass_create(&voltage, &duty, &cv_setpoint, 0.01, 0.01, 0, 1); // 0.01 0.1
             PIDClass_setOutputLimits(cv_pidClass, 0.1, 0.9);
             PIDClass_setMode(cv_pidClass, 1);
             break;
@@ -140,7 +145,7 @@ void init_algo(int algoToggleNum){
         //     break;
         case TMP:
             //TMP PID controller
-            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 0.01, 0.1, 0, 1);
+            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 1, 0.2, 0, 1); // 0.01 0.1
             PIDClass_setOutputLimits(TMP_pidClass, 0.1, 0.9);
             PIDClass_setMode(TMP_pidClass, 1);
             break;
@@ -340,11 +345,11 @@ int main()
     add_repeating_timer_us(SENSOR_ALGORITHM_RUN_RATE, AlgoISR, NULL, &algoTimer);
 
     //Initialize any necessary PID controllers and values for desired algorithm to run
-    init_algo(ALGO_TOGGLE);
+    init_algo(CV);
+    init_algo(TMP);
     createCSVName(ALGO_TOGGLE);
 
     //Set name of algo to print in sd file
-    char selectedAlgo[5];
     snprintf(selectedAlgo, 5, "%s", algorithms[ALGO_TOGGLE]);
 
     //Set the init flag high and wait for the other core to finish setup

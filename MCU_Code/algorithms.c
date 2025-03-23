@@ -7,7 +7,7 @@ float duty_min = 0.1;
 float duty_max = 0.95;
 static float P_0_step_val = 0.035;
 float P_O_step;
-static float I_C_step_val = 0.035;
+static float I_C_step_val = 0.025;
 float I_C_step;
 
 float duty = 0.1;
@@ -137,7 +137,7 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
 /* ALGORITHM FUNCTIONS */
 
-void duty_test() {
+void duty_sweep() {
 
     if (duty >= 0.95) {
         duty = 0.05;
@@ -172,7 +172,7 @@ void constant_voltage() {
 void perturb_and_observe(int variable){
 
     float duty_raw;
-    float N = 0.005;
+    float N = 0.02; // 0.005
     float deltaV = voltage - prevVoltage;
     float deltaP = power - prevPower;
 
@@ -278,7 +278,7 @@ void beta_method() {
     float k=1.38e-23;
     float A=0.985;
     float N=36;
-    float T=25;
+    float T=temperature;
     float c=q/(k*(T+273.15)*A*N);
     float E;
 
@@ -465,14 +465,14 @@ void particle_swarm_optimization() {
 
 void algorithm_of_algorithms() {
 
-    int switch_algo_flag = 0;
+    int switch_algo_flag = 1;
 
-    float deltaG = irradiance - prevIrradiance;
-    float deltaT = temperature - prevTemperature;
+    // float deltaG = irradiance - prevIrradiance;
+    // float deltaT = temperature - prevTemperature;
 
-    if(fabs(deltaG) > irradiance_hysteresis && fabs(deltaT) > temperature_hystersis) {
-        switch_algo_flag = 1;
-    }
+    // if(fabs(deltaG) > irradiance_hysteresis && fabs(deltaT) > temperature_hystersis) {
+    //     switch_algo_flag = 1;
+    // }
 
     int conditions[34][3] = {   
         // Irradiance (W/m^2), Temperature (deg C), Algorithm Toggle
