@@ -20,7 +20,10 @@
 #define PSO 7
 #define TMP 8
 #define AofA 9
+#define DSW 10
+#define CONSTANT_DUTY
 
-#define DCDCFreq 1250
+#define DCDCFreq 3125
 
-extern char algorithms[10][5];
+extern char algorithms[11][5];
+extern char selectedAlgo[5];

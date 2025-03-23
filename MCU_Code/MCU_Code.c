@@ -57,7 +57,7 @@ volatile bool core0InitFlag = false;
 uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
 
 //Algo Selection and abbreviations
-char algorithms[10][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "RCC", "PSO", "TMP", "AofA"};
+char algorithms[11][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "RCC", "PSO", "TMP", "AofA", "DSW"};
 //algorithm_toggle = 0; //0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=RCC, 7=PSO, 8=TMP, 9=AofA
 
 void selectAlgo(int algoToggleNum){
@@ -92,6 +92,9 @@ void selectAlgo(int algoToggleNum){
         case AofA:
             algorithm_of_algorithms();
             break;
+        case DSW:
+            duty_sweep();
+        break;
     }
 }
 
@@ -373,9 +376,11 @@ int main()
 
             sensorBuffer[BufferCounter].PM2voltage = PM_readVoltage(PM2);
             sensorBuffer[BufferCounter].PM2current = PM_readCurrent(PM2);
+            sensorBuffer[BufferCounter].PM2power = PM_readPower(PM2);
 
             // sensorBuffer[BufferCounter].PM3voltage = PM_readVoltage(PM3);
             // sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
+            // sensorBuffer[BufferCounter].PM3power = PM_readPower(PM3);
 
             //Irradiance
             sensorBuffer[BufferCounter].irradiance = readIrradiance();
@@ -450,16 +455,14 @@ int main()
                 voltage = sensorBuffer[BufferCounter].PM1voltage;
                 current = sensorBuffer[BufferCounter].PM1current;
                 power = sensorBuffer[BufferCounter].PM1power;
-                // power = voltage * current;
                 temperature = sensorBuffer[BufferCounter].temperature;
                 irradiance = sensorBuffer[BufferCounter].irradiance;
 
                 //Run algorithm
-                //duty = 0.7;
-                //duty_sweep();
                 selectAlgo(ALGO_TOGGLE);
 
-                printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f\n\n", voltage, current, power, duty);
+                printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f, Irradiance: %0.3f, Temperature: %0.3f\n", 
+                        voltage, current, power, duty, irradiance, temperature);
                 
                 //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*DCDCFreq);

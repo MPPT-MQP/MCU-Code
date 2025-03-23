@@ -1,4 +1,5 @@
 #include "algorithms.h"
+#include "def.h"
 #include <stdint.h>
 
 //Global Variables
@@ -136,10 +137,10 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
 /* ALGORITHM FUNCTIONS */
 
-void duty_sweep(){
+void duty_test() {
 
-    if (duty >= 0.99) {
-        duty = 0.01;
+    if (duty >= 0.95) {
+        duty = 0.05;
     } else {
         duty += 0.01;
     }
@@ -462,51 +463,6 @@ void particle_swarm_optimization() {
 
 } 
 
-/*
-void ripple_correlation_control() {
-
-    float voltage_gain = voltage * 0.33;
-    printf("Voltage Gain: %0.3f, ", voltage_gain);
-    float current_gain = current * 100;
-    printf("Current Gain: %0.3f, ", current_gain);
-    float power_gain = voltage_gain * current_gain;
-    printf("Power Gain: %0.3f\n", power_gain);
-    
-    float LPF1_output = power_gain/(1+(0.000005*LPF1_prevOutput));
-    printf("LPF1 Output: %0.3f, ", LPF1_output);
-    float LPF2_output = voltage_gain/(1+(0.0015*LPF2_prevOutput));
-    printf("LPF2 Output: %0.3f\n", LPF2_output);
-
-    float error1 = power_gain - LPF1_output;
-    printf("Error 1: %0.3f, ", error1);
-    float error2 = voltage_gain - LPF2_output;
-    printf("Error 2: %0.3f, ", error2);
-
-    rcc1_input = error1 * error2;
-    rcc1_setpoint = 0;
-    PIDClass_compute(rcc1_pidClass);
-    printf("RCC1 PID: %0.3f\n", rcc1_output);
-
-    rcc2_input = voltage_gain;
-    rcc2_setpoint = rcc1_output;
-    PIDClass_compute(rcc2_pidClass);
-
-    prevVoltage_gain = voltage_gain;
-    prevPower_gain = power_gain;
-    LPF1_prevOutput = LPF1_output;
-    LPF2_prevOutput = LPF2_output;
-
-    // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
-
-    // if (duty_raw >= duty_max || duty_raw <= duty_min) {
-    //     duty = prevDuty;
-    // }
-    // else {
-    //     duty = duty_raw;  
-    // }
-    // prevDuty = duty;
-}
-*/
 void algorithm_of_algorithms() {
 
     int switch_algo_flag = 0;
@@ -607,6 +563,7 @@ void algorithm_of_algorithms() {
 
         for (int i = 0; i< best_list_size; i++) {
             if(best_list[i][0] == minVal_irradiance && best_list[i][1] == minVal_temp) {
+                snprintf(selectedAlgo, 5, "%s", algorithms[best_list[i][2]]);
                 selectAlgo(best_list[i][2]);
                 prevAlgo = best_list[i][2];
             }
@@ -616,10 +573,57 @@ void algorithm_of_algorithms() {
         selectAlgo(prevAlgo);
     }
 
+    printf("Selected Algorithm: %s, ", selectedAlgo);
     prevIrradiance = irradiance;
     prevTemperature = temperature;
 
 }
+
+/*
+void ripple_correlation_control() {
+
+    float voltage_gain = voltage * 0.33;
+    printf("Voltage Gain: %0.3f, ", voltage_gain);
+    float current_gain = current * 100;
+    printf("Current Gain: %0.3f, ", current_gain);
+    float power_gain = voltage_gain * current_gain;
+    printf("Power Gain: %0.3f\n", power_gain);
+    
+    float LPF1_output = power_gain/(1+(0.000005*LPF1_prevOutput));
+    printf("LPF1 Output: %0.3f, ", LPF1_output);
+    float LPF2_output = voltage_gain/(1+(0.0015*LPF2_prevOutput));
+    printf("LPF2 Output: %0.3f\n", LPF2_output);
+
+    float error1 = power_gain - LPF1_output;
+    printf("Error 1: %0.3f, ", error1);
+    float error2 = voltage_gain - LPF2_output;
+    printf("Error 2: %0.3f, ", error2);
+
+    rcc1_input = error1 * error2;
+    rcc1_setpoint = 0;
+    PIDClass_compute(rcc1_pidClass);
+    printf("RCC1 PID: %0.3f\n", rcc1_output);
+
+    rcc2_input = voltage_gain;
+    rcc2_setpoint = rcc1_output;
+    PIDClass_compute(rcc2_pidClass);
+
+    prevVoltage_gain = voltage_gain;
+    prevPower_gain = power_gain;
+    LPF1_prevOutput = LPF1_output;
+    LPF2_prevOutput = LPF2_output;
+
+    // printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
+
+    // if (duty_raw >= duty_max || duty_raw <= duty_min) {
+    //     duty = prevDuty;
+    // }
+    // else {
+    //     duty = duty_raw;  
+    // }
+    // prevDuty = duty;
+}
+*/
 
 
 /* END ALGORITHM FUNCTIONS */
