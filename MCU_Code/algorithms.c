@@ -38,8 +38,8 @@ float rcc2_setpoint;
 float TMP_Vmpp;
 
 //Algorithm of Algorithms
-float temperature_hystersis = 5;
-float irradiance_hysteresis = 50;
+float temperature_hystersis = 1;
+float irradiance_hysteresis = 30;
 int prevAlgo = 0;
 
 // Structure for PID controller 
@@ -477,7 +477,7 @@ void algorithm_of_algorithms() {
     float deltaG = test_irradiance - prevIrradiance;
     float deltaT = test_temperature - prevTemperature;
 
-    if(fabs(deltaG) > irradiance_hysteresis && fabs(deltaT) > temperature_hystersis) {
+    if(fabs(deltaG) > irradiance_hysteresis || fabs(deltaT) > temperature_hystersis) {
         switch_algo_flag = 1;
     }
 
