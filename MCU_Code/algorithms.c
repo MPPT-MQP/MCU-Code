@@ -140,14 +140,16 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 void duty_test() {
 
     #ifndef CONSTANT_DUTY
-    if (duty >= 0.95) {
-        duty = 0.05;
-    } else {
-        duty += 0.01;
-    }
+        // Sweep duty cycle 
+        if (duty >= 0.95) {
+            duty = 0.05;
+        } else {
+            duty += 0.01;
+        }
     #endif
 
     #ifdef CONSTANT_DUTY
+        // Set constant duty cycle 
         duty = CONSTANT_DUTY;
     #endif
     
