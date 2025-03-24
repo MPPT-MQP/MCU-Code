@@ -144,14 +144,14 @@ void duty_sweep() {
     } else {
         duty += 0.01;
     }
-    printf("Voltage: %0.3f, Current: %0.3f, Duty: %0.3f\n", voltage, current, duty);
+    //printf("Voltage: %0.3f, Current: %0.3f, Duty: %0.3f\n", voltage, current, duty);
 }
 
 
 void constant_voltage() {
-    float duty_raw;
-    float Vref = 19.39;
-    float dt = 0.2; // not sure what to set this too
+    // float duty_raw;
+    // float Vref = 19.39;
+    // float dt = 0.2; // not sure what to set this too
     //float error = voltage-Vref;
     //printf("Voltage: %0.3f ", voltage);
     //printf("Error: %0.3f ", error);
@@ -467,6 +467,8 @@ void algorithm_of_algorithms() {
 
     int switch_algo_flag = 1;
 
+    int test_irradiance = 1000;
+    int test_temperature = 25;
     // float deltaG = irradiance - prevIrradiance;
     // float deltaT = temperature - prevTemperature;
 
@@ -521,14 +523,14 @@ void algorithm_of_algorithms() {
         int k = 0;
 
         for(int i = 0; i<34; i++) {
-            irradiance_differences[i] = fabs(conditions[i][0] - irradiance);
+            irradiance_differences[i] = fabs(conditions[i][0] - test_irradiance);
            
         }
         
         float minVal_irradiance = irradiance_differences[0];
         for (int i = 0; i<34; i++) {
             if(irradiance_differences[i] < minVal_irradiance) {
-                minVal_irradiance = irradiance_differences[i];
+                minVal_irradiance = conditions[i][0];
             }
         }
 
@@ -551,26 +553,26 @@ void algorithm_of_algorithms() {
         float temp_differences[best_list_size];
         
         for(int i = 0; i< best_list_size; i++) {
-            temp_differences[i] = fabs(best_list[i][1] - temperature);
+            temp_differences[i] = fabs(best_list[i][1] - test_temperature);
         }
 
         float minVal_temp = temp_differences[0];
         for (int i = 0; i<best_list_size; i++) {
             if(temp_differences[i] < minVal_temp) {
-                minVal_temp = temp_differences[i];
+                minVal_temp = best_list[i][1];
             }
         }
 
         for (int i = 0; i< best_list_size; i++) {
             if(best_list[i][0] == minVal_irradiance && best_list[i][1] == minVal_temp) {
                 snprintf(selectedAlgo, 5, "%s", algorithms[best_list[i][2]]);
-                selectAlgo(best_list[i][2]);
+                //selectAlgo(best_list[i][2]);
                 prevAlgo = best_list[i][2];
             }
         }
     }
     else {
-        selectAlgo(prevAlgo);
+        //selectAlgo(prevAlgo);
     }
 
     printf("Selected Algorithm: %s, ", selectedAlgo);

@@ -108,8 +108,8 @@ void init_algo(int algoToggleNum){
     switch (algoToggleNum){
         case CV:
             //Change PID controller
-            float cv_setpoint = 17.4;
-            cv_pidClass = PIDClass_create(&voltage, &duty, &cv_setpoint, 0.01, 0.01, 0, 1); // 0.01 0.1
+            float cv_setpoint = 17.2;
+            cv_pidClass = PIDClass_create(&voltage, &duty, &cv_setpoint, 0.035, 0.0001, 0, 1); // 0.01 0.1
             PIDClass_setOutputLimits(cv_pidClass, 0.1, 0.9);
             PIDClass_setMode(cv_pidClass, 1);
             break;
@@ -145,7 +145,7 @@ void init_algo(int algoToggleNum){
         //     break;
         case TMP:
             //TMP PID controller
-            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 1, 0.2, 0, 1); // 0.01 0.1
+            TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 0.01, 0.2, 0, 1); // 0.01 0.1
             PIDClass_setOutputLimits(TMP_pidClass, 0.1, 0.9);
             PIDClass_setMode(TMP_pidClass, 1);
             break;
@@ -466,8 +466,10 @@ int main()
                 //Run algorithm
                 selectAlgo(ALGO_TOGGLE);
 
-                printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f, Irradiance: %0.3f, Temperature: %0.3f\n", 
-                        voltage, current, power, duty, irradiance, temperature);
+                //printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f, Irradiance: %0.3f, Temperature: %0.3f\n", 
+                //        voltage, current, power, duty, irradiance, temperature);
+
+                printf("%0.3f, %0.3f, %0.3f, %0.3f\n", voltage, current, power, duty); // For realtime plotter
                 
                 //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*DCDCFreq);

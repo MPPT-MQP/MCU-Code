@@ -29,7 +29,7 @@ void temperature_parametric();
 void beta_method();
 void particle_swarm_optimization();
 void constant_voltage();
-void ripple_correlation_control();
+//void ripple_correlation_control();
 void duty_sweep();
 void algorithm_of_algorithms();
 void selectAlgo(int algoToggleNum);
