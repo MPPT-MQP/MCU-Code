@@ -38,8 +38,8 @@ float rcc2_setpoint;
 float TMP_Vmpp;
 
 //Algorithm of Algorithms
-float temperature_hystersis = 5;
-float irradiance_hysteresis = 50;
+float temperature_hystersis = 1;
+float irradiance_hysteresis = 30;
 int prevAlgo = 0;
 
 // Structure for PID controller 
@@ -467,14 +467,19 @@ void algorithm_of_algorithms() {
 
     int switch_algo_flag = 1;
 
-    int test_irradiance = 1000;
-    int test_temperature = 25;
-    // float deltaG = irradiance - prevIrradiance;
-    // float deltaT = temperature - prevTemperature;
+    // float test_irradiance = (float)rand() / RAND_MAX * 1000;
+    // float test_temperature = (float)rand() / RAND_MAX * 25;
+   // float test_irradiance = 401.2;
+   // float test_temperature = 0.2;
+    float test_irradiance = irradiance;
+    float test_temperature = temperature;
+    
+    float deltaG = test_irradiance - prevIrradiance;
+    float deltaT = test_temperature - prevTemperature;
 
-    // if(fabs(deltaG) > irradiance_hysteresis && fabs(deltaT) > temperature_hystersis) {
-    //     switch_algo_flag = 1;
-    // }
+    if(fabs(deltaG) > irradiance_hysteresis || fabs(deltaT) > temperature_hystersis) {
+        switch_algo_flag = 1;
+    }
 
     int conditions[34][3] = {   
         // Irradiance (W/m^2), Temperature (deg C), Algorithm Toggle
@@ -518,19 +523,18 @@ void algorithm_of_algorithms() {
 
     if(switch_algo_flag == 1) {
 
-        int best_list[34][3];
-        float irradiance_differences[34];
+        int best_list[34][3] = {0};
+        float irradiance_differences[34] = {0};
         int k = 0;
 
         for(int i = 0; i<34; i++) {
-            irradiance_differences[i] = fabs(conditions[i][0] - test_irradiance);
-           
+            irradiance_differences[i] = fabs(conditions[i][0] - test_irradiance); 
         }
         
         float minVal_irradiance = irradiance_differences[0];
         for (int i = 0; i<34; i++) {
             if(irradiance_differences[i] < minVal_irradiance) {
-                minVal_irradiance = conditions[i][0];
+                minVal_irradiance = irradiance_differences[i];
             }
         }
 
@@ -559,25 +563,25 @@ void algorithm_of_algorithms() {
         float minVal_temp = temp_differences[0];
         for (int i = 0; i<best_list_size; i++) {
             if(temp_differences[i] < minVal_temp) {
-                minVal_temp = best_list[i][1];
+                minVal_temp = temp_differences[i];
             }
         }
 
-        for (int i = 0; i< best_list_size; i++) {
-            if(best_list[i][0] == minVal_irradiance && best_list[i][1] == minVal_temp) {
+        for(int i = 0; i<best_list_size; i++) {
+            if(temp_differences[i] == minVal_temp) {
                 snprintf(selectedAlgo, 5, "%s", algorithms[best_list[i][2]]);
-                //selectAlgo(best_list[i][2]);
+                selectAlgo(best_list[i][2]);
                 prevAlgo = best_list[i][2];
             }
         }
     }
     else {
-        //selectAlgo(prevAlgo);
+        selectAlgo(prevAlgo);
     }
 
     printf("Selected Algorithm: %s, ", selectedAlgo);
-    prevIrradiance = irradiance;
-    prevTemperature = temperature;
+    prevIrradiance = test_irradiance;
+    prevTemperature = test_temperature;
 
 }
 
