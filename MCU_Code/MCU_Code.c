@@ -326,7 +326,9 @@ int main()
     //Temp Sensor ADC Setup
     TMP_ADC_setup();
 
+    //Configure PM for sample rate, averaging, etc
     PM_config(PM1);
+    PM_config(PM2);
 
     //SD Card Setup (hw_config.c sets the SPI pins)
     sd_init_driver();
