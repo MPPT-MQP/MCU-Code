@@ -66,9 +66,9 @@ void createCSVName(int algoToggleNum){
             snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
             timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[AofA]);
             break;
-        case DSW:
+        case DTY:
             snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[DSW]);
+            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[DTY]);
         break;
     }
 }

@@ -20,7 +20,7 @@
 #define PSO 7
 #define TMP 8
 #define AofA 9
-#define DSW 10
+#define DTY 10
 
 // Set a constant duty cycle instead of sweeping duty
 // #define CONSTANT_DUTY 0.7

@@ -30,7 +30,7 @@ void beta_method();
 void particle_swarm_optimization();
 void constant_voltage();
 //void ripple_correlation_control();
-void duty_sweep();
+void duty_test();
 void algorithm_of_algorithms();
 void selectAlgo(int algoToggleNum);
 

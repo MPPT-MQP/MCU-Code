@@ -137,7 +137,7 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
 /* ALGORITHM FUNCTIONS */
 
-void duty_sweep() {
+void duty_test() {
 
     #ifndef CONSTANT_DUTY
     if (duty >= 0.95) {
