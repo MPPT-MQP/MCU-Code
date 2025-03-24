@@ -467,16 +467,19 @@ void algorithm_of_algorithms() {
 
     int switch_algo_flag = 1;
 
-    float test_irradiance = (float)rand() / RAND_MAX * 1000;
-    float test_temperature = (float)rand() / RAND_MAX * 25;
+    // float test_irradiance = (float)rand() / RAND_MAX * 1000;
+    // float test_temperature = (float)rand() / RAND_MAX * 25;
    // float test_irradiance = 401.2;
    // float test_temperature = 0.2;
-    // float deltaG = irradiance - prevIrradiance;
-    // float deltaT = temperature - prevTemperature;
+    float test_irradiance = irradiance;
+    float test_temperature = temperature;
+    
+    float deltaG = test_irradiance - prevIrradiance;
+    float deltaT = test_temperature - prevTemperature;
 
-    // if(fabs(deltaG) > irradiance_hysteresis && fabs(deltaT) > temperature_hystersis) {
-    //     switch_algo_flag = 1;
-    // }
+    if(fabs(deltaG) > irradiance_hysteresis && fabs(deltaT) > temperature_hystersis) {
+        switch_algo_flag = 1;
+    }
 
     int conditions[34][3] = {   
         // Irradiance (W/m^2), Temperature (deg C), Algorithm Toggle
@@ -577,8 +580,8 @@ void algorithm_of_algorithms() {
     }
 
     printf("Selected Algorithm: %s, ", selectedAlgo);
-    prevIrradiance = irradiance;
-    prevTemperature = temperature;
+    prevIrradiance = test_irradiance;
+    prevTemperature = test_temperature;
 
 }
 
