@@ -466,10 +466,10 @@ int main()
                 //Run algorithm
                 selectAlgo(ALGO_TOGGLE);
 
-                //printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f, Irradiance: %0.3f, Temperature: %0.3f\n", 
-                //        voltage, current, power, duty, irradiance, temperature);
+                printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f, Irradiance: %0.3f, Temperature: %0.3f\n", 
+                       voltage, current, power, duty, irradiance, temperature);
 
-                printf("%0.3f, %0.3f, %0.3f, %0.3f\n", voltage, current, power, duty); // For realtime plotter
+                //printf("%0.3f, %0.3f, %0.3f, %0.3f\n", voltage, current, power, duty); // For realtime plotter
                 
                 //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*DCDCFreq);
