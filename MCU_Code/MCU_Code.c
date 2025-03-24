@@ -468,11 +468,17 @@ int main()
                 //Run algorithm
                 selectAlgo(ALGO_TOGGLE);
 
-                printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f, Irradiance: %0.3f, Temperature: %0.3f\n", 
+                // Set serial monitor to print formatted values if live plotting is not enabled
+                #ifndef LIVE_PLOT
+                    printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f, Irradiance: %0.3f, Temperature: %0.3f\n", 
                        voltage, current, power, duty, irradiance, temperature);
-
-                //printf("%0.3f, %0.3f, %0.3f, %0.3f\n", voltage, current, power, duty); // For realtime plotter
+                #endif
                 
+                // Strip formatting so data is readable by realtime plotter
+                #ifdef LIVE_PLOT
+                    printf("%0.3f, %0.3f, %0.3f, %0.3f\n", voltage, current, power, duty); 
+                #endif
+
                 //duty_sweep();
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*DCDCFreq);
                 

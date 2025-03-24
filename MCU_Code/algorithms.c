@@ -139,12 +139,18 @@ float pid_compute(PIDController *pid, float setpoint, float actual_value, float 
 
 void duty_sweep() {
 
+    #ifndef CONSTANT_DUTY
     if (duty >= 0.95) {
         duty = 0.05;
     } else {
         duty += 0.01;
     }
-    //printf("Voltage: %0.3f, Current: %0.3f, Duty: %0.3f\n", voltage, current, duty);
+    #endif
+
+    #ifdef CONSTANT_DUTY
+        duty = CONSTANT_DUTY;
+    #endif
+    
 }
 
 

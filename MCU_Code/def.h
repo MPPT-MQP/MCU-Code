@@ -21,8 +21,14 @@
 #define TMP 8
 #define AofA 9
 #define DSW 10
-#define CONSTANT_DUTY
 
+// Set a constant duty cycle instead of duty sweep
+// #define CONSTANT_DUTY 0.7
+
+// Serial Monitor Data Formated for Live Plotting
+// #define LIVE_PLOT
+
+// Frequency Divider of DC-DC Converter
 #define DCDCFreq 3125
 
 extern char algorithms[11][5];
