@@ -471,15 +471,19 @@ void particle_swarm_optimization() {
 
 void algorithm_of_algorithms() {
 
-    int switch_algo_flag = 1;
-
-    // float test_irradiance = (float)rand() / RAND_MAX * 1000;
-    // float test_temperature = (float)rand() / RAND_MAX * 25;
-   // float test_irradiance = 401.2;
-   // float test_temperature = 0.2;
+    // For testing with actual irradiance and temp measurements
     float test_irradiance = irradiance;
     float test_temperature = temperature;
+
+    // For testing AofA without sensors 
+    // float test_irradiance = (float)rand() / RAND_MAX * 1000;
+    // float test_temperature = (float)rand() / RAND_MAX * 25;
+    // float test_irradiance = 401.2;
+    // float test_temperature = 0.2;
     
+    /* Set temperature and irradiance thresholds
+    for when AofA will switch which algorithm is run */
+    int switch_algo_flag = 0;
     float deltaG = test_irradiance - prevIrradiance;
     float deltaT = test_temperature - prevTemperature;
 
@@ -487,85 +491,90 @@ void algorithm_of_algorithms() {
         switch_algo_flag = 1;
     }
 
+    /* Test Conditions Array: store the algorithm that performs best in MATLAB at
+    each temperature and irradiance combination */
     int conditions[34][3] = {   
         // Irradiance (W/m^2), Temperature (deg C), Algorithm Toggle
-        {1000, 25, 0},
-        {900, 25, 0},
-        {800, 25, 8},
-        {700, 25, 8},
-        {600, 25, 8},
-        {500, 25, 7},
-        {400, 25, 4},
-        {300, 25, 8},
-        {200, 25, 4},
+        {1000, 25, CV},
+        {900, 25, CV},
+        {800, 25, TMP},
+        {700, 25, TMP},
+        {600, 25, TMP},
+        {500, 25, PSO},
+        {400, 25, INC},
+        {300, 25, TMP},
+        {200, 25, INC},
 
-        {1000, 40, 8},
-        {1000, 35, 7},
-        {1000, 30, 7},
-        {1000, 20, 7},
-        {1000, 15, 8},
-        {1000, 10, 7},
-        {1000, 5, 7},
-        {1000, 0, 8},
-        {1000, -5, 8},
-        {1000, -10, 8},
-        {1000, -15, 8},
-        {1000, -20, 8},
-        {1000, -25, 8},
+        {1000, 40, TMP},
+        {1000, 35, PSO},
+        {1000, 30, PSO},
+        {1000, 20, PSO},
+        {1000, 15, TMP},
+        {1000, 10, PSO},
+        {1000, 5, PSO},
+        {1000, 0, TMP},
+        {1000, -5, TMP},
+        {1000, -10, TMP},
+        {1000, -15, TMP},
+        {1000, -20, TMP},
+        {1000, -25, TMP},
 
-        {800, 20, 8},
-        {600, 10, 8},
-        {400, 0, 4},
-        {400, 30, 4},
-        {400, 35, 4},
-        {400, 40, 7},
-        {300, 30, 8},
-        {300, 35, 2},
-        {300, 40, 2},
-        {200, 30, 4},
-        {200, 35, 4},
-        {200, 40, 2},
+        {800, 20, TMP},
+        {600, 10, TMP},
+        {400, 0, INC},
+        {400, 30, INC},
+        {400, 35, INC},
+        {400, 40, PSO},
+        {300, 30, TMP},
+        {300, 35, PNO},
+        {300, 40, PNO},
+        {200, 30, INC},
+        {200, 35, INC},
+        {200, 40, PNO},
+
     };
 
     if(switch_algo_flag == 1) {
 
-        int best_list[34][3] = {0};
+        /* Create array of differences between each 
+        test condition irradiance and measured irradiance */
         float irradiance_differences[34] = {0};
-        int k = 0;
-
+        
         for(int i = 0; i<34; i++) {
             irradiance_differences[i] = fabs(conditions[i][0] - test_irradiance); 
         }
         
+        /* Determine the lowest irradiance difference */
         float minVal_irradiance = irradiance_differences[0];
+        
         for (int i = 0; i<34; i++) {
             if(irradiance_differences[i] < minVal_irradiance) {
                 minVal_irradiance = irradiance_differences[i];
             }
         }
 
+        /* Add test conditions with the closest irradiance
+        to a new array of best candidates */
+        int best_list[34][3] = {0};
+        int best_list_size = 0;
+        
         for(int i = 0; i<34; i++) {
             if(irradiance_differences[i] == minVal_irradiance) {
                 for(int j = 0; j<3; j++) {
-                    best_list[k][j] = conditions[i][j];
+                    best_list[best_list_size][j] = conditions[i][j];
                 }
-                k++;
-            }
-        }
-
-        int best_list_size = 0;
-        for(int i = 0; i < 34; i++) {
-            if(best_list[i][0] != 0) {
                 best_list_size++;
             }
         }
 
-        float temp_differences[best_list_size];
-        
+        /* Create array of differences between each 
+        test condition temperature and measured temperature */
+        float temp_differences[best_list_size]; 
         for(int i = 0; i< best_list_size; i++) {
             temp_differences[i] = fabs(best_list[i][1] - test_temperature);
         }
 
+        /* Determine the lowest temperature difference */
         float minVal_temp = temp_differences[0];
         for (int i = 0; i<best_list_size; i++) {
             if(temp_differences[i] < minVal_temp) {
@@ -573,15 +582,22 @@ void algorithm_of_algorithms() {
             }
         }
 
+        /* Find test condition with closest temperature 
+        from best candidates array */
         for(int i = 0; i<best_list_size; i++) {
             if(temp_differences[i] == minVal_temp) {
+                // Print selected algorithm to array which is written to SD card 
                 snprintf(selectedAlgo, 5, "%s", algorithms[best_list[i][2]]);
+                // Run selected algorithm 
                 selectAlgo(best_list[i][2]);
+                // Save as previously selected algorithm
                 prevAlgo = best_list[i][2];
             }
         }
     }
     else {
+        /* If temperature and irradiance did not change enough
+        to switch algorithms, run previous algorithm */
         selectAlgo(prevAlgo);
     }
 

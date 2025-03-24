@@ -22,7 +22,7 @@
 #define AofA 9
 #define DSW 10
 
-// Set a constant duty cycle instead of duty sweep
+// Set a constant duty cycle instead of sweeping duty
 // #define CONSTANT_DUTY 0.7
 
 // Serial Monitor Data Formated for Live Plotting
