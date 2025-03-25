@@ -588,7 +588,8 @@ void algorithm_of_algorithms() {
         from best candidates array */
         for(int i = 0; i<best_list_size; i++) {
             if(temp_differences[i] == minVal_temp) {
-                // Print selected algorithm to array which is written to SD card 
+                // Print selected algorithm to array which is written to SD card
+                snprintf(selectedAlgo, 5, "%s", "     ");
                 snprintf(selectedAlgo, 5, "%s", algorithms[best_list[i][2]]);
                 // Run selected algorithm 
                 selectAlgo(best_list[i][2]);
@@ -601,6 +602,7 @@ void algorithm_of_algorithms() {
         /* If temperature and irradiance did not change enough
         to switch algorithms, run previous algorithm */
         selectAlgo(prevAlgo);
+        snprintf(selectedAlgo, 5, "%s", "     ");
         snprintf(selectedAlgo, 5, "%s", algorithms[prevAlgo]);
     }
 
