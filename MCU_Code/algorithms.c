@@ -601,6 +601,7 @@ void algorithm_of_algorithms() {
         /* If temperature and irradiance did not change enough
         to switch algorithms, run previous algorithm */
         selectAlgo(prevAlgo);
+        snprintf(selectedAlgo, 5, "%s", algorithms[prevAlgo]);
     }
 
     printf("Selected Algorithm: %s, ", selectedAlgo);
