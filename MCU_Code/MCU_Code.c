@@ -490,7 +490,7 @@ int main()
                 uint64_t elapsedTime_us = absolute_time_diff_us(startTime, currTime);
                 uint32_t elaspedTime_ms = us_to_ms(elapsedTime_us);
 
-                sprintf(formatString, "\n%02d:%02d:%02d, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %s", 
+                sprintf(formatString, "\n%02d:%02d:%02d, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %s,", 
                 PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec, elaspedTime_ms,
                 sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
                 sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 

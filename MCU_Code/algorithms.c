@@ -485,7 +485,7 @@ void algorithm_of_algorithms() {
     
     /* Set temperature and irradiance thresholds
     for when AofA will switch which algorithm is run */
-    int switch_algo_flag = 0;
+    int switch_algo_flag = 1;
     float deltaG = test_irradiance - prevIrradiance;
     float deltaT = test_temperature - prevTemperature;
 
@@ -589,8 +589,7 @@ void algorithm_of_algorithms() {
         for(int i = 0; i<best_list_size; i++) {
             if(temp_differences[i] == minVal_temp) {
                 // Print selected algorithm to array which is written to SD card
-                snprintf(selectedAlgo, 5, "%s", "     ");
-                snprintf(selectedAlgo, 5, "%s", algorithms[best_list[i][2]]);
+                sprintf(selectedAlgo, "%s", algorithms[best_list[i][2]]);
                 // Run selected algorithm 
                 selectAlgo(best_list[i][2]);
                 // Save as previously selected algorithm
@@ -602,8 +601,7 @@ void algorithm_of_algorithms() {
         /* If temperature and irradiance did not change enough
         to switch algorithms, run previous algorithm */
         selectAlgo(prevAlgo);
-        snprintf(selectedAlgo, 5, "%s", "     ");
-        snprintf(selectedAlgo, 5, "%s", algorithms[prevAlgo]);
+        sprintf(selectedAlgo, "%s", algorithms[prevAlgo]);
     }
 
     printf("Selected Algorithm: %s, ", selectedAlgo);
