@@ -95,7 +95,12 @@ void run_main_screens()
             sprintf(current_tracking, "%s", tracking_status_selected[tracking_toggle]);
             sprintf(current_algorithm, "%s", algorithms[algorithm_toggle]);
             sprintf(current_mode, "%s", mode[mode_toggle]);
-            char screen0[4][15] = {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
+            char screen0[4][15];
+            sprintf(screen0[0], "%s", current_tracking);
+            sprintf(screen0[1], "%s", "SET ALGORITHM");
+            sprintf(screen0[2], "%s", current_algorithm);
+            sprintf(screen0[3], "%s", current_mode);
+            //= {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
             int x_distances0[4] = {1, 1, 1, 1};
             print_text(screen0, count_of(screen0), x_distances0);
             break;
@@ -113,7 +118,12 @@ void run_main_screens()
             sprintf(current_tracking, "%s", tracking_status[tracking_toggle]);
             sprintf(current_algorithm, "%s", algorithms[algorithm_toggle]);
             sprintf(current_mode, "%s", mode[mode_toggle]);
-            char screen01[4][15] = {current_tracking, "SET ALGORITHM<", current_algorithm, current_mode};
+            char screen01[4][15];
+            sprintf(screen01[0], "%s", current_tracking);
+            sprintf(screen01[1], "%s", "SET ALGORITHM<");
+            sprintf(screen01[2], "%s", current_algorithm);
+            sprintf(screen01[3], "%s", current_mode);
+            // = {current_tracking, "SET ALGORITHM<", current_algorithm, current_mode};
             int x_distances01[4] = {1, 1, 1, 1};
             print_text(screen01, count_of(screen01), x_distances01);
 
@@ -129,11 +139,16 @@ void run_main_screens()
                 }
                 button3_state = !button3_state;
             }
-            char mode_selected[2][15] = {"MODE: BUCK<", "MODE: CC<", "MODE: BOTH<"};
+            char mode_selected[3][15] = {"MODE: BUCK<", "MODE: CC<", "MODE: BOTH<"};
             sprintf(current_tracking, "%s", tracking_status_selected[tracking_toggle]);
             sprintf(current_algorithm, "%s", algorithms[algorithm_toggle]);
             sprintf(current_mode, "%s", mode_selected[mode_toggle]);
-            char screen02[2][15] = {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
+            char screen02[4][15];
+            sprintf(screen02[0], "%s", current_tracking);
+            sprintf(screen02[1], "%s", "SET ALGORITHM");
+            sprintf(screen02[2], "%s", current_algorithm);
+            sprintf(screen02[3], "%s", current_mode);
+            //= {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
             int x_distances02[4] = {1, 1, 1, 1};
             print_text(screen02, count_of(screen02), x_distances02);
             break;
@@ -142,33 +157,43 @@ void run_main_screens()
         break;
 
     case 1:
-        if(screenUpdateFlag){
+        //if(screenUpdateFlag){
             sprintf(displayString1, "%0.2f*C", sensorBuffer[BufferCounter].temperature);
             sprintf(displayString2, "%0.2f W/m^2", sensorBuffer[BufferCounter].irradiance);
-            screenUpdateFlag = !screenUpdateFlag;
-        }
-        char screen1[4][15] = {"TEMPERATURE:", displayString1, "IRRADIANCE:", displayString2};
+            //screenUpdateFlag = !screenUpdateFlag;
+        //}
+        char screen1[4][15];
+        sprintf(screen1[0], "%s", "TEMPERATURE:");
+        sprintf(screen1[1], "%s", displayString1);
+        sprintf(screen1[2], "%s", "IRRADIANCE:");
+        sprintf(screen1[3], "%s", displayString2);
+        //= {"TEMPERATURE:", displayString1, "IRRADIANCE:", displayString2}
         int x_distances1[4] = {20, 40, 20, 20};
         print_text(screen1, count_of(screen1), x_distances1);
         break;
 
     case 2:
-        if (screenUpdateFlag)
-        {
+        //if (screenUpdateFlag)
+        //{
             sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current);
             sprintf(displayString2, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current);
             screenUpdateFlag = !screenUpdateFlag;
-        }
-        char screen2[4][15] = {"PM1 PV-Buck:", displayString1, "PM2 Buck-CC:", displayString2};
+       // }
+        char screen2[4][15];
+        sprintf(screen2[0], "%s", "PM1 PV-Buck:");
+        sprintf(screen2[1], "%s", displayString1);
+        sprintf(screen2[2], "%s", "PM2 Buck-CC:");
+        sprintf(screen2[3], "%s", displayString2);
+        //= {"PM1 PV-Buck:", displayString1, "PM2 Buck-CC:", displayString2};
         int x_distances2[4] = {20, 1, 20, 1};
         print_text(screen2, count_of(screen2), x_distances2);
         break;
 
     case 3:
-        if (screenUpdateFlag)
-        {
+        //if (screenUpdateFlag)
+        //{
             float batterySOC;
-            if (sensorBuffer[BufferCounter].PM3voltage == 0) {
+            if (sensorBuffer[BufferCounter-1].PM3voltage == 0) {
                 batterySOC = 0.00;
             } else {
                 batterySOC = 44.328 * (sensorBuffer[BufferCounter].PM3voltage) - 475.61;
@@ -176,8 +201,13 @@ void run_main_screens()
             sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter].PM3voltage, sensorBuffer[BufferCounter].PM3current);
             sprintf(displayString2, "%0.2f%", batterySOC);
             screenUpdateFlag = !screenUpdateFlag;
-        }
-        char screen3[4][15] = {"PM3 CC-Battery:", displayString1, "BATTERY SOC:", displayString2};
+       // }
+        char screen3[4][15];
+        sprintf(screen3[0], "%s", "PM3 CC-Battery:");
+        sprintf(screen3[1], "%s", displayString1);
+        sprintf(screen3[2], "%s", "BATTERY SOC:");
+        sprintf(screen3[3], "%s", displayString2);
+        // = {"PM3 CC-Battery:", displayString1, "BATTERY SOC:", displayString2};
         int x_distances3[4] = {10, 1, 20, 40};
         print_text(screen3, count_of(screen3), x_distances3);
 
@@ -208,7 +238,12 @@ void run_main_screens()
             }
             char sd_card_selected[2][15] = {"SD CARD: OFF<", "SD CARD: ON<"};
             sprintf(current_sd_card, "%s", sd_card_selected[sd_card_toggle]);
-            char screen4[4][15] = {current_sd_card, "DATE & TIME", date_string, time_string};
+            char screen4[4][15];
+            sprintf(screen4[0], "%s", current_sd_card);
+            sprintf(screen4[1], "%s", "DATE & TIME");
+            sprintf(screen4[2], "%s", date_string);
+            sprintf(screen4[3], "%s", time_string);
+            // = {current_sd_card, "DATE & TIME", date_string, time_string};
             int x_distances4[4] = {1, 1, 1, 1};
             print_text(screen4, count_of(screen4), x_distances4);
             break;
@@ -268,7 +303,12 @@ void run_main_screens()
             char date_time_selected[6][15] = {"DATE & TIME MO", "DATE & TIME D", "DATE & TIME Y", "DATE & TIME H", "DATE & TIME MI", "DATE & TIME S"};
             sprintf(current_time_select, "%s", date_time_selected[select_num - 1]);
             sprintf(current_sd_card, "%s", sd_card[sd_card_toggle]);
-            char screen41[4][15] = {current_sd_card, current_time_select, date_string, time_string};
+            char screen41[4][15];
+            sprintf(screen41[0], "%s", current_sd_card);
+            sprintf(screen41[1], "%s", current_time_select);
+            sprintf(screen41[2], "%s", date_string);
+            sprintf(screen41[3], "%s", time_string);
+            // = {current_sd_card, current_time_select, date_string, time_string};
             int x_distances41[4] = {1, 1, 1, 1};
             print_text(screen41, count_of(screen41), x_distances41);
 

@@ -40,6 +40,7 @@ mutex_t temperatureMutex;
 //Structs for RTC and A_ON Pico Clock
 struct pcf8523_time_t RTCtime;
 struct tm PicoTime;
+//struct tm startTime = {0};
 
 //Global for shared core queue
 queue_t shareQueue;
@@ -371,7 +372,7 @@ int main()
 
             //Power Monitor Status Printouts (Should print "TI")
             // PM_printManID(PM1);
-            // PM_printManID(PM2);
+            //PM_printManID(PM2);
             // PM_printManID(PM3);
 
             /* Sensor Loop*/

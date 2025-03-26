@@ -313,7 +313,7 @@ void clear_display(){
     memset(buf, 0, SSD1306_BUF_LEN);
 }
 
-void print_text(char** text, int text_length, int* x_distances) {
+void print_text(char text[4][15], int text_length, int x_distances[4]) {
    int y = 0;
    for (uint i = 0; i < text_length; i++) {
         WriteString(buf, x_distances[i], y, text[i]);
