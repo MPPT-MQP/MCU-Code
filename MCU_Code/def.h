@@ -7,20 +7,20 @@
 
 /*
  *  ======== Algorithm Toggles ========
- *  0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=RCC, 7=PSO, 8=TMP, 9=AofA
+ *  0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=PSO, 7=TMP, 8=AofA, 9=DTY, 10=RCC (not fully implemented)
 */
-#define ALGO_TOGGLE AofA
+#define ALGO_TOGGLE CV
 #define CV 0
 #define B 1
 #define PNO 2
 #define PNOV 3
 #define INC 4
 #define INCV 5
-//#define RCC 6
-#define PSO 7
-#define TMP 8
-#define AofA 9
-#define DTY 10
+#define PSO 6
+#define TMP 7
+#define AofA 8
+#define DTY 9
+//#define RCC 10
 
 // Set a constant duty cycle instead of sweeping duty
 // #define CONSTANT_DUTY 0.7

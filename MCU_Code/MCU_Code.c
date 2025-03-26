@@ -62,8 +62,8 @@ uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
 char selectedAlgo[5];
 
 //Algo Selection and abbreviations
-char algorithms[11][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "RCC", "PSO", "TMP", "AofA", "DTY"};
-//algorithm_toggle = 0; //0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=RCC, 7=PSO, 8=TMP, 9=AofA
+char algorithms[11][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "PSO", "TMP", "AofA", "DTY", "RCC"};
+//algorithm_toggle = 0; //0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=PSO, 7=TMP, 8=AofA, 9=DTY, 10=RCC
 
 void selectAlgo(int algoToggleNum){
     switch (algoToggleNum){
