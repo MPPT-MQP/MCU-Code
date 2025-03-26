@@ -459,9 +459,9 @@ int main()
                 gpio_put(EN_PIN, true);
 
                 //Copy sensor readings into globals for algorithm access
-                voltage = sensorBuffer[BufferCounter].PM2voltage;
-                current = sensorBuffer[BufferCounter].PM2current;
-                power = sensorBuffer[BufferCounter].PM2power;
+                voltage = sensorBuffer[BufferCounter].PM1voltage;
+                current = sensorBuffer[BufferCounter].PM1current;
+                power = sensorBuffer[BufferCounter].PM1power;
                 temperature = sensorBuffer[BufferCounter].temperature;
                 irradiance = sensorBuffer[BufferCounter].irradiance;
 
