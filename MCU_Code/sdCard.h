@@ -45,6 +45,5 @@ extern queue_t shareQueue;
 //Extern Time Structs
 extern struct pcf8523_time_t RTCtime;
 extern struct tm PicoTime;
-//extern struct tm startTime = {0};
 
 

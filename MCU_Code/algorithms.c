@@ -25,8 +25,6 @@ float prevPower = 0;
 float prevIrradiance = 0;
 float prevTemperature = 0;
 
-
-
 // RCC Variables
 float prevVoltage_gain = 0;
 float prevCurrent_gain = 0;
@@ -612,27 +610,7 @@ void algorithm_of_algorithms() {
     prevTemperature = test_temperature;
 
 }
-/*
-void auto_test(){
-    aon_timer_get_time_calendar(&PicoTime);
-    if ((startTime.tm_sec && startTime.tm_min) == 0) {
-        startTime.tm_sec = PicoTime.tm_sec;
-        startTime.tm_min = PicoTime.tm_min;
-    }
-    int min_since_start
-    int algorithm_length_min = 3;
-    int algorithm_length_sec = 30;
-    int total_length_min = 3;
-    int total_length_sec = 30;
 
-
-
-
-
-
-
-}
-*/
 /*
 void ripple_correlation_control() {
 

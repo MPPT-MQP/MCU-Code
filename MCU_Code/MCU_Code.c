@@ -40,7 +40,6 @@ mutex_t temperatureMutex;
 //Structs for RTC and A_ON Pico Clock
 struct pcf8523_time_t RTCtime;
 struct tm PicoTime;
-//struct tm startTime = {0};
 
 //Global for shared core queue
 queue_t shareQueue;
@@ -371,9 +370,9 @@ int main()
             //Collect sensor readings and run algorithm 
 
             //Power Monitor Status Printouts (Should print "TI")
-            // PM_printManID(PM1);
+            //PM_printManID(PM1);
             //PM_printManID(PM2);
-            // PM_printManID(PM3);
+            //PM_printManID(PM3);
 
             /* Sensor Loop*/
 
@@ -460,9 +459,9 @@ int main()
                 gpio_put(EN_PIN, true);
 
                 //Copy sensor readings into globals for algorithm access
-                voltage = sensorBuffer[BufferCounter].PM1voltage;
-                current = sensorBuffer[BufferCounter].PM1current;
-                power = sensorBuffer[BufferCounter].PM1power;
+                voltage = sensorBuffer[BufferCounter].PM2voltage;
+                current = sensorBuffer[BufferCounter].PM2current;
+                power = sensorBuffer[BufferCounter].PM2power;
                 temperature = sensorBuffer[BufferCounter].temperature;
                 irradiance = sensorBuffer[BufferCounter].irradiance;
 
