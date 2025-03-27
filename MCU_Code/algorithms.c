@@ -597,6 +597,7 @@ void algorithm_of_algorithms() {
                 prevAlgo = best_list[i][2];
             }
         }
+        switch_algo_flag = 0; //Set flag back to 0 after potentially switching algorithm
     }
     else {
         /* If temperature and irradiance did not change enough
