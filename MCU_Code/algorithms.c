@@ -546,13 +546,15 @@ void algorithm_of_algorithms() {
         float temp_currDiff;
         int currentAlgo;
 
-        float irradiance_prevDiff = fabs(conditions[0][0] - test_irradiance);
-        float temp_prevDiff = fabs(conditions[0][1] - test_temperature);
+        // float irradiance_prevDiff = fabs(conditions[0][0] - test_irradiance);
+        // float temp_prevDiff = fabs(conditions[0][1] - test_temperature);
+        float irradiance_prevDiff = 1500;
+        float temp_prevDiff = 1500;
 
         for(int i = 0; i<34; i++) { 
             irradiance_currDiff = fabs(conditions[i][0] - test_irradiance);
             temp_currDiff = fabs(conditions[i][1] - test_temperature);
-            if(irradiance_currDiff <= irradiance_prevDiff && temp_currDiff <= temp_prevDiff) {
+            if(irradiance_currDiff <= irradiance_prevDiff || temp_currDiff <= temp_prevDiff) {
                 currentAlgo = conditions[i][2];
                 irradiance_prevDiff = irradiance_currDiff;
                 temp_prevDiff = temp_currDiff;
