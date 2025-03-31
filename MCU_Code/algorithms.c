@@ -542,22 +542,26 @@ void algorithm_of_algorithms() {
         
         float minVal_irradiance;
         float minVal_temp;
-        float irradiance_difference;
-        float temp_difference;
+        float irradiance_currDiff;
+        float temp_currDiff;
         int currentAlgo;
 
+        float irradiance_prevDiff = fabs(conditions[0][0] - test_irradiance);
+        float temp_prevDiff = fabs(conditions[0][1] - test_temperature);
+
         for(int i = 0; i<34; i++) { 
-            irradiance_difference = fabs(conditions[i][0] - test_irradiance);
-            temp_difference = fabs(conditions[i][1] - test_temperature);
-            if(irradiance_difference < minVal_irradiance || temp_difference < minVal_temp) {
-                minVal_irradiance = irradiance_difference;
-                minVal_temp = temp_difference;
+            irradiance_currDiff = fabs(conditions[i][0] - test_irradiance);
+            temp_currDiff = fabs(conditions[i][1] - test_temperature);
+            if(irradiance_currDiff <= irradiance_prevDiff && temp_currDiff <= temp_prevDiff) {
                 currentAlgo = conditions[i][2];
+                irradiance_prevDiff = irradiance_currDiff;
+                temp_prevDiff = temp_currDiff;
             }
         }
         sprintf(selectedAlgo, "%s", algorithms[currentAlgo]);
         selectAlgo(currentAlgo);
         prevAlgo = currentAlgo;
+       
         
         switch_algo_flag = 0; //Set flag back to 0 after potentially switching algorithm
     }
