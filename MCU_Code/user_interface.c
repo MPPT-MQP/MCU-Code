@@ -7,8 +7,8 @@
 #include "sensors.h"
 
 // Time Stuff
-char date_string[80];
-char time_string[80];
+char date_string[15];
+char time_string[15];
 
 /* Variables to keep track of which screen and setting is selected*/
 int screen_num = 0;
@@ -39,15 +39,15 @@ void welcome_screen()
 {
     char screen1[4][15] = {" ", "WPI MPPT MQP", "2024-2025", " "};
     int x_distances1[4] = {1, 15, 30, 1};
-    print_text(screen1, count_of(screen1), x_distances1);
+    print_text(screen1, x_distances1);
 }
 
 // Main user interface loop
 void run_main_screens()
 {
     // Array for displaying sensor data
-    char displayString1[16];
-    char displayString2[16];
+    char displayString1[15];
+    char displayString2[15];
 
     // Check button 1 (toggles entire screen)
     if (button1_state)
@@ -102,7 +102,7 @@ void run_main_screens()
             sprintf(screen0[3], "%s", current_mode);
             //= {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
             int x_distances0[4] = {1, 1, 1, 1};
-            print_text(screen0, count_of(screen0), x_distances0);
+            print_text(screen0, x_distances0);
             break;
 
         case 1:
@@ -125,7 +125,7 @@ void run_main_screens()
             sprintf(screen01[3], "%s", current_mode);
             // = {current_tracking, "SET ALGORITHM<", current_algorithm, current_mode};
             int x_distances01[4] = {1, 1, 1, 1};
-            print_text(screen01, count_of(screen01), x_distances01);
+            print_text(screen01, x_distances01);
 
             break;
 
@@ -150,7 +150,7 @@ void run_main_screens()
             sprintf(screen02[3], "%s", current_mode);
             //= {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
             int x_distances02[4] = {1, 1, 1, 1};
-            print_text(screen02, count_of(screen02), x_distances02);
+            print_text(screen02, x_distances02);
             break;
         }
 
@@ -169,7 +169,7 @@ void run_main_screens()
         sprintf(screen1[3], "%s", displayString2);
         //= {"TEMPERATURE:", displayString1, "IRRADIANCE:", displayString2}
         int x_distances1[4] = {20, 40, 20, 20};
-        print_text(screen1, count_of(screen1), x_distances1);
+        print_text(screen1, x_distances1);
         break;
 
     case 2:
@@ -186,7 +186,7 @@ void run_main_screens()
         sprintf(screen2[3], "%s", displayString2);
         //= {"PM1 PV-Buck:", displayString1, "PM2 Buck-CC:", displayString2};
         int x_distances2[4] = {20, 1, 20, 1};
-        print_text(screen2, count_of(screen2), x_distances2);
+        print_text(screen2, x_distances2);
         break;
 
     case 3:
@@ -209,7 +209,7 @@ void run_main_screens()
         sprintf(screen3[3], "%s", displayString2);
         // = {"PM3 CC-Battery:", displayString1, "BATTERY SOC:", displayString2};
         int x_distances3[4] = {10, 1, 20, 40};
-        print_text(screen3, count_of(screen3), x_distances3);
+        print_text(screen3, x_distances3);
 
         break;
 
@@ -245,7 +245,7 @@ void run_main_screens()
             sprintf(screen4[3], "%s", time_string);
             // = {current_sd_card, "DATE & TIME", date_string, time_string};
             int x_distances4[4] = {1, 1, 1, 1};
-            print_text(screen4, count_of(screen4), x_distances4);
+            print_text(screen4, x_distances4);
             break;
 
         default:
@@ -310,7 +310,7 @@ void run_main_screens()
             sprintf(screen41[3], "%s", time_string);
             // = {current_sd_card, current_time_select, date_string, time_string};
             int x_distances41[4] = {1, 1, 1, 1};
-            print_text(screen41, count_of(screen41), x_distances41);
+            print_text(screen41, x_distances41);
 
             break;
         }

@@ -371,7 +371,7 @@ int main()
 
             //Power Monitor Status Printouts (Should print "TI")
             // PM_printManID(PM1);
-            // PM_printManID(PM2);
+            //PM_printManID(PM2);
             //PM_printManID(PM3);
 
             /* Sensor Loop*/
@@ -474,7 +474,7 @@ int main()
                        voltage, current, power, duty, irradiance, temperature);
                 #endif
 
-                // printf("\nVoltage: %0.3f, Current: %0.3f, Power: %0.3f", sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power);
+                //printf("\nVoltage: %0.3f, Current: %0.3f, Power: %0.3f", sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power);
                 
                 // Strip formatting so data is readable by realtime plotter
                 #ifdef LIVE_PLOT

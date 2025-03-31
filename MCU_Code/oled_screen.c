@@ -313,9 +313,9 @@ void clear_display(){
     memset(buf, 0, SSD1306_BUF_LEN);
 }
 
-void print_text(char text[4][15], int text_length, int x_distances[4]) {
+void print_text(char text[4][15], int x_distances[4]) {
    int y = 0;
-   for (uint i = 0; i < text_length; i++) {
+   for (uint i = 0; i < 4; i++) {
         WriteString(buf, x_distances[i], y, text[i]);
         y+=8;
    }
