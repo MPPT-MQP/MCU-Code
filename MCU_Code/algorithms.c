@@ -226,13 +226,13 @@ void perturb_and_observe(int variable){
 void incremental_conductance(int variable){
 
     float duty_raw;
-    float N = 0.06;
+    float N = 0.002;
     float deltaV = voltage - prevVoltage;
     float deltaI = current - prevCurrent;
     float deltaP = power - prevPower;
 
     if(variable == 1 && deltaV != 0){
-        if(deltaP/deltaV < 0.035) {
+        if(N*fabsf(deltaP/deltaV) < I_C_step_val) {
             I_C_step = N * fabsf(deltaP/deltaV);
         } else {
             I_C_step = I_C_step_val;
@@ -242,7 +242,7 @@ void incremental_conductance(int variable){
         I_C_step = I_C_step_val;
     }
 
-    //printf("IC Step: %0.3f\n", I_C_step);
+   printf("Step Size: %0.3f, ", I_C_step);
 
     if (deltaV ==  0) {
         if(deltaI == 0) {
