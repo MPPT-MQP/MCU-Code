@@ -9,7 +9,7 @@
  *  ======== Algorithm Toggles ========
  *  0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=PSO, 7=TMP, 8=AofA, 9=DTY, 10=RCC (not fully implemented)
 */
-#define ALGO_TOGGLE INCV
+#define ALGO_TOGGLE B
 #define CV 0
 #define B 1
 #define PNO 2

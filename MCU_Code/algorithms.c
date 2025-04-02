@@ -39,8 +39,8 @@ float rcc2_setpoint;
 float TMP_Vmpp;
 
 //Algorithm of Algorithms
-float temperature_hystersis = 1;
-float irradiance_hysteresis = 30;
+float temperature_hystersis = 0.25;
+float irradiance_hysteresis = 20;
 int prevAlgo = 0;
 
 // Structure for PID controller 
