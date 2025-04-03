@@ -56,5 +56,6 @@
 
 // Screen Functions
 void oled_init();
-void print_text(char text[4][15], int x_distances[4]);
+void write_text(int x, int y, char* text);
+void refresh_screen();
 void clear_display();

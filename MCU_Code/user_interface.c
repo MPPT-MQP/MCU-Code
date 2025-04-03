@@ -6,23 +6,9 @@
 #include "sdCard.h"
 #include "sensors.h"
 
-// Time Stuff
-char date_string[15];
-char time_string[15];
-
 /* Variables to keep track of which screen and setting is selected*/
 int screen_num = 0;
 int select_num = 0;
-
-/* Initializing Text to Display on Screen*/
-char current_tracking[15] = "START TRACKING";
-char tracking_status[2][15] = {"START TRACKING", "STOP TRACKING"};
-char current_algorithm[5] = "CV";
-char current_mode[15] = "MODE: BUCK";
-char mode[3][15] = {"MODE: BUCK", "MODE: CC", "MODE: BOTH"};
-char current_sd_card[15] = "SD CARD: ON";
-char sd_card[2][15] = {"SD CARD: OFF", "SD CARD: ON"};
-char current_time_select[15] = "DATE & TIME";
 
 /*Toggle Variables to Keep Track of Settings*/
 // 0 = Tracking Off, 1 = Tracking On
@@ -37,9 +23,11 @@ int sd_card_toggle = 0;
 // Run boot-up screen
 void welcome_screen()
 {
-    char screen1[4][15] = {" ", "WPI MPPT MQP", "2024-2025", " "};
-    int x_distances1[4] = {1, 15, 30, 1};
-    print_text(screen1, x_distances1);
+    write_text(1, 0, " ");
+    write_text(15, 8, "WPI MPPT MQP");
+    write_text(30, 16, "2024-2025");
+    write_text(1, 8, " ");
+    refresh_screen();
 }
 
 // Main user interface loop
@@ -48,6 +36,10 @@ void run_main_screens()
     // Array for displaying sensor data
     char displayString1[15];
     char displayString2[15];
+
+    // Time Stuff
+    char date_string[15];
+    char time_string[15];
 
     // Check button 1 (toggles entire screen)
     if (button1_state)
@@ -84,25 +76,15 @@ void run_main_screens()
             // Check button 3 (toggles settings that's currently selected)
             if (button3_state)
             {
-                tracking_toggle++;
-                if (tracking_toggle > 1)
-                {
-                    tracking_toggle = 0;
-                }
+                tracking_toggle= !tracking_toggle;
                 button3_state = !button3_state;
             }
-            char tracking_status_selected[2][15] = {"START TRACKING<", "STOP TRACKING<"};
-            sprintf(current_tracking, "%s", tracking_status_selected[tracking_toggle]);
-            sprintf(current_algorithm, "%s", algorithms[algorithm_toggle]);
-            sprintf(current_mode, "%s", mode[mode_toggle]);
-            char screen0[4][15];
-            sprintf(screen0[0], "%s", current_tracking);
-            sprintf(screen0[1], "%s", "SET ALGORITHM");
-            sprintf(screen0[2], "%s", current_algorithm);
-            sprintf(screen0[3], "%s", current_mode);
-            //= {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
-            int x_distances0[4] = {1, 1, 1, 1};
-            print_text(screen0, x_distances0);
+            if(tracking_toggle) {
+                write_text(1, 0, "STOP TRACKING<");
+            }
+            else {
+                write_text(1, 0, "START TRACKING<");
+            }
             break;
 
         case 1:
@@ -115,45 +97,17 @@ void run_main_screens()
                 }
                 button3_state = !button3_state;
             }
-            sprintf(current_tracking, "%s", tracking_status[tracking_toggle]);
-            sprintf(current_algorithm, "%s", algorithms[algorithm_toggle]);
-            sprintf(current_mode, "%s", mode[mode_toggle]);
-            char screen01[4][15];
-            sprintf(screen01[0], "%s", current_tracking);
-            sprintf(screen01[1], "%s", "SET ALGORITHM<");
-            sprintf(screen01[2], "%s", current_algorithm);
-            sprintf(screen01[3], "%s", current_mode);
-            // = {current_tracking, "SET ALGORITHM<", current_algorithm, current_mode};
-            int x_distances01[4] = {1, 1, 1, 1};
-            print_text(screen01, x_distances01);
-
-            break;
-
-        case 2:
-            if (button3_state)
-            {
-                mode_toggle++;
-                if (mode_toggle > 2)
-                {
-                    mode_toggle = 0;
-                }
-                button3_state = !button3_state;
+            if(tracking_toggle) {
+                write_text(1, 0, "STOP TRACKING");
             }
-            char mode_selected[3][15] = {"MODE: BUCK<", "MODE: CC<", "MODE: BOTH<"};
-            sprintf(current_tracking, "%s", tracking_status_selected[tracking_toggle]);
-            sprintf(current_algorithm, "%s", algorithms[algorithm_toggle]);
-            sprintf(current_mode, "%s", mode_selected[mode_toggle]);
-            char screen02[4][15];
-            sprintf(screen02[0], "%s", current_tracking);
-            sprintf(screen02[1], "%s", "SET ALGORITHM");
-            sprintf(screen02[2], "%s", current_algorithm);
-            sprintf(screen02[3], "%s", current_mode);
-            //= {current_tracking, "SET ALGORITHM", current_algorithm, current_mode};
-            int x_distances02[4] = {1, 1, 1, 1};
-            print_text(screen02, x_distances02);
-            break;
+            else {
+                write_text(1, 0, "START TRACKING");
+            }
+            break;    
         }
-
+        write_text(1, 8, "SET ALGORITHM:");
+        write_text(1, 16, algorithms[algorithm_toggle]);
+        refresh_screen();
         break;
 
     case 1:
@@ -162,14 +116,11 @@ void run_main_screens()
             sprintf(displayString2, "%0.2f W/m^2", sensorBuffer[BufferCounter].irradiance);
             //screenUpdateFlag = !screenUpdateFlag;
         //}
-        char screen1[4][15];
-        sprintf(screen1[0], "%s", "TEMPERATURE:");
-        sprintf(screen1[1], "%s", displayString1);
-        sprintf(screen1[2], "%s", "IRRADIANCE:");
-        sprintf(screen1[3], "%s", displayString2);
-        //= {"TEMPERATURE:", displayString1, "IRRADIANCE:", displayString2}
-        int x_distances1[4] = {20, 40, 20, 20};
-        print_text(screen1, x_distances1);
+        write_text(20, 0, "TEMPERATURE:");
+        write_text(40, 8, displayString1);
+        write_text(20, 16, "IRRADIANCE:");
+        write_text(20, 24, displayString2);
+        refresh_screen();
         break;
 
     case 2:
@@ -179,14 +130,11 @@ void run_main_screens()
             sprintf(displayString2, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current);
             screenUpdateFlag = !screenUpdateFlag;
        // }
-        char screen2[4][15];
-        sprintf(screen2[0], "%s", "PM1 PV-Buck:");
-        sprintf(screen2[1], "%s", displayString1);
-        sprintf(screen2[2], "%s", "PM2 Buck-CC:");
-        sprintf(screen2[3], "%s", displayString2);
-        //= {"PM1 PV-Buck:", displayString1, "PM2 Buck-CC:", displayString2};
-        int x_distances2[4] = {20, 1, 20, 1};
-        print_text(screen2, x_distances2);
+        write_text(20, 0, "PM1 PV-Buck:");
+        write_text(1, 8, displayString1);
+        write_text(20, 16, "PM2 Buck-CC:");
+        write_text(1, 24, displayString2);
+        refresh_screen();
         break;
 
     case 3:
@@ -202,15 +150,10 @@ void run_main_screens()
             sprintf(displayString2, "%0.2f%", batterySOC);
             screenUpdateFlag = !screenUpdateFlag;
        // }
-        char screen3[4][15];
-        sprintf(screen3[0], "%s", "PM3 CC-Battery:");
-        sprintf(screen3[1], "%s", displayString1);
-        sprintf(screen3[2], "%s", "BATTERY SOC:");
-        sprintf(screen3[3], "%s", displayString2);
-        // = {"PM3 CC-Battery:", displayString1, "BATTERY SOC:", displayString2};
-        int x_distances3[4] = {10, 1, 20, 40};
-        print_text(screen3, x_distances3);
-
+        write_text(10, 0, "PM3 CC-Battery:");
+        write_text(1, 8, displayString1);
+        write_text(20, 16, "BATTERY SOC:");
+        write_text(40, 24, displayString2);
         break;
 
     case 4:
@@ -222,7 +165,7 @@ void run_main_screens()
         if (button2_state)
         {
             select_num++;
-            if (select_num > 5)
+            if (select_num > 6)
             {
                 select_num = 0;
             }
@@ -236,19 +179,41 @@ void run_main_screens()
                 sd_card_toggle = !sd_card_toggle;
                 button3_state = !button3_state;
             }
-            char sd_card_selected[2][15] = {"SD CARD: OFF<", "SD CARD: ON<"};
-            sprintf(current_sd_card, "%s", sd_card_selected[sd_card_toggle]);
-            char screen4[4][15];
-            sprintf(screen4[0], "%s", current_sd_card);
-            sprintf(screen4[1], "%s", "DATE & TIME");
-            sprintf(screen4[2], "%s", date_string);
-            sprintf(screen4[3], "%s", time_string);
-            // = {current_sd_card, "DATE & TIME", date_string, time_string};
-            int x_distances4[4] = {1, 1, 1, 1};
-            print_text(screen4, x_distances4);
+            if(sd_card_toggle) {
+                write_text(1, 0, "SD CARD: ON<");
+            }
+            else {
+                write_text(1, 0, "SD CARD: OFF<");
+            }
+            write_text(1, 8, "DATE & TIME");
             break;
 
         default:
+            if(sd_card_toggle) {
+                write_text(1, 0, "SD CARD: ON");
+            }
+            else {
+                write_text(1, 0, "SD CARD: OFF");
+            }
+            switch (select_num-1) {
+                case 0:
+                    write_text(1, 0, "DATE & TIME MO");
+                break;
+                case 1:
+                     write_text(1, 0, "DATE & TIME D");
+                break;
+                case 2:
+                    write_text(1, 0, "DATE & TIME Y");
+                break;
+                case 3:
+                    write_text(1, 0, "DATE & TIME H");
+                break;
+                case 4:
+                    write_text(1, 0, "DATE & TIME MI");
+                break;
+                case 5:
+                    write_text(1, 0, "DATE & TIME S");
+            }
             // Check button 3 (increments currently selected date value)
             if (button3_state)
             {
@@ -298,22 +263,12 @@ void run_main_screens()
                     break;
                 }
                 button4_state = !button4_state;
-            }
-
-            char date_time_selected[6][15] = {"DATE & TIME MO", "DATE & TIME D", "DATE & TIME Y", "DATE & TIME H", "DATE & TIME MI", "DATE & TIME S"};
-            sprintf(current_time_select, "%s", date_time_selected[select_num - 1]);
-            sprintf(current_sd_card, "%s", sd_card[sd_card_toggle]);
-            char screen41[4][15];
-            sprintf(screen41[0], "%s", current_sd_card);
-            sprintf(screen41[1], "%s", current_time_select);
-            sprintf(screen41[2], "%s", date_string);
-            sprintf(screen41[3], "%s", time_string);
-            // = {current_sd_card, current_time_select, date_string, time_string};
-            int x_distances41[4] = {1, 1, 1, 1};
-            print_text(screen41, x_distances41);
-
+            } 
             break;
         }
+        write_text(1, 16, date_string);
+        write_text(1, 24, time_string);
+        refresh_screen();
         break;
     }
 }
