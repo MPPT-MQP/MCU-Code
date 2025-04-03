@@ -181,7 +181,6 @@ bool AlgoISR(__unused repeating_timer_t *t){
     algoFlag = true;
     return true;
 }
-
 //Init LED on Pico if the oled screen is not used
 #ifndef OLED_SCREEN
 int pico_led_init(void) {
@@ -394,9 +393,9 @@ int main()
             
             
             //Delay if tracking isn't running (so OLED has enough time to update since interrupt fires fast)
-            // if(tracking_toggle == 0){
-            //     sleep_ms(100);
-            // }
+            if(tracking_toggle == 0){
+                sleep_ms(100);
+            }
 
             //Temperature
             // sensorBuffer[BufferCounter].temperature = tempVAL;
