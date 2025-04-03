@@ -63,11 +63,7 @@ void run_main_screens()
         // Check button 2 (toggles selected field on a screen)
         if (button2_state)
         {
-            select_num++;
-            if (select_num > 2)
-            {
-                select_num = 0;
-            }
+            select_num = !select_num;
             button2_state = !button2_state;
         }
         switch (select_num)
@@ -76,7 +72,7 @@ void run_main_screens()
             // Check button 3 (toggles settings that's currently selected)
             if (button3_state)
             {
-                tracking_toggle= !tracking_toggle;
+                tracking_toggle=!tracking_toggle;
                 button3_state = !button3_state;
             }
             if(tracking_toggle) {
@@ -85,6 +81,7 @@ void run_main_screens()
             else {
                 write_text(1, 0, "START TRACKING<");
             }
+            write_text(1, 8, "SET ALGORITHM");
             break;
 
         case 1:
@@ -103,9 +100,9 @@ void run_main_screens()
             else {
                 write_text(1, 0, "START TRACKING");
             }
+            write_text(1, 8, "SET ALGORITHM<");
             break;    
         }
-        write_text(1, 8, "SET ALGORITHM:");
         write_text(1, 16, algorithms[algorithm_toggle]);
         refresh_screen();
         break;
@@ -154,6 +151,7 @@ void run_main_screens()
         write_text(1, 8, displayString1);
         write_text(20, 16, "BATTERY SOC:");
         write_text(40, 24, displayString2);
+        refresh_screen();
         break;
 
     case 4:
@@ -197,22 +195,22 @@ void run_main_screens()
             }
             switch (select_num-1) {
                 case 0:
-                    write_text(1, 0, "DATE & TIME MO");
+                    write_text(1, 8, "DATE & TIME MO");
                 break;
                 case 1:
-                     write_text(1, 0, "DATE & TIME D");
+                     write_text(1, 8, "DATE & TIME D");
                 break;
                 case 2:
-                    write_text(1, 0, "DATE & TIME Y");
+                    write_text(1, 8, "DATE & TIME Y");
                 break;
                 case 3:
-                    write_text(1, 0, "DATE & TIME H");
+                    write_text(1, 8, "DATE & TIME H");
                 break;
                 case 4:
-                    write_text(1, 0, "DATE & TIME MI");
+                    write_text(1, 8, "DATE & TIME MI");
                 break;
                 case 5:
-                    write_text(1, 0, "DATE & TIME S");
+                    write_text(1, 8, "DATE & TIME S");
             }
             // Check button 3 (increments currently selected date value)
             if (button3_state)

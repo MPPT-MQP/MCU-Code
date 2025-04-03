@@ -394,9 +394,9 @@ int main()
             
             
             //Delay if tracking isn't running (so OLED has enough time to update since interrupt fires fast)
-            if(tracking_toggle == 0){
-                sleep_ms(100);
-            }
+            // if(tracking_toggle == 0){
+            //     sleep_ms(100);
+            // }
 
             //Temperature
             // sensorBuffer[BufferCounter].temperature = tempVAL;
