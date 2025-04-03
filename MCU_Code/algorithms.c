@@ -186,7 +186,12 @@ void perturb_and_observe(int variable){
     float deltaP = power - prevPower;
 
     if(variable == 1){
-        P_O_step = N * abs(deltaP);
+        if (N*fabsf(deltaP) < P_0_step_val) {
+            P_O_step = N * fabsf(deltaP);
+        }
+        else {
+            P_O_step = P_0_step_val;
+        }
     }
     else {
         P_O_step = P_0_step_val;
@@ -264,14 +269,14 @@ void incremental_conductance(int variable){
         } 
     }  
 
-    printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
-
     if (duty_raw >= duty_max || duty_raw <= duty_min) {
         duty = prevDuty;
     }
     else {
         duty = duty_raw;
     }
+
+    //printf("Voltage: %0.3f, Current: %0.3f, Duty Raw: %0.3f\n", voltage, current, duty_raw);
     
     prevDuty = duty;
     prevVoltage = voltage;
