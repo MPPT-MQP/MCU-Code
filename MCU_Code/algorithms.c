@@ -40,7 +40,7 @@ float TMP_Vmpp;
 
 //Algorithm of Algorithms
 float temperature_hystersis = 0.25;
-float irradiance_hysteresis = 20;
+float irradiance_hysteresis = 10;
 int prevAlgo = 0;
 
 // Structure for PID controller 
@@ -504,42 +504,42 @@ void algorithm_of_algorithms() {
     each temperature and irradiance combination */
     int conditions[34][3] = {   
         // Irradiance (W/m^2), Temperature (deg C), Algorithm Toggle
-        {1000, 25, CV},
-        {900, 25, CV},
-        {800, 25, TMP},
-        {700, 25, TMP},
-        {600, 25, TMP},
+        {1000, 25, PSO},
+        {900, 25, PSO},
+        {800, 25, PSO},
+        {700, 25, PSO},
+        {600, 25, CV},
         {500, 25, PSO},
-        {400, 25, INC},
-        {300, 25, TMP},
-        {200, 25, INC},
+        {400, 25, CV},
+        {300, 25, PSO},
+        {200, 25, B},
 
         {1000, 40, TMP},
         {1000, 35, PSO},
         {1000, 30, PSO},
-        {1000, 20, PSO},
+        {1000, 20, CV},
         {1000, 15, TMP},
-        {1000, 10, PSO},
-        {1000, 5, PSO},
-        {1000, 0, TMP},
+        {1000, 10, TMP},
+        {1000, 5, TMP},
+        {1000, 0, PSO},
         {1000, -5, TMP},
         {1000, -10, TMP},
         {1000, -15, TMP},
         {1000, -20, TMP},
         {1000, -25, TMP},
 
-        {800, 20, TMP},
-        {600, 10, TMP},
-        {400, 0, INC},
+        {800, 20, CV},
+        {600, 10, PSO},
+        {400, 0, B},
         {400, 30, INC},
-        {400, 35, INC},
+        {400, 35, PSO},
         {400, 40, PSO},
-        {300, 30, TMP},
-        {300, 35, PNO},
-        {300, 40, PNO},
-        {200, 30, INC},
-        {200, 35, INC},
-        {200, 40, PNO},
+        {300, 30, PSO},
+        {300, 35, TMP},
+        {300, 40, TMP},
+        {200, 30, B},
+        {200, 35, B},
+        {200, 40, B},
 
     };
 
