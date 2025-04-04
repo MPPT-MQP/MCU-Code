@@ -552,7 +552,7 @@ void algorithm_of_algorithms() {
         int currentAlgo;
 
         for(int i = 0; i<34; i++) { 
-            currentDiff = (fabs(conditions[i][0] - test_irradiance))*0.025 + fabs(conditions[i][1] - test_temperature);
+            currentDiff = (fabs(conditions[i][0] - test_irradiance)) + fabs(conditions[i][1] - test_temperature);
             if(currentDiff <= lowestDiff) {
                 currentAlgo = conditions[i][2];
                 lowestDiff = currentDiff;
