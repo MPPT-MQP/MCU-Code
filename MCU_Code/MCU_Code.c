@@ -495,7 +495,7 @@ int main()
                 PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec, elaspedTime_ms,
                 sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
                 sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
-                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty, selectedAlgo);
+                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, /*test_temperature*/sensorBuffer[BufferCounter].temperature, /*test_irradiance*/sensorBuffer[BufferCounter].irradiance, duty, selectedAlgo);
                 //printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
             
                 //Returns false if the queue is full

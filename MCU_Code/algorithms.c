@@ -24,6 +24,8 @@ float prevCurrent = 0;
 float prevPower = 0;
 float prevIrradiance = 0;
 float prevTemperature = 0;
+// float test_irradiance;
+// float test_temperature;
 
 // RCC Variables
 float prevVoltage_gain = 0;
@@ -485,8 +487,8 @@ void algorithm_of_algorithms() {
     float test_temperature = temperature;
 
     // For testing AofA without sensors 
-    // float test_irradiance = (float)rand() / RAND_MAX * 1000;
-    // float test_temperature = (float)rand() / RAND_MAX * 25;
+    // test_irradiance = (float)rand() / RAND_MAX * 1000;
+    // test_temperature = (float)rand() / RAND_MAX * 25;
     // float test_irradiance = 401.2;
     // float test_temperature = 0.2;
     
@@ -544,32 +546,22 @@ void algorithm_of_algorithms() {
     };
 
     if(switch_algo_flag == 1) {
-        
-        float minVal_irradiance;
-        float minVal_temp;
-        float irradiance_currDiff;
-        float temp_currDiff;
+
+        float currentDiff;
+        float lowestDiff = 1500;
         int currentAlgo;
 
-        // float irradiance_prevDiff = fabs(conditions[0][0] - test_irradiance);
-        // float temp_prevDiff = fabs(conditions[0][1] - test_temperature);
-        float irradiance_prevDiff = 1500;
-        float temp_prevDiff = 1500;
-
         for(int i = 0; i<34; i++) { 
-            irradiance_currDiff = fabs(conditions[i][0] - test_irradiance);
-            temp_currDiff = fabs(conditions[i][1] - test_temperature);
-            if(irradiance_currDiff <= irradiance_prevDiff || temp_currDiff <= temp_prevDiff) {
+            currentDiff = (fabs(conditions[i][0] - test_irradiance))*0.025 + fabs(conditions[i][1] - test_temperature);
+            if(currentDiff <= lowestDiff) {
                 currentAlgo = conditions[i][2];
-                irradiance_prevDiff = irradiance_currDiff;
-                temp_prevDiff = temp_currDiff;
+                lowestDiff = currentDiff;
             }
         }
         sprintf(selectedAlgo, "%s", algorithms[currentAlgo]);
         selectAlgo(currentAlgo);
         prevAlgo = currentAlgo;
        
-        
         switch_algo_flag = 0; //Set flag back to 0 after potentially switching algorithm
     }
     else {

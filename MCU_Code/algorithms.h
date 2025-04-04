@@ -22,6 +22,8 @@ extern void* cv_pidClass;
 extern void* rcc1_pidClass;
 extern void* rcc2_pidClass;
 extern void* TMP_pidClass;
+// extern float test_irradiance;
+// extern float test_temperature;
 
 void perturb_and_observe(int variable);
 void incremental_conductance(int variable);
