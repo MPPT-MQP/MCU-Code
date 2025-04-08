@@ -328,6 +328,7 @@ int main()
     //Configure PM for sample rate, averaging, etc
     PM_config(PM1);
     PM_config(PM2);
+    PM_config(PM3);
 
     //SD Card Setup (hw_config.c sets the SPI pins)
     sd_init_driver();
@@ -384,9 +385,9 @@ int main()
             sensorBuffer[BufferCounter].PM2current = PM_readCurrent(PM2);
             sensorBuffer[BufferCounter].PM2power = PM_readPower(PM2);
 
-            // sensorBuffer[BufferCounter].PM3voltage = PM_readVoltage(PM3);
-            // sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
-            // sensorBuffer[BufferCounter].PM3power = PM_readPower(PM3);
+            sensorBuffer[BufferCounter].PM3voltage = PM_readVoltage(PM3);
+            sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
+            sensorBuffer[BufferCounter].PM3power = PM_readPower(PM3);
 
             //Irradiance
             sensorBuffer[BufferCounter].irradiance = readIrradiance();
