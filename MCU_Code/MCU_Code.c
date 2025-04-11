@@ -216,6 +216,10 @@ void core1_main(){
     pico_led_init();
     #endif
 
+    /* RTC Initialization Options - Uncomment to set RTC */
+    //pcf8523_set_manually(2025, 2, 16, 12, 45, 11);
+    //pcf8523_set_from_PC();
+
     //Set Pico Clock
     pcf8523_read(&RTCtime);
     PicoTime.tm_hour = RTCtime.hour;
@@ -307,10 +311,6 @@ int main()
 
     //Init both I2C0 and I2C1
     configI2C0();
-
-    /* RTC Initialization Options - Uncomment to set RTC */
-    //pcf8523_set_manually(2025, 2, 16, 12, 45, 11);
-    //pcf8523_set_from_PC();
 
     //Make sure SD card save flag is false before starting the core
     saveFlag = false;
