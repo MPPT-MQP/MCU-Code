@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 #include "hardware/i2c.h"
@@ -12,7 +13,6 @@
 #include "user_interface.h"
 #include "pico/util/queue.h"
 #include "algorithms.h"
-#include <time.h>
 #include "pico/multicore.h"
 #include "pico/time.h"
 #include "def.h"
