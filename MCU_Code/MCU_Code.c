@@ -17,6 +17,14 @@
 #include "pico/time.h"
 #include "def.h"
 
+/*
+* MCU_Code.c
+* Main firmware to run MPPT algorithms, real-time data logging to an SD card, 
+* hardware sensor readings, and an OLED display.
+* Authors: Kyle Rabbitt, Frank Parsons, Saketh Dinasarapu, Micaela Tourtellot
+* Organization: MPPT MQP @ WPI
+*/
+
 //PID class
 void* cv_pidClass;
 void* TMP_pidClass;
