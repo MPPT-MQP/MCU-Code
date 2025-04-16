@@ -7,6 +7,10 @@ volatile bool button2_state = 0;
 volatile bool button3_state = 0;
 volatile bool button4_state = 0;
 
+volatile bool partialSaveFlag = 0;
+volatile bool initSDFlag = 0;
+volatile bool timeFlag = 0;
+
 /* Start Debounce Code*/
 #define DEBOUNCE_MS 50
 bool is_debounceing = false;
@@ -48,9 +52,9 @@ void buttonsInit(void) {
     #ifdef BUTTON_INTERRUPTS
     // enable interrupts with rising edge -> 0x08
     gpio_set_irq_enabled_with_callback(BUTTON1PIN, GPIO_IRQ_EDGE_RISE, true, &buttonISR);
-    gpio_set_irq_enabled(BUTTON2PIN, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
-    gpio_set_irq_enabled(BUTTON3PIN, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
-    gpio_set_irq_enabled(BUTTON4PIN, GPIO_IRQ_EDGE_FALL, BUTTON_INTERRUPTS);
+    gpio_set_irq_enabled(BUTTON2PIN, GPIO_IRQ_EDGE_RISE, true);
+    gpio_set_irq_enabled(BUTTON3PIN, GPIO_IRQ_EDGE_RISE, true);
+    gpio_set_irq_enabled(BUTTON4PIN, GPIO_IRQ_EDGE_RISE, true);
     #endif
 
 }
@@ -60,22 +64,32 @@ void buttonISR(uint gpio, uint32_t events) {
     if(debounce()) return; // Debounce button
     switch(gpio) {
         case BUTTON1PIN:
-            printf("\nButton 1 pressed\n");
+            // printf("\nButton 1 pressed\n");
             button1_state = !button1_state;
         break;
             
         case BUTTON2PIN:
-            printf("\nButton 2 pressed\n");
+            // printf("\nButton 2 pressed\n");
             button2_state = !button2_state;
         break;
 
         case BUTTON3PIN:
-            printf("\nButton 3 pressed\n");
+            // printf("\nButton 3 pressed\n");
+            if(button3_state == 1){
+                partialSaveFlag = true;
+            }
+            if(button3_state == 0){
+                initSDFlag = true;
+                timeFlag = true;
+            }
             button3_state = !button3_state;
+            #ifndef OLED_SCREEN
+            tracking_toggle = !tracking_toggle;
+            #endif
         break;
         
         case BUTTON4PIN:
-            printf("\nButton 4 pressed\n");
+            // printf("\nButton 4 pressed\n");
             button4_state = !button4_state;
         break;
     }

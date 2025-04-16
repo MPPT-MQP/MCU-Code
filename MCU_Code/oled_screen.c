@@ -259,6 +259,9 @@ static inline int GetFontIndex(uint8_t ch) {
      else if (ch == '&') {
         return ch - '&' + 47;
     }
+     else if (ch == ',') {
+        return ch - ',' + 48;
+    }
 
     else return  0; // Not got that char so space.
 }
@@ -303,22 +306,19 @@ void oled_init() {
     // zero the entire display
     memset(buf, 0, SSD1306_BUF_LEN);
     render(buf, &frame_area);
-    sleep_ms(1000);
+   // sleep_ms(1000);
 }
 
 void clear_display(){
     memset(buf, 0, SSD1306_BUF_LEN);
 }
 
-void print_text(char** text, int text_length, int* x_distances) {
-   int y = 0;
-   for (uint i = 0; i < text_length; i++) {
-        WriteString(buf, x_distances[i], y, text[i]);
-        y+=8;
-   }
-    render(buf, &frame_area);
-    sleep_ms(1000);
+void write_text(int x, int y, char* text) {
+    WriteString(buf, x, y, text);
 }
 
+void refresh_screen() {
+    render(buf, &frame_area);
+}
 
 
