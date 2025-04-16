@@ -22,55 +22,11 @@ char CSVName[45];
 //Select name for the created CSV file
 void createCSVName(int algoToggleNum){
     struct tm timeFile;
+    //Get current time
     aon_timer_get_time_calendar(&timeFile);
 
-    switch (algoToggleNum){
-        case CV:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[CV]);
-            break;
-        case B:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[B]);
-            break;
-        case PNO:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[PNO]);
-            break;
-        case PNOV:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[PNOV]);
-            break;
-        case INC:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[INC]);
-            break;
-        case INCV:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[INCV]);
-            break;
-        // case RCC:
-        //     snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-        //     timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[RCC]);
-        //     break;
-        case PSO:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[PSO]);
-            break;
-        case TMP:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[TMP]);
-            break;
-        case AofA:
-            //algo of algo goes here
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[AofA]);
-            break;
-        case DTY:
-            snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
-            timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[DTY]);
-        break;
-    }
+    snprintf(CSVName, 45, "%02d-%02d-%02d %02d.%02d.%02d__%s.csv", 
+    timeFile.tm_year, timeFile.tm_mon, timeFile.tm_mday, timeFile.tm_hour, timeFile.tm_min, timeFile.tm_sec, algorithms[algoToggleNum]);
 }
 
 //Mount sd card

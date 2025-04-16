@@ -17,15 +17,12 @@
 #include "pico/time.h"
 #include "def.h"
 
-//extern char selectedAlgo[5];
-
 //PID class
 void* cv_pidClass;
-// void* rcc1_pidClass;
-// void* rcc2_pidClass;
 void* TMP_pidClass;
 
 //Amount of time until alarm isr runs (flag is toggling between true and false)
+//This is how often the screen sensor values update
 #define ALARM_TIME_MS 1000
 
 //Rate that the sensors and algorithm run
@@ -62,9 +59,14 @@ uint32_t bytesToSave = SAMPLES_TO_SAVE * SAMPLE_SIZE;
 char selectedAlgo[5];
 
 //Algo Selection and abbreviations
-char algorithms[11][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "PSO", "TMP", "AofA", "DTY", "RCC"};
-//algorithm_toggle = 0; //0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=PSO, 7=TMP, 8=AofA, 9=DTY, 10=RCC
+char algorithms[10][5] = {"CV", "B", "PNO", "PNOV", "INC", "INCV", "PSO", "TMP", "AofA", "DTY"};
 
+//Initial variable to store the first temperature reading
+float tempVAL;
+
+
+/// @brief Select which algorithm to run
+/// @param algoToggleNum Number of algorithm to run
 void selectAlgo(int algoToggleNum){
     switch (algoToggleNum){
         case CV:
@@ -74,20 +76,21 @@ void selectAlgo(int algoToggleNum){
             beta_method();
             break;
         case PNO:
+            //0 sets to P&O fixed step
             perturb_and_observe(0);
             break;
         case PNOV:
+            //1 sets to P&O variable step
             perturb_and_observe(1);
             break;
         case INC:
+            //0 sets to INC fixed step
             incremental_conductance(0);
             break;
         case INCV:
+            //1 sets to INC variable step
             incremental_conductance(1);
             break;
-        // case RCC:
-        //     ripple_correlation_control();
-        //     break;
         case PSO:
             particle_swarm_optimization();
             break;
@@ -103,8 +106,9 @@ void selectAlgo(int algoToggleNum){
     }
 }
 
+/// @brief Create PID controller instance for selected algorithm
+/// @param algoToggleNum Algorithm number to initialize PID
 void init_algo(int algoToggleNum){
-    //PIDClass_release();
     switch (algoToggleNum){
         case CV:
             //Change PID controller
@@ -113,66 +117,25 @@ void init_algo(int algoToggleNum){
             PIDClass_setOutputLimits(cv_pidClass, 0.1, 0.9);
             PIDClass_setMode(cv_pidClass, 1);
             break;
-        // case B:
-            
-        //     break;
-        // case PNO:
-            
-        //     break;
-        // case PNOV:
-            
-        //     break;
-        // case INC:
-            
-        //     break;
-        // case INCV:
-            
-        //     break;
-        // case RCC:
-        //     //PID init
-        //         float rcc1_setpoint = 0;
-        //         rcc1_pidClass = PIDClass_create(&rcc1_input, &rcc1_output, &rcc1_setpoint, 200, 5, 0, 1); //200 5
-        //         PIDClass_setOutputLimits(rcc1_pidClass, 0, 30);
-        //         PIDClass_setMode(rcc1_pidClass, 1);
-
-        //         float rcc2_setpoint = 0;
-        //         rcc2_pidClass = PIDClass_create(&rcc2_input, &duty, &rcc2_setpoint, 2e-0, -0.009, 0, 1); //2e-9 -0.009
-        //         PIDClass_setOutputLimits(rcc2_pidClass, 0.1, 0.9);
-        //         PIDClass_setMode(rcc2_pidClass, 1);
-        //     break;
-        // case PSO:
-            
-        //     break;
         case TMP:
             //TMP PID controller
             TMP_pidClass = PIDClass_create(&voltage, &duty, &TMP_Vmpp, 0.01, 0.1, 0, 1); // 0.01 0.1
             PIDClass_setOutputLimits(TMP_pidClass, 0.1, 0.9);
             PIDClass_setMode(TMP_pidClass, 1);
             break;
-        // case AofA:
-        //     //algo of algo goes here
-        //     break;
         default:
-
+            //Other algorithm, just leave switch
             break;
     }
 }
 
 
-/// @brief ISR handler for the repeating timer on core 1.
+/// @brief ISR handler for the repeating timer on core 1 (Screen update).
 // Return true from ISR to keep the repeating timer running
 bool alarmISR(__unused repeating_timer_t *t){
     screenUpdateFlag = !screenUpdateFlag;
     return true;
 }
-
-// /// @brief Doorbell ISR handler - read external adc and clear the doorbell
-// void doorbellISR(){
-//     sensorBuffer[BufferCounter].temperature = readTMP102();
-//     printf("\n\n\n\nTEMP: %0.3f", sensorBuffer[BufferCounter].temperature);
-//     printf("\ndoorbell\n");
-//     multicore_doorbell_clear_current_core(doorbellNumber);
-// }
 
 /// @brief Set flag to true so that the sensor / algorithm loop runs
 /// @param t Unused
@@ -181,34 +144,33 @@ bool AlgoISR(__unused repeating_timer_t *t){
     algoFlag = true;
     return true;
 }
+
 //Init LED on Pico if the oled screen is not used
 #ifndef OLED_SCREEN
 int pico_led_init(void) {
-    // A device like Pico that uses a GPIO for the LED will define PICO_DEFAULT_LED_PIN
-    // so we can use normal GPIO functionality to turn the led on and off
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
     return PICO_OK;
 }
 #endif
 
-float tempVAL;
+
 /// @brief Core 1 Main Function
 void core1_main(){
     configI2C1();
 
+    //Init Temp sensor registers
     initTMP102();
-    // //Setup External ADC (ADS1115) & a doorbell for core communication
-    // configExtADC((((((((CONFIG_DEFAULT & ~CONFIG_MUX_MASK) | CONFIG_MUX_AIN0_GND) & ~CONFIG_PGA_MASK) | CONFIG_PGA_4p096V) & ~CONFIG_MODE_MASK) | CONFIG_MODE_CONT) & ~CONFIG_DR_MASK) | CONFIG_DR_475SPS);
-    // doorbellNumber = multicore_doorbell_claim_unused(0x02, true);
 
     //Init Mutex for temp sensor readings
     mutex_init(&temperatureMutex);
 
     //Take first temp reading if core 0 needs it
-    mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
+    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
+    mutex_enter_blocking(&temperatureMutex);
     tempVAL = readTMP102();
-    sensorBuffer[QUEUE_BUFFER_SIZE - 1].temperature = tempVAL;  //Set previous value from 0 to temp value if core 0 needs it on startup
+    //Set previous value from 0 to temp value if core 0 needs it on startup
+    sensorBuffer[QUEUE_BUFFER_SIZE - 1].temperature = tempVAL;
     mutex_exit(&temperatureMutex);
 
     #ifndef OLED_SCREEN
@@ -220,7 +182,7 @@ void core1_main(){
     //pcf8523_set_manually(2025, 2, 16, 12, 45, 11);
     //pcf8523_set_from_PC();
 
-    //Set Pico Clock
+    //Set Pico Clock to RTC values
     pcf8523_read(&RTCtime);
     PicoTime.tm_hour = RTCtime.hour;
     PicoTime.tm_min = RTCtime.minute;
@@ -230,19 +192,13 @@ void core1_main(){
     PicoTime.tm_mday = RTCtime.day;
     aon_timer_start_calendar(&PicoTime);
     
-    
-    // //Init doorbell
-    // uint32_t irqNumber = multicore_doorbell_irq_num(doorbellNumber);
-    // irq_set_exclusive_handler(irqNumber, doorbellISR);
-    // irq_set_enabled(irqNumber, true);
-    
     #ifdef OLED_SCREEN
     // Initialize OLED Screen and Display Welcome
     oled_init();
     welcome_screen();
     #endif
 
-    //Initialize Alarm Pool and repeating timer (IRQ will call on core 1)
+    //Initialize Alarm Pool and repeating timer for screen update (IRQ will call on core 1)
     struct repeating_timer alarmTimer;
     alarm_pool_t *core1Pool = alarm_pool_create_with_unused_hardware_alarm(2);
     alarm_pool_add_repeating_timer_ms(core1Pool, ALARM_TIME_MS, alarmISR, NULL, &alarmTimer);
@@ -250,6 +206,7 @@ void core1_main(){
     //Setup Buttons
     buttonsInit();
 
+    //After all startup functions are called, wait for both cores to be done before running loops
     //Set flag and wait for both to be true
     core1InitFlag = true;
     while(core0InitFlag == false){
@@ -269,10 +226,12 @@ void core1_main(){
             initSDFile();
         }
         
-        mutex_enter_blocking(&temperatureMutex);    //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
+        //Mutex to prevent shared data problems with core 0 (block until ownership is claimed)
+        mutex_enter_blocking(&temperatureMutex);  
         tempVAL = readTMP102();
         mutex_exit(&temperatureMutex);
         
+        //If OLED screen disabled, turn on LED when running algorithm and turn off when not
         #ifndef OLED_SCREEN
         if(tracking_toggle == 1){
             gpio_put(PICO_DEFAULT_LED_PIN, true);
@@ -282,17 +241,21 @@ void core1_main(){
         sleep_us(4);
         #endif
         
+        //If algorithm is running, copy out of the queue into a local SD card buffer
         if(tracking_toggle == 1){
             copySDBuffer();
-
             if(saveFlag == true){
+                //Once the SD card buffer is filled up to the defined size, save all data to the SD card
                 writeSD(bytesToSave);
             }
         }
 
-        //If tracking has been turned off, save current local sensor buffer on core 1
+        /*
+        If algorithm has been turned off before the SD card buffer is full,
+        save the partial data in the SD card buffer
+        */
         if(partialSaveFlag == 1){
-            //Calculate and save the current values in the localSensorBuffer on core 1
+            //Calculate the number of bytes to save to the SD card
             uint32_t localBytestoWrite = localSensorCounter * SAMPLE_SIZE;
             writeSD(localBytestoWrite);
             partialSaveFlag = 0;
@@ -306,24 +269,18 @@ int main()
 
     //Init Queue
     queue_init(&shareQueue, SAMPLE_SIZE, QUEUE_BUFFER_SIZE);
-    // int spinlockNum = spin_lock_claim_unused(true);
-    // queue_init_with_spinlock(&shareQueue, SAMPLE_SIZE, QUEUE_BUFFER_SIZE, spinlockNum);
 
-    //Init both I2C0 and I2C1
+    //Init both I2C0
     configI2C0();
 
     //Make sure SD card save flag is false before starting the core
     saveFlag = false;
 
-    //Launch core 1 (OLED, SD Card, Pyranometer)
+    //Launch core 1 (OLED, SD Card, Temp Sensor, RTC)
     multicore_launch_core1(core1_main);
-
-    printf("System Clock Frequency is %d Hz\n", clock_get_hz(clk_sys));
-    printf("USB Clock Frequency is %d Hz\n", clock_get_hz(clk_usb));
-    // For more examples of clocks use see https://github.com/raspberrypi/pico-examples/tree/master/clocks
     
-    //Temp Sensor ADC Setup
-    TMP_ADC_setup();
+    //Pyranometer Sensor ADC Setup
+    PYR_ADC_setup();
 
     //Configure PM for sample rate, averaging, etc
     PM_config(PM1);
@@ -349,6 +306,8 @@ int main()
     //Initialize any necessary PID controllers and values for desired algorithm to run
     init_algo(CV);
     init_algo(TMP);
+
+    //Format name of CSV file to include current time and algorithm
     createCSVName(ALGO_TOGGLE);
 
     //Set name of algo to print in sd file
@@ -364,19 +323,17 @@ int main()
    
     while (true) {
         if(algoFlag){
-            //Set flag back to false
-            //printf("In loop\n");
+            //Set flag back to false (how fast algo loop runs)
             algoFlag = false;
-            //Collect sensor readings and run algorithm 
 
-            //Power Monitor Status Printouts (Should print "TI")
-            // PM_printManID(PM1);
+            //DEBUG: Power Monitor Status Printouts (Should print "TI")
+            //PM_printManID(PM1);
             //PM_printManID(PM2);
             //PM_printManID(PM3);
 
-            /* Sensor Loop*/
+            /* Collect Sensor Readings */
 
-            // //Power Monitors
+            //Read Power Monitor Values
             sensorBuffer[BufferCounter].PM1voltage = PM_readVoltage(PM1);
             sensorBuffer[BufferCounter].PM1current = PM_readCurrent(PM1);
             sensorBuffer[BufferCounter].PM1power = PM_readPower(PM1);
@@ -389,7 +346,7 @@ int main()
             sensorBuffer[BufferCounter].PM3current = PM_readCurrent(PM3);
             sensorBuffer[BufferCounter].PM3power = PM_readPower(PM3);
 
-            //Irradiance
+            //Read Irradiance Value from ADC
             sensorBuffer[BufferCounter].irradiance = readIrradiance();
             
             
@@ -398,9 +355,13 @@ int main()
                 sleep_ms(100);
             }
 
-            //Temperature
-            // sensorBuffer[BufferCounter].temperature = tempVAL;
-
+            /*Temperature Sensor
+                Note: Temperature sensor values are not updated every time data is collected
+                Try to enter mutex
+                If core 1 is currently in the mutex, use the previously collected value from the sensorBuffer
+                (A wrap around counter is used to prevent any issues with getting the previous sensor value)
+                If core 0 can enter the mutex, use the new temperature reading from core 1 and save it to the sensorBuffer
+            */
             bool enterMutex = mutex_try_enter(&temperatureMutex, NULL);
             if(enterMutex == true){
                 sensorBuffer[BufferCounter].temperature = tempVAL;
@@ -414,35 +375,8 @@ int main()
                     oldBufferCounter = BufferCounter - 1; 
                 }
                 sensorBuffer[BufferCounter].temperature = sensorBuffer[oldBufferCounter].temperature;
-                //printf("\nOLD TEMP: %f", sensorBuffer[BufferCounter].temperature);
             }
-            
-            // //If SD card is currently saving, use old value
-            // if(saveFlag == true){
-            //     sensorBuffer[BufferCounter].temperature = sensorBuffer[BufferCounter-1].temperature;
-            // }else{
-            //     //Trigger Doorbell
-            //     multicore_doorbell_set_other_core(doorbellNumber);
-            //     while(multicore_doorbell_is_set_other_core(doorbellNumber)){
-            //         //Wait for temperature sensor reading to complete
-            //         tight_loop_contents();
-            //     }
-            // }
-            
-            //printf("Irradiance: %0.3f", sensorBuffer[BufferCounter].irradiance);
-            // Returns irradiance converted voltage value
-
-
-            // //Write inital header data below
-            // printf("\nTimestamp, PM1 (V), PM1(I), PM1(W), PM2 (V), PM2(I), PM2(W), PM3 (V), PM3(I), PM3(W), Temp (C), Light (W/m^2)");
-            
-            // //Write row data
-            // printf("\nTIME, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", 
-            // sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
-            // sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
-            // sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance);
-            
-            
+                        
             /*End sensor loop*/
 
             /*Run Algorithm*/
@@ -455,7 +389,7 @@ int main()
                     timeFlag = false;
                 }
 
-                //Turn on DC-DC Converter
+                //Turn on DC-DC Converter (enable pin)
                 gpio_put(EN_PIN, true);
 
                 //Copy sensor readings into globals for algorithm access
@@ -468,56 +402,54 @@ int main()
                 //Run algorithm
                 selectAlgo(ALGO_TOGGLE);
 
-                // Set serial monitor to print formatted values if live plotting is not enabled
+                //Set serial monitor to print formatted values if live plotting is not enabled
                 #ifndef LIVE_PLOT
                     printf("Voltage: %0.3f, Current: %0.3f, Power: %0.3f, Duty: %0.3f, Irradiance: %0.3f, Temperature: %0.3f\n", 
                        voltage, current, power, duty, irradiance, temperature);
                 #endif
 
-                //printf("\nVoltage: %0.3f, Current: %0.3f, Power: %0.3f", sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power);
-                
                 // Strip formatting so data is readable by realtime plotter
                 #ifdef LIVE_PLOT
                     printf("%0.3f, %0.3f, %0.3f, %0.3f\n", voltage, current, power, duty); 
                 #endif
 
-                //duty_sweep();
+                //Set DC-DC converter PWM duty cycle and enable it 
                 pwm_set_chan_level(slice_num, PWM_CHAN_A, duty*DCDCFreq);
                 
-                //Sprintf to format sensor data
-                char formatString[SAMPLE_SIZE];
+                //Get current timestamp and calculate elapsed time
                 aon_timer_get_time_calendar(&PicoTime);
 
                 absolute_time_t currTime = get_absolute_time();
                 uint64_t elapsedTime_us = absolute_time_diff_us(startTime, currTime);
                 uint32_t elaspedTime_ms = us_to_ms(elapsedTime_us);
 
+                //Sprintf to format sensor data
+                char formatString[SAMPLE_SIZE];
                 sprintf(formatString, "\n%02d:%02d:%02d, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %s,", 
                 PicoTime.tm_hour, PicoTime.tm_min, PicoTime.tm_sec, elaspedTime_ms,
                 sensorBuffer[BufferCounter].PM1voltage, sensorBuffer[BufferCounter].PM1current, sensorBuffer[BufferCounter].PM1power, 
                 sensorBuffer[BufferCounter].PM2voltage, sensorBuffer[BufferCounter].PM2current, sensorBuffer[BufferCounter].PM2power, sensorBuffer[BufferCounter].PM3voltage, 
-                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, /*test_temperature*/sensorBuffer[BufferCounter].temperature, /*test_irradiance*/sensorBuffer[BufferCounter].irradiance, duty, selectedAlgo);
-                //printf("\nAlgorithm Values: %0.2f, %0.2f, %0.2f, %0.4f\n", voltage, current, power, duty);
+                sensorBuffer[BufferCounter].PM3current, sensorBuffer[BufferCounter].PM3power, sensorBuffer[BufferCounter].temperature, sensorBuffer[BufferCounter].irradiance, duty, selectedAlgo);
             
+                //Try to add the formatted string to the queue for core 1 to use
                 //Returns false if the queue is full
                 bool resultsAdd = queue_try_add(&shareQueue, &formatString);
                 if(resultsAdd == false){
                     printf("\nCORE 0: Queue Full Add Error \n");
                 }
-            }else
-            {
-                // Turn off DC-DC Converter 
+            }else{
+                //Turn off DC-DC Converter (if tracking_toggle = 0)
                 gpio_put(EN_PIN, false);
             }
             /*End algorithm loop*/
 
-            
-            //Reset buffer
+            //Reset buffer counter
             if(BufferCounter++ >= QUEUE_BUFFER_SIZE){
                 BufferCounter = 0;
             }
 
         }else{
+            //If algoToggle is 0
             //Wait for flag to be high so main loop runs
             tight_loop_contents();
         }//End flag check

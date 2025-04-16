@@ -7,7 +7,7 @@
 
 /*
  *  ======== Algorithm Toggles ========
- *  0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=PSO, 7=TMP, 8=AofA, 9=DTY, 10=RCC (not fully implemented)
+ *  0=CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=PSO, 7=TMP, 8=AofA, 9=DTY
 */
 #define ALGO_TOGGLE AofA
 #define CV 0
@@ -20,7 +20,6 @@
 #define TMP 7
 #define AofA 8
 #define DTY 9
-//#define RCC 10
 
 // Set a constant duty cycle instead of sweeping duty
 //#define CONSTANT_DUTY 0.7
@@ -31,5 +30,5 @@
 // Frequency Divider of DC-DC Converter
 #define DCDCFreq 3125
 
-extern char algorithms[11][5];
+extern char algorithms[10][5];
 extern char selectedAlgo[5];

@@ -8,7 +8,7 @@
 
 
 
-/*Below values are 16 bits, need 8 bits for pico SDK*/
+/*Below values are 16 bits, need 8 bits for pico SDK so use a bit mask*/
 
 /* Register 0x00 (CONVERSION) definition
  * |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

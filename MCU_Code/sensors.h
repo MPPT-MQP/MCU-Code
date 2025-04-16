@@ -27,7 +27,7 @@
 #define tmp_offset 0.5
 #define tmp_scaling 0.01
 #define TMP_NUM_SAMPLES 20 // Number of samples to average
-#define TEMP_PIN 26
+#define PYR_PIN 26
 #define TEMP_SAMPLE_DELAY 0 //sleep delay between adc reads in ms
 
 //PM Address Defines
@@ -65,9 +65,9 @@ void PM_config(uint8_t address);
 //Pyranometer
 float readPyranometer(float voltage);
 float readIrradiance();
+void PYR_ADC_setup();
 
 //Temp Sensor
-void TMP_ADC_setup();
 float readTempature(uint16_t num_samples, uint16_t sampleDelay);
 
 // PWM Generator

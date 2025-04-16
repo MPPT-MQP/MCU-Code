@@ -55,7 +55,7 @@ pico_set_program_version(MCU_Code "0.1")
 pico_enable_stdio_uart(MCU_Code 1)
 pico_enable_stdio_usb(MCU_Code 0)
 
-# *************************************Tell CMake where to find other source code SD CARD
+# ****Tell CMake where to find other source code SD CARD****
 add_subdirectory(lib/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src build)
 
 # Add the standard library to the build

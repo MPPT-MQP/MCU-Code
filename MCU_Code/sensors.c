@@ -155,11 +155,11 @@ void PM_config(uint8_t address){
 
 /*Temperature ADC Reading and Conversion*/
 
-void TMP_ADC_setup(){
+void PYR_ADC_setup(){
     adc_init(); 
 
     // Make sure GPIO is high-impedance, no pullups etc
-    adc_gpio_init(TEMP_PIN);
+    adc_gpio_init(PYR_PIN);
 }
 
 // 12-bit conversion, assume max value == ADC_VREF == 3.3 V
