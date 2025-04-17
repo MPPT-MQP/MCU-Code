@@ -295,6 +295,7 @@ static void WriteString(uint8_t *buf, int16_t x, int16_t y, char *str) {
 
 #endif
 
+// Initialize screen 
 void oled_init() {
     // I2C is "open drain", pull ups to keep signal high when no data is being
     // sent
@@ -309,6 +310,7 @@ void oled_init() {
    // sleep_ms(1000);
 }
 
+// Helper functions to operate screen
 void clear_display(){
     memset(buf, 0, SSD1306_BUF_LEN);
 }
