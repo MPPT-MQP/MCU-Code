@@ -15,6 +15,7 @@ ____
 | def.h                | Configuration file to select algorithm, enable/disable OLED screen, and DC-DC converter frequency |
 | hw_config.h          | Config file from no-OS-FatFS SD card library |
 | MCUCode.c            | Main code file for both core0 and core1 |
+| oled_font.h          | Contains 8 bit ASCII characters for each letter and symbol |
 | oled_screen.c / .h   | Functions to interface with the SSD1306 display IC|
 | PowerMonitor.h       | Defines for the INA740B power monitor |
 | sdCard.c / .h        | Functions to init Sd card, mount, and write data to the buffer & card |
