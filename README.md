@@ -1,4 +1,5 @@
 # FinalMCUCode
+## <mark> NOTE: This branch is outdated. It utilizes a ping pong buffer for sharing test data between cores vs the queue that is used in main. </mark>
 ### Code Written by: MPPT MQP 2025 (Kyle, Frank, Micaela, Saketh)
 
 #### Code is designed for the RP2350. It should also work with the RP2040 (Pico1) but will need slight adjustments due to the picoSDK.
