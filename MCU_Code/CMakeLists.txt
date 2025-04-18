@@ -43,7 +43,9 @@ add_executable(MCU_Code
      algorithms.c
      sdCard.c
      buttons.c
-     user_interface.c)
+     user_interface.c
+     lib/PID/src/PID_v1.c++
+     )
 
 # comment test
 pico_set_program_name(MCU_Code "MCU_Code")
@@ -53,13 +55,14 @@ pico_set_program_version(MCU_Code "0.1")
 pico_enable_stdio_uart(MCU_Code 1)
 pico_enable_stdio_usb(MCU_Code 0)
 
-# *************************************Tell CMake where to find other source code SD CARD
+# ****Tell CMake where to find other source code SD CARD****
 add_subdirectory(lib/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src build)
 
 # Add the standard library to the build
 target_link_libraries(MCU_Code
         pico_stdlib
-        no-OS-FatFS-SD-SDIO-SPI-RPi-Pico)
+        no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
+        )
         #^ Tell CMake to include lib
 
 # Add the standard include files to the build

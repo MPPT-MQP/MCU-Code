@@ -295,6 +295,7 @@ static void WriteString(uint8_t *buf, int16_t x, int16_t y, char *str) {
 
 #endif
 
+// Initialize screen 
 void oled_init() {
     // I2C is "open drain", pull ups to keep signal high when no data is being
     // sent
@@ -309,19 +310,17 @@ void oled_init() {
    // sleep_ms(1000);
 }
 
+// Helper functions to operate screen
 void clear_display(){
     memset(buf, 0, SSD1306_BUF_LEN);
 }
 
-void print_text(char** text, int text_length, int* x_distances) {
-   int y = 0;
-   for (uint i = 0; i < text_length; i++) {
-        WriteString(buf, x_distances[i], y, text[i]);
-        y+=8;
-   }
-    render(buf, &frame_area);
-    //sleep_ms(1000);
+void write_text(int x, int y, char* text) {
+    WriteString(buf, x, y, text);
 }
 
+void refresh_screen() {
+    render(buf, &frame_area);
+}
 
 

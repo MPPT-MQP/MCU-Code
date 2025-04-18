@@ -9,7 +9,7 @@
 #include "pico/aon_timer.h"
 
 #define SAMPLES_TO_SAVE 300
-#define SAMPLE_SIZE 110
+#define SAMPLE_SIZE 150
 #define QUEUE_BUFFER_SIZE 20    
 
 
@@ -19,6 +19,7 @@ void mountSD();
 void initSDFile();
 void copySDBuffer();
 void writeSD(uint32_t bytes);
+void createCSVName(int algoToggleNum);
 
 struct sensorData {
     float PM1voltage;
@@ -34,15 +35,16 @@ struct sensorData {
     float irradiance;
 };
 
-
 //Sensor Data Buffer
-extern struct sensorData sensorBuffer[20];
+extern struct sensorData sensorBuffer[QUEUE_BUFFER_SIZE];
 extern uint16_t BufferCounter;
+extern uint16_t localSensorCounter;
 
 extern queue_t shareQueue;
 
 //Extern Time Structs
 extern struct pcf8523_time_t RTCtime;
 extern struct tm PicoTime;
+extern uint32_t elapsedtime;
 
 
