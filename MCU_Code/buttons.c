@@ -15,6 +15,7 @@ volatile bool timeFlag = 0;
 #define DEBOUNCE_MS 50
 bool is_debounceing = false;
 
+// Debounce ISR
 int64_t debounce_alarm_callback(alarm_id_t id, void *user_data) {
     is_debounceing = false;
     return 0;
@@ -75,6 +76,7 @@ void buttonISR(uint gpio, uint32_t events) {
 
         case BUTTON3PIN:
             // printf("\nButton 3 pressed\n");
+            #ifndef OLED_SCREEN
             if(button3_state == 1){
                 partialSaveFlag = true;
             }
@@ -82,6 +84,7 @@ void buttonISR(uint gpio, uint32_t events) {
                 initSDFlag = true;
                 timeFlag = true;
             }
+            #endif
             button3_state = !button3_state;
             #ifndef OLED_SCREEN
             tracking_toggle = !tracking_toggle;

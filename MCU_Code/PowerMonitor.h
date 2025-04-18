@@ -1,3 +1,5 @@
+/* Defines list from TI */
+
 #define INA740_config_register 0x00U
 #define INA740_config_register_rst_NormalOperation 0x0000U
 #define INA740_config_register_rst_SystemReset 0x8000U

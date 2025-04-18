@@ -76,7 +76,8 @@
         "vector": "cpp",
         "pid_v1.h": "c",
         "multicore.h": "c",
-        "hw_config.h": "c"
+        "hw_config.h": "c",
+        "sensors.h": "c"
     },
     "cSpell.words": [
         "dotw",
