@@ -431,6 +431,7 @@ int main()
                 absolute_time_t currTime = get_absolute_time();
                 uint64_t elapsedTime_us = absolute_time_diff_us(startTime, currTime);
                 uint32_t elaspedTime_ms = us_to_ms(elapsedTime_us);
+                elapsedtime = elaspedTime_ms;
 
                 //Sprintf to format sensor data
                 char formatString[SAMPLE_SIZE];

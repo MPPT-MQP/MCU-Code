@@ -27,6 +27,14 @@ int tracking_toggle = 0;
 // 0 = CV, 1=B, 2=PNO, 3=PNOV, 4=INC, 5=INCV, 6=PSO, 7=TMP, 8=AofA, 9=DTY
 int algorithm_toggle = 0;
 
+ // Array for displaying sensor data
+ char displayString1[15];
+ char displayString2[15];
+
+ // Array for displaying time and date
+ char date_string[15];
+ char time_string[15];
+
 // Run boot-up screen
 void welcome_screen()
 {
@@ -41,14 +49,6 @@ void welcome_screen()
 // Main user interface loop
 void run_main_screens()
 {
-    // Array for displaying sensor data
-    char displayString1[15];
-    char displayString2[15];
-
-    // Array for displaying time and date
-    char date_string[15];
-    char time_string[15];
-
     // Check button 1 (toggles entire screen)
     if (button1_state)
     {
@@ -190,7 +190,7 @@ void run_main_screens()
             sprintf(displayString1, "%0.2fV, %0.2fA", sensorBuffer[BufferCounter].PM3voltage, sensorBuffer[BufferCounter].PM3current);
             sprintf(displayString2, "%0.2f%", batterySOC);
             screenUpdateFlag = !screenUpdateFlag;
-       }
+        }
         // Write PM3 measurements and battery SoC to screen with labels
         write_text(10, 0, "PM3 CC-Battery:");
         write_text(1, 8, displayString1);
